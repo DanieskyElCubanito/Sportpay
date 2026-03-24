@@ -45,7 +45,6 @@
             text-align: center; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2);
         }
 
-        /* Estilo idéntico a la captura para los Tiers */
         .tier-row { 
             display: flex; align-items: center; justify-content: space-between; 
             padding: 15px 0; border-bottom: 1px solid var(--border-light); position: relative;
@@ -110,11 +109,10 @@
     </div>
 
     <div id="view-buy" class="view" style="background: var(--bg-light);">
-        
         <div style="display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; background: white; font-weight: bold; font-size: 1.1em;">
             <i class="fas fa-chevron-left" onclick="switchTab('home')" style="cursor: pointer; color: var(--text-dark); font-size: 1.2em;"></i>
             <span>Buy GH/s</span>
-            <i class="fas fa-file-invoice" style="color: var(--text-dark); font-size: 1.2em; cursor: pointer;" onclick="tg.showAlert('History coming soon')"></i>
+            <i class="fas fa-file-invoice" style="color: var(--text-dark); font-size: 1.2em; cursor: pointer;"></i>
         </div>
 
         <div style="background: white; padding: 20px; margin-top: 10px;">
@@ -127,64 +125,14 @@
         <div style="background: white; padding: 20px; margin-top: 10px;">
             <input type="number" id="buy-amount" placeholder="Please enter the amount of GH/s to buy" 
                    style="width: 100%; padding: 16px; border: 1px solid var(--border-light); border-radius: 8px; background: #f8fafc; margin-bottom: 15px; font-size: 0.9em; box-sizing: border-box; outline: none;">
-            
-            <button onclick="processPurchase()" 
-                    style="width: 100%; background: var(--primary-blue); color: white; border: none; padding: 16px; border-radius: 8px; font-weight: bold; font-size: 1.05em;">
-                Buy Now
-            </button>
+            <button onclick="processPurchase()" style="width: 100%; background: var(--primary-blue); color: white; border: none; padding: 16px; border-radius: 8px; font-weight: bold; font-size: 1.05em;">Buy Now</button>
         </div>
 
         <div style="background: white; padding: 5px 20px; margin-top: 10px;">
-            
-            <div class="tier-row">
-                <div class="tier-box">1</div>
-                <div class="tier-info">
-                    <div class="tier-label">Amount</div>
-                    <div class="tier-val">>= $0</div>
-                </div>
-                <div class="tier-return">
-                    <div class="tier-label">Return</div>
-                    <div class="tier-val">5.5%</div>
-                </div>
-            </div>
-
-            <div class="tier-row">
-                <div class="tier-box">2</div>
-                <div class="tier-info">
-                    <div class="tier-label">Amount</div>
-                    <div class="tier-val">>= $20</div>
-                </div>
-                <div class="tier-return">
-                    <div class="tier-label">Return</div>
-                    <div class="tier-val">6.0%</div>
-                </div>
-            </div>
-
-            <div class="tier-row">
-                <div class="tier-box">3</div>
-                <div class="tier-info">
-                    <div class="tier-label">Amount</div>
-                    <div class="tier-val">>= $300</div>
-                </div>
-                <div class="tier-return">
-                    <div class="tier-label">Return</div>
-                    <div class="tier-val">6.5%</div>
-                </div>
-            </div>
-
-            <div class="tier-row">
-                <span class="badge-popular">POPULAR</span>
-                <div class="tier-box">4</div>
-                <div class="tier-info">
-                    <div class="tier-label">Amount</div>
-                    <div class="tier-val">>= $3000+</div>
-                </div>
-                <div class="tier-return">
-                    <div class="tier-label">Return</div>
-                    <div class="tier-val" style="color: var(--badge-red);">Contact</div>
-                </div>
-            </div>
-
+            <div class="tier-row"><div class="tier-box">1</div><div class="tier-info"><div class="tier-label">Amount</div><div class="tier-val">>= $0</div></div><div class="tier-return"><div class="tier-label">Return</div><div class="tier-val">5.5%</div></div></div>
+            <div class="tier-row"><div class="tier-box">2</div><div class="tier-info"><div class="tier-label">Amount</div><div class="tier-val">>= $20</div></div><div class="tier-return"><div class="tier-label">Return</div><div class="tier-val">6.0%</div></div></div>
+            <div class="tier-row"><div class="tier-box">3</div><div class="tier-info"><div class="tier-label">Amount</div><div class="tier-val">>= $300</div></div><div class="tier-return"><div class="tier-label">Return</div><div class="tier-val">6.5%</div></div></div>
+            <div class="tier-row"><span class="badge-popular">POPULAR</span><div class="tier-box">4</div><div class="tier-info"><div class="tier-label">Amount</div><div class="tier-val">>= $3000+</div></div><div class="tier-return"><div class="tier-label">Return</div><div class="tier-val" style="color: var(--badge-red);">Contact</div></div></div>
         </div>
     </div>
 
@@ -192,7 +140,6 @@
         <div style="padding: 40px 20px; text-align: center;">
             <i class="fas fa-users" style="font-size: 3em; color: var(--primary-blue); margin-bottom: 15px;"></i>
             <h3>Referral Program</h3>
-            <p style="color: var(--text-dim);">Share your link and earn rewards.</p>
             <div id="ref-link" style="background: white; padding: 15px; border-radius: 12px; font-size: 0.85em; color: var(--primary-blue); border: 2px dashed var(--primary-blue); margin: 20px 0; word-break: break-all;"></div>
             <button onclick="copyRef()" style="width: 100%; background:var(--primary-blue); color:white; border:none; padding:15px; border-radius:12px; font-weight:bold;">Copy Link</button>
         </div>
@@ -200,27 +147,11 @@
 
     <div id="view-about" class="view">
         <div style="padding: 40px 20px; text-align: center;">
-            <div style="width:70px; height:70px; background:white; border-radius:20px; display:flex; align-items:center; justify-content:center; margin: 0 auto 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border:1px solid var(--border-light);">
-                <i class="fas fa-shield-halved" style="font-size: 2em; color: var(--primary-blue);"></i>
-            </div>
             <h2 style="margin:0;">Sports Pay</h2>
             <p style="color: var(--text-dim); font-size: 0.9em;">Version 1.0.0</p>
         </div>
-        
-        <div class="card" onclick="tg.showAlert('Support Contact: @Danny_Support')" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
-            <div style="display:flex; align-items:center; gap:12px;">
-                <i class="fas fa-headset" style="color:var(--primary-blue); font-size: 1.2em;"></i> 
-                <b style="font-size: 1.05em;">Online Support</b>
-            </div>
-            <i class="fas fa-chevron-right" style="color:#cbd5e1"></i>
-        </div>
-
-        <div class="card" onclick="tg.showAlert('Terms and Conditions applied.')" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
-            <div style="display:flex; align-items:center; gap:12px;">
-                <i class="fas fa-file-contract" style="color:var(--text-dim); font-size: 1.2em;"></i> 
-                <b style="font-size: 1.05em;">Terms of Service</b>
-            </div>
-            <i class="fas fa-chevron-right" style="color:#cbd5e1"></i>
+        <div class="card" onclick="tg.showAlert('Support Contact: @Danny_Support')" style="display:flex; justify-content:space-between; align-items:center;">
+            <b>Online Support</b><i class="fas fa-chevron-right" style="color:#cbd5e1"></i>
         </div>
     </div>
 
@@ -231,10 +162,10 @@
     </nav>
 
     <script>
+        // // #9____________________________ LÓGICA DE INICIO... (el resto del JS sigue igual)
         const tg = window.Telegram.WebApp;
         tg.ready();
 
-        // #9____________________________ LÓGICA DE INICIO
         function init() {
             const user = tg.initDataUnsafe?.user;
             if (user) {
@@ -251,29 +182,14 @@
         function updateUI(bal, power, profit, rate) {
             document.getElementById('total-val').innerText = bal.toFixed(4);
             document.getElementById('mining-power').innerText = power;
-            // Actualiza también el poder en la pestaña de compra
             document.getElementById('buy-total-power').innerText = power;
-            
             document.getElementById('daily-profit').innerText = "$ " + profit.toFixed(4);
             document.getElementById('return-rate').innerText = rate + "%";
         }
 
-        // #10____________________________ LÓGICA DE COMPRA
-        function processPurchase() {
-            const amount = document.getElementById('buy-amount').value;
-            if(amount > 0) {
-                tg.sendData("buy_" + amount);
-            } else {
-                tg.showAlert("Enter a valid amount");
-            }
-        }
-
-        // #11____________________________ UTILIDADES Y NAVEGACIÓN
         function switchTab(id) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.getElementById('view-' + id).classList.add('active');
-            
-            // Ocultar barra inferior en la vista de compra para que parezca una pantalla nueva
             const nav = document.getElementById('main-nav');
             if(id === 'buy') {
                 nav.style.display = 'none';
@@ -285,8 +201,13 @@
                 if(id === 'share') tabs[1].classList.add('active');
                 if(id === 'about') tabs[2].classList.add('active');
             }
-            
             tg.HapticFeedback.impactOccurred('light');
+        }
+
+        function processPurchase() {
+            const amount = document.getElementById('buy-amount').value;
+            if(amount > 0) tg.sendData("buy_" + amount);
+            else tg.showAlert("Enter a valid amount");
         }
 
         function startTimer() {
@@ -301,8 +222,6 @@
                     const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
                     const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
                     document.getElementById('settlement-timer').innerText = `${h}:${m}:${s}`;
-                } else {
-                    document.getElementById('settlement-timer').innerText = "00:00:00";
                 }
             }, 1000);
         }
@@ -317,4 +236,4 @@
         init();
     </script>
 </body>
-    </html>
+                                                                                                                              </html>
