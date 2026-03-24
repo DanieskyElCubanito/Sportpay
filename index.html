@@ -3,261 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sports Pay - AE Clone</title>
+    <title>Sports Pay - AE Tech Clone</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        /* #1____________________________ ESTILOS BASE (AE TECH) */
+        /* #1____________________________ ESTILOS BASE (AE TECH ORIGINAL) */
         :root {
             --ae-blue: #007aff;
             --bg-gray: #f2f2f7;
-            --text-dark: #1c1c1e;
+            --text-dark: #000000;
             --text-gray: #8e8e93;
             --white: #ffffff;
-            --success: #34c759;
-            --danger: #ff3b30;
         }
 
         body {
             background-color: var(--bg-gray);
             color: var(--text-dark);
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            margin: 0; padding: 0; overflow-x: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0; padding: 0;
         }
 
         /* #2____________________________ SISTEMA DE VISTAS */
-        .view { display: none; min-height: 100vh; animation: fadeIn 0.15s ease; padding-bottom: 90px; }
+        .view { display: none; min-height: 100vh; animation: fadeIn 0.1s ease; }
         .view.active { display: block !important; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         /* #3____________________________ COMPONENTES DASHBOARD */
-        .top-header { background: white; padding: 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e5e5ea; }
-        .id-badge { font-size: 0.9em; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+        .section-ae { background: var(--white); padding: 15px 20px; margin-top: 10px; }
         
-        .main-card { background: white; margin: 10px; padding: 20px; border-radius: 12px; }
-        .bal-title { color: var(--text-gray); font-size: 0.85em; margin-bottom: 5px; }
-        .bal-amount { font-size: 2.2em; font-weight: 700; display: flex; align-items: center; justify-content: space-between; }
-        
-        .btn-withdraw { background: var(--ae-blue); color: white; border: none; padding: 10px 18px; border-radius: 20px; font-weight: 600; font-size: 0.85em; }
-
-        .energy-box {
-            background: linear-gradient(135deg, #007aff, #00c6ff); color: white;
-            margin: 10px; padding: 20px; border-radius: 15px; position: relative;
+        .energy-card-ae {
+            background: linear-gradient(135deg, #007aff, #00c6ff);
+            color: white; margin: 10px; padding: 20px; border-radius: 15px;
         }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 20px; }
-        .stat-item { background: rgba(255,255,255,0.15); padding: 10px; border-radius: 10px; text-align: center; }
-        .stat-label { font-size: 0.65em; opacity: 0.9; margin-bottom: 4px; }
-        .stat-val { font-size: 0.9em; font-weight: 700; }
 
-        /* #4____________________________ COMPONENTES BUY (COMO EL VIDEO) */
-        .tier-row { display: flex; align-items: center; padding: 12px 15px; border-bottom: 1px solid #f2f2f7; }
-        .tier-idx { width: 28px; height: 28px; background: #eef2ff; color: var(--ae-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 12px; font-size: 0.8em; }
-        .tier-info { flex: 1; }
-        .tier-label { font-size: 0.75em; color: var(--text-gray); }
-        .tier-val { font-weight: 600; font-size: 0.95em; }
-        
-        .buy-input-container { background: white; padding: 20px; margin-top: 10px; }
-        .input-group { position: relative; display: flex; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .input-group img { width: 24px; margin-right: 10px; }
-        .input-group input { border: none; outline: none; font-size: 1.1em; font-weight: 500; width: 100%; }
-
-        .estimated-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 15px; background: white; margin-top: 10px; }
-        .est-box { border: 1px solid #f0f0f0; padding: 10px; border-radius: 8px; text-align: center; }
-        .est-label { font-size: 0.65em; color: var(--ae-blue); font-weight: bold; margin-bottom: 5px; }
-        .est-val { font-size: 0.85em; font-weight: 700; }
-
-        /* #5____________________________ MODAL DE PAGO (AE TECH) */
-        .payment-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 2000; display: none;
-            align-items: center; justify-content: center;
+        .tier-row { 
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 15px 0; border-bottom: 1px solid #f2f2f7; 
         }
-        .modal-content { background: white; width: 90%; border-radius: 20px; overflow: hidden; position: relative; }
-        .qr-area { padding: 30px; text-align: center; }
-        .qr-placeholder { width: 180px; height: 180px; margin: 0 auto; background: #eee; }
-        .pay-footer { background: #f9f9f9; padding: 15px; text-align: center; border-top: 1px solid #eee; }
-        
-        .nav-bar { position: fixed; bottom: 0; width: 100%; background: white; display: flex; padding: 10px 0 25px; border-top: 1px solid #eee; z-index: 1000; }
-        .nav-item { flex: 1; text-align: center; color: #999; font-size: 0.7em; }
-        .nav-item.active { color: var(--ae-blue); }
-        .nav-item i { display: block; font-size: 1.6em; margin-bottom: 3px; }
+        .tier-icon { 
+            width: 35px; height: 35px; background: #f2f2f7; border-radius: 8px; 
+            display: flex; align-items: center; justify-content: center; font-weight: bold; 
+        }
+
+        /* #4____________________________ COMPONENTES DE COMPRA (ESTILO VIDEO) */
+        .input-group-ae {
+            display: flex; align-items: center; border-bottom: 1px solid #eee;
+            padding: 10px 0; margin: 10px 0;
+        }
+        .input-group-ae input {
+            border: none; outline: none; font-size: 1.1em; width: 100%; font-weight: 500;
+        }
+
+        .grid-est {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 10px;
+        }
+        .box-est {
+            border: 1px solid #efeff4; padding: 10px; border-radius: 8px; text-align: center;
+        }
+        .label-est { color: var(--ae-blue); font-size: 0.65em; font-weight: bold; margin-bottom: 4px; }
+        .val-est { font-size: 0.85em; font-weight: 700; }
+
+        .btn-ae-main {
+            width: 100%; background: var(--ae-blue); color: white; border: none;
+            padding: 15px; border-radius: 25px; font-weight: 600; font-size: 1em;
+        }
+
+        /* #5____________________________ NAVEGACIÓN INFERIOR */
+        .nav-ae {
+            position: fixed; bottom: 0; width: 100%; background: white;
+            display: flex; padding: 10px 0 25px; border-top: 1px solid #eee;
+        }
+        .nav-tab { flex: 1; text-align: center; color: #999; font-size: 0.7em; }
+        .nav-tab.active { color: var(--ae-blue); }
+        .nav-tab i { display: block; font-size: 1.6em; margin-bottom: 3px; }
     </style>
 </head>
 <body>
 
     <div id="view-home" class="view active">
-        <div class="top-header">
-            <div class="id-badge">AE Tech — ID:<span id="user-id">000000</span> <i class="far fa-copy" style="font-size: 0.8em; color: var(--ae-blue);"></i></div>
-        </div>
-
-        <div class="main-card">
-            <div class="bal-title">Total Earned <i class="far fa-clock"></i> History</div>
-            <div class="bal-amount">
-                $ <span id="main-bal">0.3592</span>
-                <button class="btn-withdraw" onclick="switchTab('buy')"><i class="fas fa-wallet"></i> withdraw</button>
-            </div>
-        </div>
-
-        <div class="energy-box">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div><i class="fas fa-bolt"></i> AE (AI ENERGY)</div>
-                <i class="fas fa-sync-alt" style="font-size: 0.9em; opacity: 0.8;"></i>
-            </div>
-            <div style="font-size: 2.8em; font-weight: 800; margin: 10px 0;"><span id="main-power">6530</span></div>
-            
-            <div class="stats-grid">
-                <div class="stat-item"><div class="stat-label">Daily Earn</div><div class="stat-val">$ <span id="stat-daily">0.3592</span></div></div>
-                <div class="stat-item"><div class="stat-label">Return</div><div class="stat-val"><span id="stat-rate">5.5</span>%</div></div>
-                <div class="stat-item"><div class="stat-label">Settlement</div><div class="stat-val" id="timer">07:36:38</div></div>
-            </div>
-        </div>
+        <div style="background: white; padding: 15px; font-weight: 600; border-bottom: 1px solid #eee; text-align: center;">Sports Pay</div>
         
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px;">
-            <div class="main-card" style="margin:0; padding: 15px;" onclick="switchTab('buy')">
-                <i class="fas fa-coins" style="color: #f97316; font-size: 1.5em; margin-bottom: 8px;"></i>
-                <div style="font-weight: 700; font-size: 0.9em;">Buy AE</div>
-                <div style="color: var(--text-gray); font-size: 0.7em;">Higher returns</div>
-            </div>
-            <div class="main-card" style="margin:0; padding: 15px;" onclick="switchTab('share')">
-                <i class="fas fa-gift" style="color: #ef4444; font-size: 1.5em; margin-bottom: 8px;"></i>
-                <div style="font-weight: 700; font-size: 0.9em;">Refer Friend</div>
-                <div style="color: var(--text-gray); font-size: 0.7em;">Get $10 bonus</div>
+        <div class="section-ae">
+            <div style="color: var(--text-gray); font-size: 0.85em;">Available Balance</div>
+            <div style="font-size: 2em; font-weight: 700;">$ <span id="home-bal">0.0000</span></div>
+        </div>
+
+        <div class="energy-card-ae">
+            <div style="font-size: 0.7em; opacity: 0.9;">AI ENERGY POWER</div>
+            <div style="font-size: 2.5em; font-weight: 800; margin: 10px 0;"><span id="home-power">0</span></div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.75em;">
+                <span>Daily: $<span id="home-daily">0.00</span></span>
+                <span>Return: <span id="home-rate">5.5</span>%</span>
             </div>
         </div>
     </div>
 
     <div id="view-buy" class="view">
-        <div class="header-ae" style="background: white; padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #eee;">
-            <i class="fas fa-arrow-left" onclick="switchTab('home')" style="margin-right: 15px;"></i>
+        <div style="background: white; padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #eee;">
+            <i class="fas fa-chevron-left" onclick="switchTab('home')" style="margin-right: 15px;"></i>
             <span style="font-weight: 700;">Buy AI Energy</span>
         </div>
 
-        <div class="section-white" style="background: white; padding: 15px; margin-top: 10px;">
-            <div style="color: var(--ae-blue); font-weight: bold; font-size: 0.85em; margin-bottom: 10px;"><i class="fas fa-chart-line"></i> Daily Return Tiers</div>
-            <div class="tier-row"><div class="tier-idx">1</div><div class="tier-info"><div class="tier-label">Amount</div><div class="tier-val">>= $0</div></div><div style="text-align:right"><div class="tier-label">Return</div><div class="tier-val" style="color:var(--ae-blue)">5.5%</div></div></div>
-            <div class="tier-row"><div class="tier-idx">2</div><div class="tier-info"><div class="tier-label">Amount</div><div class="tier-val">>= $20</div></div><div style="text-align:right"><div class="tier-label">Return</div><div class="tier-val" style="color:var(--ae-blue)">6.0%</div></div></div>
-        </div>
-
-        <div class="buy-input-container">
-            <div class="tier-label" style="margin-bottom: 15px; font-weight: bold; text-transform: uppercase;">You want to buy the quantity</div>
-            <div class="input-group">
-                <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="usdt">
-                <input type="number" id="buy-qty" placeholder="Min $1 USDT" oninput="calculateReturns()">
+        <div class="section-ae">
+            <div style="color: var(--text-gray); font-size: 0.8em; margin-bottom: 10px;">ENTER QUANTITY</div>
+            <div class="input-group-ae">
+                <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" width="24" style="margin-right: 10px;">
+                <input type="number" id="buy-amount" placeholder="0.00" oninput="logic_calculate()">
             </div>
-            <div style="margin-top: 15px; font-size: 0.9em; text-align: center;">
-                Your AE total will be:<br>
-                <span style="font-weight: 800; color: var(--ae-blue); font-size: 1.2em;">
-                    <span id="ae-calc-total">6530</span> AE = $<span id="usd-calc-total">6.53</span>
-                </span>
+            <div style="text-align: center; margin-top: 15px;">
+                <span style="color: var(--text-gray); font-size: 0.85em;">New total: </span>
+                <span id="calc-new-ae" style="color: var(--ae-blue); font-weight: 800;">0</span>
+                <span style="color: var(--ae-blue); font-weight: 800;"> AE</span>
             </div>
         </div>
 
-        <div class="estimated-grid">
-            <div class="est-box"><div class="est-label">DAILY</div><div class="est-val" id="est-daily">$0.3591</div></div>
-            <div class="est-box"><div class="est-label">20 DAYS</div><div class="est-val" id="est-20">$7.182</div></div>
-            <div class="est-box"><div class="est-label">PROFIT</div><div class="est-val" id="est-profit" style="color: var(--success)">$0.652</div></div>
+        <div class="grid-est" style="padding: 0 15px;">
+            <div class="box-est"><div class="label-est">DAILY</div><div class="val-est" id="est-daily">$0.00</div></div>
+            <div class="box-est"><div class="label-est">20 DAYS</div><div class="val-est" id="est-20">$0.00</div></div>
+            <div class="box-est"><div class="label-est">PROFIT</div><div class="val-est" id="est-profit" style="color: #34c759;">$0.00</div></div>
         </div>
 
-        <div style="padding: 15px;">
-            <button class="btn-capsule" style="width:100%; padding: 16px; background: var(--ae-blue); color: white; border: none; border-radius: 12px; font-weight: bold;" onclick="showPayment()">Continue</button>
+        <div style="padding: 20px;">
+            <button class="btn-ae-main" onclick="logic_process_pay()">Continue</button>
         </div>
     </div>
 
-    <div class="payment-modal" id="payModal">
-        <div class="modal-content">
-            <div style="padding: 15px; text-align: center; border-bottom: 1px solid #eee; position: relative;">
-                <b id="pay-timer-text">Send countdown: 00:29:58</b>
-                <i class="fas fa-times" onclick="closePayment()" style="position: absolute; right: 15px; top: 15px; color: #ccc;"></i>
-            </div>
-            <div class="qr-area">
-                <h2 id="pay-amount-display">0 USDT</h2>
-                <div class="qr-placeholder" style="display: flex; align-items: center; justify-content: center; background: #fff;">
-                     <i class="fas fa-qrcode" style="font-size: 8em; color: #333;"></i>
-                </div>
-                <div style="margin-top: 15px; font-size: 0.8em; color: var(--text-gray);">Address</div>
-                <div style="background: #f2f2f7; padding: 10px; border-radius: 8px; font-size: 0.75em; word-break: break-all; margin-top: 5px;">
-                    0x2597c5Fb67fD36ff64aC8bebdEdC69a7B3de4e05
-                </div>
-            </div>
-            <div class="pay-footer">
-                <div style="font-size: 0.8em; margin-bottom: 5px;">Payment Status:</div>
-                <b style="color: var(--success)"><i class="fas fa-hourglass-half"></i> NOT RECEIVED ⌛</b>
-            </div>
-        </div>
-    </div>
-
-    <nav class="nav-bar" id="main-nav">
-        <div class="nav-item active" onclick="switchTab('home')"><i class="fas fa-home"></i>Home</div>
-        <div class="nav-item" onclick="switchTab('buy')"><i class="fas fa-bolt"></i>Energy</div>
-        <div class="nav-item" onclick="switchTab('about')"><i class="fas fa-user"></i>Me</div>
+    <nav class="nav-ae" id="main-nav">
+        <div class="nav-tab active" onclick="switchTab('home')"><i class="fas fa-home"></i>Home</div>
+        <div class="nav-tab" onclick="switchTab('buy')"><i class="fas fa-bolt"></i>Energy</div>
+        <div class="nav-tab" onclick="switchTab('about')"><i class="fas fa-user"></i>Me</div>
     </nav>
 
     <script>
-        /* #10___________________________ VARIABLES DE ESTADO (AE TECH LOGIC) */
+        /* #9____________________________ INICIO DE TELEGRAM */
         const tg = window.Telegram.WebApp;
-        let currentPower = 6530;
-        let currentBalance = 0.3592;
-        let payTimerInterval;
+        tg.ready();
 
-        /* #11___________________________ FUNCIÓN DE CÁLCULO (DINÁMICA DEL VIDEO) */
-        function calculateReturns() {
-            const input = document.getElementById('buy-qty').value || 0;
-            const amount = parseFloat(input);
-            
-            // Lógica AE Tech: 1 USDT = 1000 AE
-            const newAE = amount * 1000;
-            const totalAE = currentPower + newAE;
-            
-            // Determinar tasa por Tier
-            let rate = 5.5;
-            if(amount >= 20) rate = 6.0;
-            if(amount >= 300) rate = 6.5;
-            if(amount >= 3000) rate = 7.0;
-
-            const daily = (totalAE / 1000) * (rate / 100); // Estimación
-
-            document.getElementById('ae-calc-total').innerText = totalAE.toLocaleString();
-            document.getElementById('usd-calc-total').innerText = (totalAE / 1000).toFixed(2);
-            document.getElementById('est-daily').innerText = "$" + daily.toFixed(4);
-            document.getElementById('est-20').innerText = "$" + (daily * 20).toFixed(3);
-            document.getElementById('est-profit').innerText = "$" + (daily * 1.8).toFixed(3); // Simulación de profit del video
-        }
-
-        /* #12___________________________ FUNCIÓN DE MODAL Y TIEMPO (AE TECH) */
-        function showPayment() {
-            const amount = document.getElementById('buy-qty').value;
-            if(!amount || amount <= 0) return tg.showAlert("Please enter an amount");
-            
-            document.getElementById('pay-amount-display').innerText = amount + " USDT";
-            document.getElementById('payModal').style.display = 'flex';
-            
-            // Iniciar cuenta regresiva de 30 min como el video
-            let time = 1799; 
-            payTimerInterval = setInterval(() => {
-                let min = Math.floor(time / 60).toString().padStart(2, '0');
-                let sec = (time % 60).toString().padStart(2, '0');
-                document.getElementById('pay-timer-text').innerText = `Send countdown: 00:${min}:${sec}`;
-                if(time <= 0) clearInterval(payTimerInterval);
-                time--;
-            }, 1000);
-        }
-
-        function closePayment() {
-            document.getElementById('payModal').style.display = 'none';
-            clearInterval(payTimerInterval);
-        }
-
+        /* #10___________________________ FUNCIÓN: CAMBIO DE PESTAÑA */
         function switchTab(id) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.getElementById('view-' + id).classList.add('active');
-            tg.HapticFeedback.impactOccurred('medium');
+            
+            const nav = document.getElementById('main-nav');
+            if(id === 'buy') nav.style.display = 'none';
+            else nav.style.display = 'flex';
+            
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            tg.HapticFeedback.impactOccurred('light');
         }
 
-        window.onload = () => {
-            tg.ready();
-            document.getElementById('user-id').innerText = tg.initDataUnsafe?.user?.id || "7517815832";
-        };
+        /* #11___________________________ FUNCIÓN: LÓGICA DE CÁLCULO (VIDEO) */
+        function logic_calculate() {
+            const input = document.getElementById('buy-amount').value || 0;
+            const amount = parseFloat(input);
+            
+            // Lógica AE: 1 USDT = 1000 AE
+            const extraAE = amount * 1000;
+            const currentAE = 6530; // Ejemplo del video
+            const totalAE = currentAE + extraAE;
+            
+            // Tasa dinámica
+            let rate = 5.5;
+            if(amount >= 20) rate = 6.0;
+            if(amount >= 300) rate = 6.5;
+
+            const daily = (totalAE / 1000) * (rate / 100);
+
+            document.getElementById('calc-new-ae').innerText = totalAE.toLocaleString();
+            document.getElementById('est-daily').innerText = "$" + daily.toFixed(4);
+            document.getElementById('est-20').innerText = "$" + (daily * 20).toFixed(3);
+            document.getElementById('est-profit').innerText = "$" + (daily * 1.5).toFixed(3);
+        }
+
+        /* #12___________________________ FUNCIÓN: PROCESAR PAGO */
+        function logic_process_pay() {
+            const val = document.getElementById('buy-amount').value;
+            if(val > 0) {
+                tg.HapticFeedback.notificationOccurred('success');
+                tg.sendData("pay_" + val);
+            } else {
+                tg.showAlert("Please enter an amount");
+            }
+        }
     </script>
 </body>
-                                                                 </html>
+    </html>
