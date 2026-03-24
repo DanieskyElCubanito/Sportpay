@@ -1,217 +1,465 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sports Pay Premier</title>
+    <title>AE Tech - Dynamic Home</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
+        /* =========================================
+           NUEVO ESTILO PROFESIONAL (Light/Blue Tech)
+           Inspirado exactamente en AE_Tech
+           ========================================= */
         :root {
-            --primary: #c9a55c; 
-            --bg: #0f141a;
-            --card-bg: #1a222c;
-            --text-main: #ffffff;
-            --text-dim: #94a3b8;
-            --success: #22c55e;
+            --bg-light: #f4f7fa;      /* Fondo general gris muy claro */
+            --card-white: #ffffff;    /* Fondo de tarjetas puro blanco */
+            --text-dark: #1e293b;     /* Texto principal casi negro */
+            --text-dim: #64748b;      /* Texto secundario gris */
+            --primary-blue: #2563eb;  /* Azul vibrante AE_Tech */
+            --primary-dark: #1e40af;  /* Azul oscuro para hover */
+            --accent-orange: #f97316; /* Naranja para iconos de energía */
+            --border-light: #e2e8f0;  /* Bordes suaves */
+            --shadow-sm: 0 2px 6px rgba(0,0,0,0.05);
         }
 
         body {
-            background-color: var(--bg);
-            color: var(--text-main);
+            background-color: var(--bg-light);
+            color: var(--text-dark);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             margin: 0; padding: 0; overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* --- SISTEMA DE VISTAS (CORREGIDO) --- */
-        .view { 
-            display: none; /* Ocultas por defecto */
-            padding-bottom: 100px; 
-            animation: fadeIn 0.3s ease; 
-        }
-        
-        .view.active { 
-            display: block !important; /* Solo se muestra la activa */
-        }
-
+        /* Contenedor de Vistas */
+        .view { display: none; padding-bottom: 100px; animation: fadeIn 0.3s ease; }
+        .view.active { display: block !important; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* HEADER Y DASHBOARD */
-        .header-profile { text-align: center; padding: 30px 20px; background: linear-gradient(180deg, rgba(201,165,92,0.1) 0%, rgba(15,20,26,0) 100%); }
-        .avatar-container img { width: 90px; height: 90px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; }
-        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 15px; }
-        .db-card { background: var(--card-bg); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
-        .db-label { font-size: 0.7em; color: var(--text-dim); display: block; margin-bottom: 4px; text-transform: uppercase; }
-        .db-value { font-size: 1.1em; font-weight: bold; }
-
-        /* TIENDA */
-        .tiers-list-container { padding: 0 15px; display: flex; flex-direction: column; gap: 10px; }
-        .tier-card { 
-            background: var(--card-bg); border-radius: 12px; padding: 12px 15px; 
-            display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05);
+        /* --- SECCIÓN 1: HEADER (WELCOME) --- */
+        .home-header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background-color: var(--card-white);
+            border-bottom: 1px solid var(--border-light);
         }
-        .tier-card.active { border: 1px solid var(--primary); background: rgba(201,165,92,0.05); }
+        .header-logo {
+            width: 50px; height: 50px;
+            background-color: aliceblue; /* Simulación de logo */
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--primary-blue); font-weight: bold; font-size: 1.2em;
+            border: 1px solid var(--border-light);
+        }
+        .header-info h2 { margin: 0; font-size: 1.1em; font-weight: 700; color: var(--text-dark); }
+        .header-info p { margin: 2px 0 0; font-size: 0.8em; color: var(--text-dim); }
 
-        /* EQUIPO ESTILO AE_TECH */
-        .invite-card { background: var(--card-bg); padding: 15px; border-radius: 12px; margin: 15px; border: 1px solid rgba(201,165,92,0.2); }
-        .invite-input-group { display: flex; gap: 8px; margin-top: 8px; }
-        .invite-input-group input { flex: 1; background: rgba(0,0,0,0.2); border: 1px solid #333; color: #fff; padding: 10px; border-radius: 8px; font-size: 0.8em; outline: none; }
+        /* --- SECCIÓN 2: TOTAL EARNED & WITHDRAW --- */
+        .balance-section {
+            padding: 15px 20px;
+            background-color: var(--card-white);
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .balance-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .bal-label-group { display: flex; align-items: center; gap: 8px; font-size: 0.85em; color: var(--text-dim); }
+        .bal-value { font-size: 1.8em; font-weight: 800; color: var(--text-dark); margin: 5px 0; }
         
-        .levels-list { padding: 0 15px; }
-        .level-item { 
-            background: var(--card-bg); margin-bottom: 8px; padding: 12px; border-radius: 10px; 
-            display: flex; align-items: center; border: 1px solid rgba(255,255,255,0.03);
+        .btn-withdraw {
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 0.9em;
+            cursor: pointer;
+            display: flex; align-items: center; gap: 8px;
         }
-        .level-badge { width: 40px; height: 40px; background: rgba(201,165,92,0.1); color: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 12px; }
-        .level-data { flex: 1; }
-        .level-data .users { display: block; font-size: 0.9em; font-weight: bold; }
-        .level-data .com { font-size: 0.7em; color: var(--text-dim); }
-        .level-percent { color: var(--success); font-weight: bold; }
 
-        /* BOTONES */
-        .btn-primary { background: var(--primary); color: #000; border: none; padding: 15px; border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer; }
-        .btn-secondary { background: rgba(255,255,255,0.05); color: #fff; border: none; padding: 15px; border-radius: 12px; font-weight: bold; width: 100%; margin-top: 10px; }
+        /* --- SECCIÓN 3: AE AI ENERGY (Tarjeta Azul) --- */
+        .energy-card-container { padding: 0 15px; margin-bottom: 15px; }
+        .energy-card {
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 20px;
+            border-radius: 20px;
+            position: relative;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2);
+            overflow: hidden;
+        }
+        /* Marca de agua del logo AE */
+        .energy-card::after {
+            content: "AE"; position: absolute; right: -20px; bottom: -30px;
+            font-size: 10em; font-weight: 900; color: rgba(255,255,255,0.07);
+        }
+        
+        .e-header { display: flex; align-items: center; justify-content: space-between; font-size: 0.85em; font-weight: bold; margin-bottom: 15px;}
+        .e-title { display: flex; align-items: center; gap: 8px; text-transform: uppercase; }
+        
+        .e-value { text-align: center; font-size: 3em; font-weight: 800; margin: 10px 0;}
+        
+        .e-stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center; margin-top: 15px; position: relative; z-index: 1;}
+        .e-stat-box { background-color: rgba(255,255,255,0.1); padding: 10px 5px; border-radius: 12px;}
+        .es-label { font-size: 0.7em; color: rgba(255,255,255,0.8); text-transform: uppercase; display: block;}
+        .es-val { font-size: 0.95em; font-weight: bold;}
 
-        /* NAVEGACIÓN INFERIOR */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #161c24; display: flex; padding: 10px 0 25px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000; }
-        .nav-tab { flex: 1; text-align: center; color: var(--text-dim); font-size: 0.7em; cursor: pointer; }
-        .nav-tab i { display: block; font-size: 1.4em; margin-bottom: 4px; }
-        .nav-tab.active { color: var(--primary); }
+        /* --- SECCIÓN 4: MINI ACCIONES GRID --- */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 0 15px;
+            margin-bottom: 15px;
+        }
+        .act-card {
+            background-color: var(--card-white);
+            padding: 20px 15px;
+            border-radius: 16px;
+            border: 1px solid var(--border-light);
+            display: flex; align-items: center; gap: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+        .act-icon { font-size: 1.5em; color: var(--primary-blue); width: 30px; text-align: center;}
+        .act-text b { font-size: 0.95em; color: var(--text-dark); display: block;}
+        .act-text span { font-size: 0.75em; color: var(--text-dim);}
 
-        /* CALCULADORA */
-        .calculator-section { background: var(--card-bg); margin: 15px; padding: 20px; border-radius: 15px; }
-        .input-usdt-wrapper { display: flex; align-items: center; background: #000; padding: 12px; border-radius: 10px; margin: 10px 0; border: 1px solid #333; }
-        .input-usdt-wrapper input { background: transparent; border: none; color: #fff; font-size: 1.2em; width: 100%; outline: none; }
+        /* --- SECCIÓN 5: WEEKEND SPECIAL (Banner) --- */
+        .banner-container { padding: 0 15px; margin-bottom: 15px; }
+        .weekend-banner {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            border-radius: 16px;
+            padding: 15px 20px;
+            color: white;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .banner-info { flex: 1; }
+        .b-tag { color: var(--primary-blue); font-size: 0.8em; font-weight: bold; display: flex; align-items: center; gap: 5px;}
+        .b-title { font-weight: bold; margin: 5px 0; font-size: 1.1em; }
+        .b-title b { color: var(--success, #22c55e); }
+        .b-sub { font-size: 0.75em; color: rgba(255,255,255,0.7); }
+        .btn-banner { background: white; color: var(--primary-blue); border: none; padding: 10px 15px; border-radius: 8px; font-size: 0.85em; font-weight: bold; cursor: pointer;}
+
+        /* --- SECCIÓN 6: REGISTROS (AI Energy Records) --- */
+        .records-section { padding: 0 15px; margin-bottom: 20px; }
+        .sec-title-card {
+            background-color: var(--card-white);
+            padding: 15px;
+            border-radius: 16px;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 10px;
+        }
+        .sec-header { display: flex; align-items: center; gap: 10px; font-weight: bold; margin-bottom: 15px; color: var(--text-dark); }
+        .sec-header i { color: var(--primary-blue); font-size: 1.2em; }
+        
+        /* Lista de Registros */
+        .record-item {
+            background-color: var(--card-white);
+            padding: 15px;
+            border-radius: 12px;
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 8px;
+            border: 1px solid var(--border-light);
+        }
+        .r-date-badge {
+            width: 40px; height: 40px;
+            background-color: aliceblue; border-radius: 8px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border: 1px solid var(--border-light);
+        }
+        .r-date-day { font-size: 1.1em; font-weight: bold; color: var(--primary-blue); }
+        .r-date-unit { font-size: 0.6em; color: var(--text-dim); text-transform: uppercase; }
+        
+        .r-info { flex: 1; display: flex; flex-direction: column; }
+        .r-timestamp { font-size: 0.8em; color: var(--text-dim); margin-bottom: 2px; }
+        .r-progress-bar { height: 6px; background-color: var(--bg-light); border-radius: 3px; position: relative; overflow: hidden;}
+        .r-progress-fill { height: 100%; background-color: var(--primary-blue); border-radius: 3px; width: 0; }
+        
+        .r-values { text-align: right; }
+        .rv-amount { color: var(--primary-blue); font-weight: bold; }
+        .rv-type { font-size: 0.7em; color: var(--accent-orange); text-transform: uppercase; display: flex; align-items: center; gap: 3px;}
+
+        /* --- BOTÓN VER MÁS --- */
+        .btn-view-more {
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1em;
+            margin-top: 15px;
+            cursor: pointer;
+        }
+
+        /* --- SECCIÓN 7: AI TRADING (image_12.png) --- */
+        .trading-section { padding: 0 15px; margin-bottom: 20px; }
+        .trading-card {
+            background-color: var(--card-white);
+            padding: 15px;
+            border-radius: 16px;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+        }
+        .trade-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .trade-item:last-child { border-bottom: none; }
+        
+        .t-coin-info b { font-size: 0.95em; color: var(--text-dark); display: block;}
+        .t-coin-info span { font-size: 0.7em; color: var(--text-dim);}
+        
+        .t-type-tag { font-size: 0.65em; font-weight: bold; padding: 3px 8px; border-radius: 5px; text-transform: uppercase;}
+        .t-type-tag.long { background-color: rgba(34, 197, 94, 0.1); color: #16a34a; }
+        .t-type-tag.short { background-color: rgba(239, 68, 68, 0.1); color: #dc2626; }
+        .t-leverage { background-color: #f1f5f9; color: #475569; font-size: 0.65em; font-weight: bold; padding: 3px 8px; border-radius: 5px; margin-left: 5px;}
+
+        .t-profit { text-align: right; color: #16a34a; font-weight: bold; font-size: 1.1em;}
+
+        /* =========================================
+           BARRA DE NAVEGACIÓN INFERIOR (En inglés)
+           ========================================= */
+        .bottom-nav { 
+            position: fixed; bottom: 0; width: 100%; 
+            background: var(--card-white); 
+            display: flex; 
+            padding: 12px 0 25px; 
+            border-top: 1px solid var(--border-light); 
+            z-index: 1000;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.03);
+        }
+        .nav-tab { 
+            flex: 1; text-align: center; 
+            color: var(--text-dim); 
+            font-size: 0.75em; 
+            cursor: pointer; 
+            transition: 0.2s; 
+        }
+        .nav-tab.active { color: var(--primary-blue); }
+        .nav-tab i { display: block; font-size: 1.5em; margin-bottom: 4px; }
     </style>
 </head>
 <body>
 
-    <div id="view-inicio" class="view active">
-        <div class="header-profile">
-            <div class="avatar-container"><img id="user-photo" src="https://via.placeholder.com/100"></div>
-            <h2 id="profile-name" style="margin: 10px 0 5px;">Cargando...</h2>
-            <div style="color: var(--text-dim); font-size: 0.8em;">ID: <span id="u-id">---</span></div>
+    <div id="view-home" class="view active">
+        
+        <div class="home-header">
+            <div class="header-logo">AE</div>
+            <div class="header-info">
+                <p>Welcome to,</p>
+                <h2>AE Tech - ID: <span id="admin-id">000000000</span></h2>
+            </div>
         </div>
-        <div class="dashboard-grid">
-            <div class="db-card"><span class="db-label">Saldo</span><div class="db-value">0.00 USDT</div></div>
-            <div class="db-card"><span class="db-label">Equipo</span><div class="db-value" style="color:var(--success)">0.00 USDT</div></div>
-        </div>
-        <div style="padding: 20px;">
-            <button class="btn-primary" onclick="switchView('tienda')">Invertir</button>
-            <button class="btn-secondary" onclick="tg.sendData('btn_withdraw')">Retirar</button>
-        </div>
-    </div>
 
-    <div id="view-tienda" class="view">
-        <div style="padding: 20px; font-weight: bold;"><i class="fas fa-shopping-cart"></i> Tienda de Inversión</div>
-        <div class="tiers-list-container">
-            <div class="tier-card active" id="tier-1" onclick="selectTier(1, 1, 0.05)">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <div style="background:var(--primary); color:#000; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold;">1</div>
-                    <div><span style="font-size:0.7em; color:var(--text-dim); display:block;">Monto</span><b>>= $1</b></div>
+        <div class="balance-section">
+            <div class="balance-row">
+                <div class="bal-data">
+                    <div class="bal-label-group">
+                        <span>Total Earned</span>
+                        <i class="fas fa-history"></i>
+                        <span>History</span>
+                    </div>
+                    <div class="bal-value">$ <span id="total-earned-val">0.3592</span></div>
                 </div>
-                <div style="text-align:right;"><span style="font-size:0.7em; color:var(--text-dim); display:block;">Día</span><b style="color:var(--primary)">5.0%</b></div>
+                <button class="btn-withdraw">
+                    <i class="fas fa-arrow-right"></i>
+                    Withdraw
+                </button>
             </div>
         </div>
-        <div class="calculator-section">
-            <div style="font-size:0.8em; color:var(--text-dim);">CANTIDAD A INVERTIR</div>
-            <div class="input-usdt-wrapper">
-                <i class="fas fa-dollar-sign" style="margin-right:10px; color:var(--success)"></i>
-                <input type="number" id="invest-amount" value="1" oninput="calculateReturns()">
+
+        <div class="energy-card-container">
+            <div class="energy-card">
+                <div class="e-header">
+                    <div class="e-title">
+                        <i class="fas fa-bolt" style="color:var(--accent-orange)"></i>
+                        <span>AE (AI ENERGY)</span>
+                    </div>
+                    <i class="fas fa-sync-alt" id="sync-energy" style="cursor:pointer"></i>
+                </div>
+                
+                <div class="e-value" id="energy-val">6530</div>
+                
+                <div class="e-stats-grid">
+                    <div class="e-stat-box">
+                        <span class="es-label">Daily Earn</span>
+                        <span class="es-val">$ <span id="daily-earn-val">0.3592</span></span>
+                    </div>
+                    <div class="e-stat-box">
+                        <span class="es-label">Return</span>
+                        <span class="es-val"><span id="return-rate-val">5.5</span>%</span>
+                    </div>
+                    <div class="e-stat-box">
+                        <span class="es-label">Settlement</span>
+                        <span class="es-val" id="settlement-timer-val">10:32:03</span>
+                    </div>
+                </div>
             </div>
-            <button class="btn-primary" onclick="abrirPasarela()">Pagar Ahora</button>
+        </div>
+
+        <div class="actions-grid">
+            <div class="act-card">
+                <div class="act-icon"><i class="fas fa-charging-station" style="color:var(--accent-orange)"></i></div>
+                <div class="act-text">
+                    <b>Buy AE</b>
+                    <span>Higher returns</span>
+                </div>
+            </div>
+            <div class="act-card">
+                <div class="act-icon"><i class="fas fa-gift"></i></div>
+                <div class="act-text">
+                    <b>Refer Friend</b>
+                    <span>Get $10 bonus</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="banner-container">
+            <div class="weekend-banner">
+                <div class="banner-info">
+                    <div class="b-tag">
+                        <i class="fas fa-star"></i>
+                        Weekend Special
+                    </div>
+                    <div class="b-title">Earn up to <b>30% ROI</b></div>
+                    <div class="b-sub">In just 48 hours</div>
+                </div>
+                <button class="btn-banner">START NOW <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <div class="records-section">
+            <div class="sec-title-card">
+                <div class="sec-header">
+                    <i class="fas fa-signal"></i>
+                    <span>My AI Energy Records</span>
+                </div>
+                
+                <div id="records-list">
+                    <div class="record-item">
+                        <div class="r-date-badge">
+                            <span class="r-date-day">1</span>
+                            <span class="r-date-unit">Day</span>
+                        </div>
+                        <div class="r-info">
+                            <span class="r-timestamp">2026-03-23 16:28:14</span>
+                            <div class="r-progress-bar">
+                                <div class="r-progress-fill" style="width: 15%"></div>
+                            </div>
+                        </div>
+                        <div class="r-values">
+                            <div class="rv-amount">+1233.8</div>
+                            <div class="rv-type">
+                                <i class="fas fa-bolt"></i> AE
+                            </div>
+                        </div>
+                    </div>
+                    <div class="record-item">
+                        <div class="r-date-badge">
+                            <span class="r-date-day">4</span>
+                            <span class="r-date-unit">Days</span>
+                        </div>
+                        <div class="r-info">
+                            <span class="r-timestamp">2026-03-20 08:13:07</span>
+                            <div class="r-progress-bar">
+                                <div class="r-progress-fill" style="width: 60%"></div>
+                            </div>
+                        </div>
+                        <div class="r-values">
+                            <div class="rv-amount">+1055.6</div>
+                            <div class="rv-type">
+                                <i class="fas fa-bolt"></i> AE
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-view-more">View More</button>
+            </div>
+        </div>
+
+        <div class="trading-section">
+            <div class="trading-card">
+                <div class="sec-header">
+                    <i class="fas fa-robot"></i>
+                    <span>AI Trading</span>
+                </div>
+                
+                <div id="trades-list">
+                    <div class="trade-item">
+                        <div class="t-coin-info">
+                            <b>BSV/USDT</b>
+                            <span>Entry: 14.54000</span>
+                        </div>
+                        <div>
+                            <span class="t-type-tag short">SHORT</span>
+                            <span class="t-leverage">11X</span>
+                        </div>
+                        <div class="t-profit">+43.62%</div>
+                    </div>
+                    <div class="trade-item">
+                        <div class="t-coin-info">
+                            <b>JTO/USDT</b>
+                            <span>Entry: 0.321800</span>
+                        </div>
+                        <div>
+                            <span class="t-type-tag short">SHORT</span>
+                            <span class="t-leverage">11X</span>
+                        </div>
+                        <div class="t-profit">+46.08%</div>
+                    </div>
+                </div>
+
+                <button class="btn-view-more">View More</button>
+            </div>
         </div>
     </div>
 
-    <div id="view-equipo" class="view">
-        <div style="padding: 20px; text-align: center;">
-            <h2 style="margin-bottom:5px;">Mi Equipo</h2>
-            <p style="color:var(--text-dim); font-size:0.8em;">Gana comisiones en 5 niveles</p>
-        </div>
-        <div class="invite-card">
-            <span style="font-size:0.7em; color:var(--text-dim);">TU LINK DE REFERIDO</span>
-            <div class="invite-input-group">
-                <input type="text" id="invite-link" readonly>
-                <button onclick="copyInvite()" style="background:var(--primary); border:none; padding:5px 12px; border-radius:5px; font-weight:bold;">Copiar</button>
-            </div>
-        </div>
-        <div class="levels-list">
-            <div class="level-item"><div class="level-badge">L1</div><div class="level-data"><span class="users">0 Usuarios</span><span class="com">Directos</span></div><div class="level-percent">+2%</div></div>
-            <div class="level-item"><div class="level-badge">L2</div><div class="level-data"><span class="users">0 Usuarios</span><span class="com">Nivel 2</span></div><div class="level-percent">+2%</div></div>
-            <div class="level-item"><div class="level-badge">L3</div><div class="level-data"><span class="users">0 Usuarios</span><span class="com">Nivel 3</span></div><div class="level-percent">+2%</div></div>
-            <div class="level-item"><div class="level-badge">L4</div><div class="level-data"><span class="users">0 Usuarios</span><span class="com">Nivel 4</span></div><div class="level-percent">+2%</div></div>
-            <div class="level-item"><div class="level-badge">L5</div><div class="level-data"><span class="users">0 Usuarios</span><span class="com">Nivel 5</span></div><div class="level-percent">+2%</div></div>
-        </div>
+    <div id="view-share" class="view">
+        <div style="padding: 20px;"><h2>Share Section</h2></div>
     </div>
-
-    <div id="view-ajustes" class="view">
-        <div style="padding: 30px 20px;"><h2>Ajustes</h2></div>
-        <div style="padding: 0 20px;">
-            <button class="btn-secondary" onclick="tg.sendData('set_wallet')">Configurar Wallet</button>
-            <button class="btn-secondary" style="background:transparent; border:1px solid var(--primary); color:var(--primary)" onclick="window.open('https://t.me/TuSoporte')">Soporte</button>
-        </div>
+    <div id="view-about" class="view">
+        <div style="padding: 20px;"><h2>About Section</h2></div>
     </div>
 
     <nav class="bottom-nav">
-        <div class="nav-tab active" onclick="switchView('inicio', this)"><i class="fas fa-home"></i>Inicio</div>
-        <div class="nav-tab" onclick="switchView('tienda', this)"><i class="fas fa-shopping-bag"></i>Tienda</div>
-        <div class="nav-tab" onclick="switchView('equipo', this)"><i class="fas fa-users"></i>Equipo</div>
-        <div class="nav-tab" onclick="switchView('ajustes', this)"><i class="fas fa-cog"></i>Ajustes</div>
+        <div id="nav-home" class="nav-tab active" onclick="switchView('home', this)">
+            <i class="fas fa-home"></i><span>Home</span>
+        </div>
+        <div id="nav-share" class="nav-tab" onclick="switchView('share', this)">
+            <i class="fas fa-share-alt"></i><span>Share</span>
+        </div>
+        <div id="nav-about" class="nav-tab" onclick="switchView('about', this)">
+            <i class="fas fa-info-circle"></i><span>About</span>
+        </div>
     </nav>
 
     <script>
+        // 1. INICIALIZAR TELEGRAM
         const tg = window.Telegram.WebApp;
-        tg.expand();
+        tg.expand(); // Expandir Mini App
 
+        // Capturar datos del usuario que abre la app
         const user = tg.initDataUnsafe?.user;
+        
+        // Ponemos el ID real del usuario en el Header si existe
         if (user) {
-            document.getElementById('profile-name').innerText = user.first_name;
-            document.getElementById('u-id').innerText = user.id;
-            document.getElementById('invite-link').value = `https://t.me/TuBot?start=${user.id}`;
-            if(user.photo_url) document.getElementById('user-photo').src = user.photo_url;
+            document.getElementById('admin-id').innerText = user.id;
         }
 
-        // FUNCIÓN DE NAVEGACIÓN CORREGIDA
+        // 2. SISTEMA DE NAVEGACIÓN DE VISTAS
         function switchView(viewId, element) {
-            // 1. Ocultar TODAS las vistas quitando la clase active
-            const views = document.querySelectorAll('.view');
-            views.forEach(v => {
-                v.classList.remove('active');
-            });
-
-            // 2. Mostrar la vista seleccionada
-            const targetView = document.getElementById('view-' + viewId);
-            if (targetView) {
-                targetView.classList.add('active');
-            }
-
-            // 3. Actualizar iconos del menú
-            const tabs = document.querySelectorAll('.nav-tab');
-            tabs.forEach(t => t.classList.remove('active'));
-            
-            if (element) {
-                element.classList.add('active');
-            } else {
-                // Si se llama desde un botón externo, buscar el tab correspondiente
-                const tabList = { 'inicio': 0, 'tienda': 1, 'equipo': 2, 'ajustes': 3 };
-                tabs[tabList[viewId]].classList.add('active');
-            }
-
-            tg.HapticFeedback.impactOccurred('light');
-        }
-
-        function copyInvite() {
-            const link = document.getElementById('invite-link');
-            link.select();
-            navigator.clipboard.writeText(link.value);
-            tg.showAlert("✅ Link copiado");
-        }
-
-        // Lógica de Tienda básica para que no de error
-        function calculateReturns() { /* Lógica aquí */ }
-        function selectTier() { /* Lógica aquí */ }
-        function abrirPasarela() { tg.showAlert("Función de pago lista."); }
-    </script>
-</body>
-                                                                         </html>
+            // Ocultar todas las vistas 
