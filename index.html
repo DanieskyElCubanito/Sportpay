@@ -26,7 +26,6 @@
             margin: 0; padding: 0; overflow-x: hidden;
         }
 
-        /* SISTEMA DE VISTAS */
         .view { display: none; padding-bottom: 100px; animation: fadeIn 0.3s ease; }
         .view.active { display: block !important; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -51,21 +50,18 @@
         .energy-card::after { content: "SP"; position: absolute; right: -20px; bottom: -30px; font-size: 10em; font-weight: 900; color: rgba(255,255,255,0.07); }
         .e-value { text-align: center; font-size: 3em; font-weight: 800; margin: 10px 0;}
         .e-stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center; margin-top: 15px; position: relative; z-index: 1;}
-        .e-stat-box { background-color: rgba(255,255,255,0.1); padding: 10px 5px; border-radius: 12px;}
+        .e-stat-box { background-color: rgba(255,255,255,0.1); padding: 10px 2px; border-radius: 12px;}
+        .es-label { font-size: 0.55em; display:block; opacity:0.8; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px;}
+        .es-val { font-size: 0.85em; font-weight: bold; }
 
-        /* LISTAS Y TARJETAS */
+        /* ACTIONS */
         .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 15px; margin-bottom: 15px; }
         .act-card { background: var(--card-white); padding: 15px; border-radius: 16px; border: 1px solid var(--border-light); display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow-sm); }
         
         .info-row {
             background: white; padding: 15px; border-radius: 15px; border: 1px solid var(--border-light);
             display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
-            cursor: pointer;
         }
-
-        /* VISTA ABOUT */
-        .about-header { padding: 30px 20px; background: white; text-align: center; border-bottom: 1px solid var(--border-light); margin-bottom: 20px; }
-        .about-logo { font-size: 3em; color: var(--primary-blue); margin-bottom: 10px; }
 
         /* NAV */
         .bottom-nav { position: fixed; bottom: 0; width: 100%; background: var(--card-white); display: flex; padding: 12px 0 25px; border-top: 1px solid var(--border-light); z-index: 9999; }
@@ -81,15 +77,15 @@
             <div class="header-logo">SP</div>
             <div class="header-info">
                 <p>Welcome to Sports Pay,</p>
-                <h2>User ID: <span id="display-id">Loading...</span></h2>
+                <h2>User ID: <span id="display-id">000000</span></h2>
             </div>
         </div>
 
         <div style="padding: 15px 20px; background: white; border-bottom: 1px solid var(--border-light); margin-bottom: 15px;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
-                    <div style="font-size: 0.85em; color: var(--text-dim);">Total Earned <i class="fas fa-history"></i></div>
-                    <div style="font-size: 1.8em; font-weight: 800; margin: 5px 0;">$ <span id="total-val">0.3592</span></div>
+                    <div style="font-size: 0.85em; color: var(--text-dim);">Total Earned (Available) <i class="fas fa-wallet"></i></div>
+                    <div style="font-size: 1.8em; font-weight: 800; margin: 5px 0; color: var(--text-dark);">$ <span id="total-val">0.0000</span></div>
                 </div>
                 <button style="background: var(--primary-blue); color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold;" onclick="tg.sendData('withdraw')">Withdraw</button>
             </div>
@@ -98,20 +94,29 @@
         <div class="energy-card-container">
             <div class="energy-card">
                 <div style="display: flex; justify-content: space-between; font-size: 0.85em; font-weight: bold;">
-                    <div><i class="fas fa-bolt" style="color:var(--accent-orange)"></i> AI MINING POWER</div>
+                    <div><i class="fas fa-bolt" style="color:var(--accent-orange)"></i> MINING POWER</div>
                     <i class="fas fa-sync-alt" onclick="location.reload()"></i>
                 </div>
-                <div class="e-value">6530<span style="font-size: 0.4em; margin-left:5px;">GH/s</span></div>
+                <div class="e-value"><span id="mining-power-val">0</span><span style="font-size: 0.4em; margin-left:5px;">GH/s</span></div>
                 <div class="e-stats-grid">
-                    <div class="e-stat-box"><span style="font-size: 0.6em; display:block; opacity:0.8;">DAILY PROFIT</span><span style="font-size: 0.9em; font-weight: bold;">$ 0.3592</span></div>
-                    <div class="e-stat-box"><span style="font-size: 0.6em; display:block; opacity:0.8;">RETURN</span><span style="font-size: 0.9em; font-weight: bold;">5.5%</span></div>
-                    <div class="e-stat-box"><span style="font-size: 0.6em; display:block; opacity:0.8;">SETTLEMENT</span><span style="font-size: 0.9em; font-weight: bold;">10:32:03</span></div>
+                    <div class="e-stat-box">
+                        <span class="es-label">DAILY PROFIT</span>
+                        <span class="es-val" id="daily-profit-val">$ 0.0000</span>
+                    </div>
+                    <div class="e-stat-box">
+                        <span class="es-label">RETURN</span>
+                        <span class="es-val" id="return-val">0.0%</span>
+                    </div>
+                    <div class="e-stat-box">
+                        <span class="es-label">SETTLEMENT</span>
+                        <span class="es-val" id="settlement-timer">00:00:00</span>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="actions-grid">
-            <div class="act-card">
+            <div class="act-card" onclick="tg.showAlert('Purchase system opening soon')">
                 <i class="fas fa-charging-station" style="color:var(--accent-orange); font-size: 1.5em;"></i>
                 <div><b style="font-size: 0.9em; display:block;">Buy GH/s</b><span style="font-size: 0.7em; color: var(--text-dim);">Boost power</span></div>
             </div>
@@ -126,51 +131,29 @@
         <div style="padding: 20px; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; text-align: center; border-radius: 0 0 30px 30px; margin-bottom: 20px;">
             <i class="fas fa-users" style="font-size: 3em; margin-bottom: 10px;"></i>
             <h2 style="margin: 0;">Invite & Earn</h2>
-            <p style="font-size: 0.9em; opacity: 0.8;">Share your link and build your team</p>
+            <p style="font-size: 0.9em; opacity: 0.8;">Build your Sports Pay Team</p>
         </div>
-
         <div style="background: #eff6ff; border: 2px dashed #2563eb; padding: 20px; border-radius: 20px; text-align: center; margin: 0 20px 25px;">
-            <div style="font-weight: bold; color: #1e293b; margin-bottom: 10px;">Invitation Link</div>
+            <div style="font-weight: bold; color: #1e293b; margin-bottom: 10px;">Your Invitation Link</div>
             <div id="referral-link-display" style="font-size: 0.8em; color: #2563eb; background: white; padding: 10px; border-radius: 10px; margin-bottom: 15px; word-break: break-all; border: 1px solid #d1e2ff;">Generating...</div>
             <button onclick="copyRefLink()" style="width: 100%; background: #2563eb; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold;">Copy Link</button>
         </div>
     </div>
 
     <div id="view-about" class="view">
-        <div class="about-header">
-            <div class="about-logo"><i class="fas fa-shield-halved"></i></div>
-            <h2 style="margin: 0;">Sports Pay Info</h2>
-            <p style="color: var(--text-dim); font-size: 0.9em;">Verified Investment Platform</p>
+        <div style="padding: 30px 20px; background: white; text-align: center; border-bottom: 1px solid var(--border-light); margin-bottom: 20px;">
+            <div style="font-size: 3em; color: var(--primary-blue); margin-bottom: 10px;"><i class="fas fa-shield-halved"></i></div>
+            <h2 style="margin: 0;">About Sports Pay</h2>
+            <p style="color: var(--text-dim); font-size: 0.9em;">Official Information & Support</p>
         </div>
-
         <div style="padding: 0 20px;">
-            <div class="info-row" onclick="tg.showAlert('Official Sports Pay Whitepaper v2.0')">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <i class="fas fa-file-lines" style="color: var(--primary-blue);"></i>
-                    <b>Whitepaper</b>
-                </div>
+            <div class="info-row" onclick="tg.showAlert('Sports Pay Whitepaper v2.0 - Certified Investment')">
+                <div style="display: flex; align-items: center; gap: 15px;"><i class="fas fa-file-lines" style="color: var(--primary-blue);"></i><b>Whitepaper</b></div>
                 <i class="fas fa-chevron-right" style="color: #cbd5e1;"></i>
             </div>
-
-            <div class="info-row" onclick="tg.showAlert('Sports Pay is a registered entity specializing in AI-driven sports arbitrage.')">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <i class="fas fa-building" style="color: var(--primary-blue);"></i>
-                    <b>Company Profile</b>
-                </div>
+            <div class="info-row" onclick="tg.showAlert('Support 24/7 available at @Danny_Support')">
+                <div style="display: flex; align-items: center; gap: 15px;"><i class="fas fa-headset" style="color: var(--primary-blue);"></i><b>Online Support</b></div>
                 <i class="fas fa-chevron-right" style="color: #cbd5e1;"></i>
-            </div>
-
-            <div class="info-row" onclick="tg.showAlert('Telegram Support: @Danny_Support')">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <i class="fas fa-headset" style="color: var(--primary-blue);"></i>
-                    <b>Online Support</b>
-                </div>
-                <i class="fas fa-chevron-right" style="color: #cbd5e1;"></i>
-            </div>
-
-            <div style="margin-top: 30px; text-align: center; color: var(--text-dim); font-size: 0.75em;">
-                <p>© 2026 Sports Pay. All Rights Reserved.</p>
-                <p>Version 1.0.4 (Stable)</p>
             </div>
         </div>
     </div>
@@ -187,12 +170,60 @@
         tg.expand();
 
         const BOT_USERNAME = "SportsPay_bot"; 
+        
+        // Simulación de datos reales (Esto lo conectarás con tu base de datos después)
+        let userData = {
+            id: tg.initDataUnsafe?.user?.id || "7517815832",
+            balance: 0.3592,    // Total Earned
+            miningPower: 6530,  // GH/s
+            dailyProfit: 0.3592, 
+            returnRate: 5.5     // %
+        };
 
         function initApp() {
-            const user = tg.initDataUnsafe?.user;
-            const userId = user ? user.id : "7517815832";
-            document.getElementById('display-id').innerText = userId;
-            document.getElementById('referral-link-display').innerText = `https://t.me/${BOT_USERNAME}?start=${userId}`;
+            document.getElementById('display-id').innerText = userData.id;
+            document.getElementById('total-val').innerText = userData.balance.toFixed(4);
+            document.getElementById('mining-power-val').innerText = userData.miningPower;
+            document.getElementById('daily-profit-val').innerText = `$ ${userData.dailyProfit.toFixed(4)}`;
+            document.getElementById('return-val').innerText = `${userData.returnRate}%`;
+            document.getElementById('referral-link-display').innerText = `https://t.me/${BOT_USERNAME}?start=${userData.id}`;
+            
+            startSettlementTimer();
+        }
+
+        function startSettlementTimer() {
+            const timerElement = document.getElementById('settlement-timer');
+
+            function updateTimer() {
+                // Si no hay inversión (miningPower es 0), se queda en 00:00:00
+                if (userData.miningPower <= 0) {
+                    timerElement.innerText = "00:00:00";
+                    return;
+                }
+
+                const now = new Date();
+                
+                // Configurar objetivo: 12:00 AM hora de Cuba (aproximadamente UTC-4)
+                // Usamos la hora local del dispositivo y ajustamos para el fin del día
+                const target = new Date();
+                target.setHours(24, 0, 0, 0); // Próxima medianoche
+
+                const diff = target - now;
+
+                if (diff <= 0) {
+                    timerElement.innerText = "00:00:00";
+                    return;
+                }
+
+                const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
+                const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+                const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+
+                timerElement.innerText = `${h}:${m}:${s}`;
+            }
+
+            setInterval(updateTimer, 1000);
+            updateTimer();
         }
 
         function switchTab(viewId) {
@@ -200,7 +231,6 @@
             document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
             document.getElementById('view-' + viewId).classList.add('active');
             
-            // Lógica para marcar activo el botón correcto
             const tabs = document.querySelectorAll('.nav-tab');
             if(viewId === 'home') tabs[0].classList.add('active');
             if(viewId === 'share') tabs[1].classList.add('active');
@@ -212,11 +242,11 @@
         function copyRefLink() {
             const link = document.getElementById('referral-link-display').innerText;
             navigator.clipboard.writeText(link).then(() => {
-                tg.showAlert("✅ Link copied!");
+                tg.showAlert("✅ Invitation link copied to clipboard!");
             });
         }
 
         initApp();
     </script>
 </body>
-                </html>
+</html>
