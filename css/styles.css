@@ -1,13 +1,25 @@
 :root {
+    /* Colores base dinámicos */
     --ae-blue: #007aff;
+    --success: #34c759;
+    --danger: #ff3b30;
+    
+    /* Variables que cambiarán con el tema de Telegram */
     --bg-gray: #f2f2f7;
     --text-dark: #1c1c1e;
     --text-gray: #8e8e93;
     --white: #ffffff;
-    --success: #34c759;
-    --danger: #ff3b30;
+    --card-bg: #ffffff;
 }
 
+/* Esta clase se activará automáticamente vía JavaScript */
+body.dark-mode {
+    --bg-gray: #111111;
+    --text-dark: #ffffff;
+    --text-gray: #aaaaaa;
+    --white: #1c1c1e;
+    --card-bg: #1c1c1e;
+}
 body {
     background-color: var(--bg-gray);
     color: var(--text-dark);
