@@ -51,17 +51,17 @@
         .e-value { text-align: center; font-size: 3em; font-weight: 800; margin: 10px 0;}
         .e-stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center; margin-top: 15px; position: relative; z-index: 1;}
         .e-stat-box { background-color: rgba(255,255,255,0.1); padding: 10px 2px; border-radius: 12px;}
-        .es-label { font-size: 0.55em; display:block; opacity:0.8; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px;}
+        .es-label { font-size: 0.55em; display:block; opacity:0.8; text-transform: uppercase; margin-bottom: 4px;}
         .es-val { font-size: 0.85em; font-weight: bold; }
 
-        /* ACTIONS */
-        .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 15px; margin-bottom: 15px; }
-        .act-card { background: var(--card-white); padding: 15px; border-radius: 16px; border: 1px solid var(--border-light); display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow-sm); }
-        
-        .info-row {
-            background: white; padding: 15px; border-radius: 15px; border: 1px solid var(--border-light);
-            display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
+        /* TIERS VIEW */
+        .tier-card {
+            background: white; border-radius: 16px; padding: 15px; margin-bottom: 12px;
+            display: grid; grid-template-columns: 40px 1fr 1fr; align-items: center;
+            border: 1px solid var(--border-light); position: relative;
         }
+        .tier-number { width: 28px; height: 28px; background: #e2e8f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.8em; }
+        .tier-badge { position: absolute; top: -10px; right: 15px; background: var(--accent-orange); color: white; font-size: 0.6em; padding: 4px 8px; border-radius: 20px; font-weight: bold; text-transform: uppercase; }
 
         /* NAV */
         .bottom-nav { position: fixed; bottom: 0; width: 100%; background: var(--card-white); display: flex; padding: 12px 0 25px; border-top: 1px solid var(--border-light); z-index: 9999; }
@@ -75,17 +75,14 @@
     <div id="view-home" class="view active">
         <div class="home-header">
             <div class="header-logo">SP</div>
-            <div class="header-info">
-                <p>Welcome to Sports Pay,</p>
-                <h2>User ID: <span id="display-id">000000</span></h2>
-            </div>
+            <div class="header-info"><p>Welcome to Sports Pay,</p><h2>User ID: <span id="display-id">0000</span></h2></div>
         </div>
 
-        <div style="padding: 15px 20px; background: white; border-bottom: 1px solid var(--border-light); margin-bottom: 15px;">
+        <div style="padding: 15px 20px; background: white; margin-bottom: 15px; border-bottom: 1px solid var(--border-light);">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
                     <div style="font-size: 0.85em; color: var(--text-dim);">Total Earned (Available) <i class="fas fa-wallet"></i></div>
-                    <div style="font-size: 1.8em; font-weight: 800; margin: 5px 0; color: var(--text-dark);">$ <span id="total-val">0.0000</span></div>
+                    <div style="font-size: 1.8em; font-weight: 800; margin: 5px 0;">$ <span id="total-val">0.3592</span></div>
                 </div>
                 <button style="background: var(--primary-blue); color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold;" onclick="tg.sendData('withdraw')">Withdraw</button>
             </div>
@@ -97,63 +94,84 @@
                     <div><i class="fas fa-bolt" style="color:var(--accent-orange)"></i> MINING POWER</div>
                     <i class="fas fa-sync-alt" onclick="location.reload()"></i>
                 </div>
-                <div class="e-value"><span id="mining-power-val">0</span><span style="font-size: 0.4em; margin-left:5px;">GH/s</span></div>
+                <div class="e-value">6530<span style="font-size: 0.4em; margin-left:5px;">GH/s</span></div>
                 <div class="e-stats-grid">
-                    <div class="e-stat-box">
-                        <span class="es-label">DAILY PROFIT</span>
-                        <span class="es-val" id="daily-profit-val">$ 0.0000</span>
-                    </div>
-                    <div class="e-stat-box">
-                        <span class="es-label">RETURN</span>
-                        <span class="es-val" id="return-val">0.0%</span>
-                    </div>
-                    <div class="e-stat-box">
-                        <span class="es-label">SETTLEMENT</span>
-                        <span class="es-val" id="settlement-timer">00:00:00</span>
-                    </div>
+                    <div class="e-stat-box"><span class="es-label">DAILY PROFIT</span><span class="es-val" id="daily-profit-val">$ 0.3592</span></div>
+                    <div class="e-stat-box"><span class="es-label">RETURN</span><span class="es-val" id="return-val">5.5%</span></div>
+                    <div class="e-stat-box"><span class="es-label">SETTLEMENT</span><span class="es-val" id="settlement-timer">10:32:03</span></div>
                 </div>
             </div>
         </div>
 
-        <div class="actions-grid">
-            <div class="act-card" onclick="tg.showAlert('Purchase system opening soon')">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 15px;">
+            <div onclick="switchTab('buy')" style="background: white; padding: 15px; border-radius: 16px; border: 1px solid var(--border-light); display: flex; align-items: center; gap: 10px;">
                 <i class="fas fa-charging-station" style="color:var(--accent-orange); font-size: 1.5em;"></i>
                 <div><b style="font-size: 0.9em; display:block;">Buy GH/s</b><span style="font-size: 0.7em; color: var(--text-dim);">Boost power</span></div>
             </div>
-            <div class="act-card" onclick="switchTab('share')">
+            <div onclick="switchTab('share')" style="background: white; padding: 15px; border-radius: 16px; border: 1px solid var(--border-light); display: flex; align-items: center; gap: 10px;">
                 <i class="fas fa-gift" style="color:var(--primary-blue); font-size: 1.5em;"></i>
                 <div><b style="font-size: 0.9em; display:block;">Refer</b><span style="font-size: 0.7em; color: var(--text-dim);">Get $10 Bonus</span></div>
             </div>
         </div>
     </div>
 
+    <div id="view-buy" class="view">
+        <div style="padding: 20px; background: white; border-bottom: 1px solid var(--border-light); margin-bottom: 20px; text-align: center;">
+            <h2 style="margin: 0;">Buy GH/s Energy</h2>
+            <p style="color: var(--text-dim); font-size: 0.9em;">Daily Return Tiers</p>
+        </div>
+
+        <div style="padding: 0 15px;">
+            <div class="tier-card">
+                <div class="tier-number">1</div>
+                <div><span style="font-size: 0.7em; color: var(--text-dim); display: block;">Amount</span><b style="font-size: 0.9em;">>= $0</b></div>
+                <div style="text-align: right;"><span style="font-size: 0.7em; color: var(--text-dim); display: block;">Return</span><b style="color: var(--primary-blue); font-size: 1.1em;">5.5%</b></div>
+            </div>
+            <div class="tier-card">
+                <div class="tier-number">2</div>
+                <div><span style="font-size: 0.7em; color: var(--text-dim); display: block;">Amount</span><b style="font-size: 0.9em;">>= $20</b></div>
+                <div style="text-align: right;"><span style="font-size: 0.7em; color: var(--text-dim); display: block;">Return</span><b style="color: var(--primary-blue); font-size: 1.1em;">6.0%</b></div>
+            </div>
+            <div class="tier-card">
+                <div class="tier-number">3</div>
+                <div><span style="font-size: 0.7em; color: var(--text-dim); display: block;">Amount</span><b style="font-size: 0.9em;">>= $300</b></div>
+                <div style="text-align: right;"><span style="font-size: 0.7em; color: var(--text-dim); display: block;">Return</span><b style="color: var(--primary-blue); font-size: 1.1em;">6.5%</b></div>
+            </div>
+            <div class="tier-card" style="border: 2px solid var(--primary-blue);">
+                <span class="tier-badge">Popular</span>
+                <div class="tier-number" style="background: var(--primary-blue); color: white;">4</div>
+                <div><span style="font-size: 0.7em; color: var(--text-dim); display: block;">Amount</span><b style="font-size: 0.9em;">>= $3000+</b></div>
+                <div style="text-align: right;"><span style="font-size: 0.7em; color: var(--text-dim); display: block;">Return</span><b style="color: var(--primary-blue); font-size: 1.1em;">Contact</b></div>
+            </div>
+        </div>
+
+        <div style="padding: 20px;">
+            <button onclick="tg.sendData('open_payment')" style="width: 100%; background: var(--primary-blue); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; font-size: 1em; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);">
+                <i class="fas fa-plus-circle"></i> Recharge Now
+            </button>
+        </div>
+    </div>
+
     <div id="view-share" class="view">
-        <div style="padding: 20px; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; text-align: center; border-radius: 0 0 30px 30px; margin-bottom: 20px;">
+        <div style="padding: 30px 20px; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; text-align: center; border-radius: 0 0 30px 30px; margin-bottom: 25px;">
             <i class="fas fa-users" style="font-size: 3em; margin-bottom: 10px;"></i>
             <h2 style="margin: 0;">Invite & Earn</h2>
-            <p style="font-size: 0.9em; opacity: 0.8;">Build your Sports Pay Team</p>
         </div>
-        <div style="background: #eff6ff; border: 2px dashed #2563eb; padding: 20px; border-radius: 20px; text-align: center; margin: 0 20px 25px;">
-            <div style="font-weight: bold; color: #1e293b; margin-bottom: 10px;">Your Invitation Link</div>
-            <div id="referral-link-display" style="font-size: 0.8em; color: #2563eb; background: white; padding: 10px; border-radius: 10px; margin-bottom: 15px; word-break: break-all; border: 1px solid #d1e2ff;">Generating...</div>
+        <div style="background: #eff6ff; border: 2px dashed #2563eb; padding: 20px; border-radius: 20px; text-align: center; margin: 0 20px;">
+            <div id="referral-link-display" style="font-size: 0.8em; color: #2563eb; background: white; padding: 10px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #d1e2ff;">t.me/SportsPay_bot?start=...</div>
             <button onclick="copyRefLink()" style="width: 100%; background: #2563eb; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold;">Copy Link</button>
         </div>
     </div>
 
     <div id="view-about" class="view">
-        <div style="padding: 30px 20px; background: white; text-align: center; border-bottom: 1px solid var(--border-light); margin-bottom: 20px;">
-            <div style="font-size: 3em; color: var(--primary-blue); margin-bottom: 10px;"><i class="fas fa-shield-halved"></i></div>
-            <h2 style="margin: 0;">About Sports Pay</h2>
-            <p style="color: var(--text-dim); font-size: 0.9em;">Official Information & Support</p>
+        <div style="padding: 30px 20px; text-align: center;">
+            <i class="fas fa-shield-halved" style="font-size: 3em; color: var(--primary-blue); margin-bottom: 15px;"></i>
+            <h2 style="margin: 0;">Sports Pay</h2>
+            <p style="color: var(--text-dim);">Secure Arbitrage Platform</p>
         </div>
         <div style="padding: 0 20px;">
-            <div class="info-row" onclick="tg.showAlert('Sports Pay Whitepaper v2.0 - Certified Investment')">
-                <div style="display: flex; align-items: center; gap: 15px;"><i class="fas fa-file-lines" style="color: var(--primary-blue);"></i><b>Whitepaper</b></div>
-                <i class="fas fa-chevron-right" style="color: #cbd5e1;"></i>
-            </div>
-            <div class="info-row" onclick="tg.showAlert('Support 24/7 available at @Danny_Support')">
-                <div style="display: flex; align-items: center; gap: 15px;"><i class="fas fa-headset" style="color: var(--primary-blue);"></i><b>Online Support</b></div>
-                <i class="fas fa-chevron-right" style="color: #cbd5e1;"></i>
+            <div style="background: white; padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between;" onclick="tg.showAlert('Support: @Danny_Support')">
+                <b>Online Support</b><i class="fas fa-chevron-right" style="color: #cbd5e1;"></i>
             </div>
         </div>
     </div>
@@ -169,61 +187,11 @@
         tg.ready();
         tg.expand();
 
-        const BOT_USERNAME = "SportsPay_bot"; 
-        
-        // Simulación de datos reales (Esto lo conectarás con tu base de datos después)
-        let userData = {
-            id: tg.initDataUnsafe?.user?.id || "7517815832",
-            balance: 0.3592,    // Total Earned
-            miningPower: 6530,  // GH/s
-            dailyProfit: 0.3592, 
-            returnRate: 5.5     // %
-        };
-
         function initApp() {
-            document.getElementById('display-id').innerText = userData.id;
-            document.getElementById('total-val').innerText = userData.balance.toFixed(4);
-            document.getElementById('mining-power-val').innerText = userData.miningPower;
-            document.getElementById('daily-profit-val').innerText = `$ ${userData.dailyProfit.toFixed(4)}`;
-            document.getElementById('return-val').innerText = `${userData.returnRate}%`;
-            document.getElementById('referral-link-display').innerText = `https://t.me/${BOT_USERNAME}?start=${userData.id}`;
-            
+            const userId = tg.initDataUnsafe?.user?.id || "7517815832";
+            document.getElementById('display-id').innerText = userId;
+            document.getElementById('referral-link-display').innerText = `https://t.me/SportsPay_bot?start=${userId}`;
             startSettlementTimer();
-        }
-
-        function startSettlementTimer() {
-            const timerElement = document.getElementById('settlement-timer');
-
-            function updateTimer() {
-                // Si no hay inversión (miningPower es 0), se queda en 00:00:00
-                if (userData.miningPower <= 0) {
-                    timerElement.innerText = "00:00:00";
-                    return;
-                }
-
-                const now = new Date();
-                
-                // Configurar objetivo: 12:00 AM hora de Cuba (aproximadamente UTC-4)
-                // Usamos la hora local del dispositivo y ajustamos para el fin del día
-                const target = new Date();
-                target.setHours(24, 0, 0, 0); // Próxima medianoche
-
-                const diff = target - now;
-
-                if (diff <= 0) {
-                    timerElement.innerText = "00:00:00";
-                    return;
-                }
-
-                const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
-                const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-                const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
-
-                timerElement.innerText = `${h}:${m}:${s}`;
-            }
-
-            setInterval(updateTimer, 1000);
-            updateTimer();
         }
 
         function switchTab(viewId) {
@@ -235,18 +203,31 @@
             if(viewId === 'home') tabs[0].classList.add('active');
             if(viewId === 'share') tabs[1].classList.add('active');
             if(viewId === 'about') tabs[2].classList.add('active');
-
             tg.HapticFeedback.impactOccurred('light');
+        }
+
+        function startSettlementTimer() {
+            const timerElement = document.getElementById('settlement-timer');
+            function updateTimer() {
+                const now = new Date();
+                const target = new Date();
+                target.setHours(24, 0, 0, 0);
+                const diff = target - now;
+                const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
+                const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+                const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+                timerElement.innerText = `${h}:${m}:${s}`;
+            }
+            setInterval(updateTimer, 1000);
+            updateTimer();
         }
 
         function copyRefLink() {
             const link = document.getElementById('referral-link-display').innerText;
-            navigator.clipboard.writeText(link).then(() => {
-                tg.showAlert("✅ Invitation link copied to clipboard!");
-            });
+            navigator.clipboard.writeText(link).then(() => tg.showAlert("✅ Link copied!"));
         }
 
         initApp();
     </script>
 </body>
-</html>
+                    </html>4
