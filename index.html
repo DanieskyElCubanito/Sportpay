@@ -17,6 +17,7 @@
             --card-bg: #1a222c;
             --text-main: #ffffff;
             --text-dim: #94a3b8;
+            --success: #22c55e;
         }
 
         body {
@@ -73,6 +74,22 @@
         .r-value { font-weight: bold; color: #fff; font-size: 1em; }
         .profit-box { background: rgba(201,165,92,0.1); border-color: rgba(201,165,92,0.3); }
         .profit-val { color: var(--primary); }
+
+        /* ESTILOS DE EQUIPO (NUEVOS) */
+        .team-stats-container { padding: 0 20px; margin-bottom: 20px; }
+        .invite-card { background: var(--card-bg); padding: 15px; border-radius: 16px; border: 1px solid rgba(201,165,92,0.2); margin-top: 15px; }
+        .invite-label { font-size: 0.8em; color: var(--text-dim); margin-bottom: 10px; display: block; }
+        .invite-input-group { display: flex; background: rgba(0,0,0,0.3); border-radius: 10px; padding: 10px; align-items: center; border: 1px solid rgba(255,255,255,0.1); }
+        .invite-input-group input { background: transparent; border: none; color: var(--text-dim); font-size: 0.85em; width: 100%; outline: none; }
+        .copy-btn { background: var(--primary); color: #000; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
+        .levels-list { padding: 0 20px; display: flex; flex-direction: column; gap: 10px; }
+        .level-item { background: var(--card-bg); padding: 15px; border-radius: 12px; display: flex; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
+        .level-badge { width: 45px; height: 45px; background: rgba(201,165,92,0.1); color: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1em; margin-right: 15px; border: 1px solid rgba(201,165,92,0.2); }
+        .level-data { flex: 1; }
+        .level-data .users { display: block; font-size: 0.95em; font-weight: bold; }
+        .level-data .com { font-size: 0.75em; color: var(--text-dim); }
+        .level-percent { color: var(--success); font-weight: bold; font-size: 0.9em; }
 
         /* BOTONES */
         .btn-primary { background: var(--primary); color: #000; border: none; padding: 16px; border-radius: 12px; font-size: 1em; font-weight: bold; width: 100%; cursor: pointer; transition: 0.2s; }
@@ -182,7 +199,6 @@
         
         <div class="calculator-section">
             <div class="calc-label">CANTIDAD QUE DESEAS COMPRAR</div>
-            
             <div class="input-usdt-wrapper">
                 <div class="usdt-icon-circle"><i class="fas fa-dollar-sign"></i></div>
                 <input type="number" id="invest-amount" value="1" oninput="calculateReturns()">
@@ -216,71 +232,80 @@
         </div>
     </div>
 
-    <div id="equipo-section" class="tab-content">
-    <div class="referral-header">
-        <h3>Programa de Referidos</h3>
-        <p>Gana un 2% por cada depósito de tus amigos en 5 niveles.</p>
-        <div class="total-referral-card">
-            <span class="label">Total Ganado</span>
-            <span class="amount" id="total-ganado-ref">0.00 USDT</span>
+    <div id="view-equipo" class="view">
+        <div class="header-profile" style="padding: 20px;">
+            <h2>Mi Equipo</h2>
+            <p style="color: var(--text-dim);">Gana 2% en 5 niveles de profundidad.</p>
+        </div>
+
+        <div class="team-stats-container">
+            <div class="dashboard-grid" style="padding: 0; margin-bottom: 15px;">
+                <div class="db-card">
+                    <span class="db-label">Total Referidos</span>
+                    <div class="db-value" id="total-ref-count">0</div>
+                </div>
+                <div class="db-card">
+                    <span class="db-label">Bonus Acumulado</span>
+                    <div class="db-value" style="color: #22c55e;">0.00 USDT</div>
+                </div>
+            </div>
+
+            <div class="invite-card">
+                <span class="invite-label">ENLACE DE INVITACIÓN</span>
+                <div class="invite-input-group">
+                    <input type="text" id="invite-link" value="https://t.me/SportsPayBot?start=7517815832" readonly>
+                    <button class="copy-btn" onclick="copyInvite()">COPIAR</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="levels-list">
+            <div class="level-item">
+                <div class="level-badge">L1</div>
+                <div class="level-data">
+                    <span class="users"><span id="l1-count">0</span> Usuarios</span>
+                    <span class="com">Ganancia por depósito</span>
+                </div>
+                <div class="level-percent">+2%</div>
+            </div>
+            <div class="level-item">
+                <div class="level-badge">L2</div>
+                <div class="level-data">
+                    <span class="users"><span id="l2-count">0</span> Usuarios</span>
+                    <span class="com">Ganancia por depósito</span>
+                </div>
+                <div class="level-percent">+2%</div>
+            </div>
+            <div class="level-item">
+                <div class="level-badge">L3</div>
+                <div class="level-data">
+                    <span class="users"><span id="l3-count">0</span> Usuarios</span>
+                    <span class="com">Ganancia por depósito</span>
+                </div>
+                <div class="level-percent">+2%</div>
+            </div>
+            <div class="level-item">
+                <div class="level-badge">L4</div>
+                <div class="level-data">
+                    <span class="users"><span id="l4-count">0</span> Usuarios</span>
+                    <span class="com">Ganancia por depósito</span>
+                </div>
+                <div class="level-percent">+2%</div>
+            </div>
+            <div class="level-item">
+                <div class="level-badge">L5</div>
+                <div class="level-data">
+                    <span class="users"><span id="l5-count">0</span> Usuarios</span>
+                    <span class="com">Ganancia por depósito</span>
+                </div>
+                <div class="level-percent">+2%</div>
+            </div>
+        </div>
+
+        <div class="main-actions">
+            <button class="btn-ghost" onclick="tg.sendData('btn_team_details')">Ver Detalles en el Bot</button>
         </div>
     </div>
-
-    <div class="invite-box">
-        <p>Tu enlace de invitación</p>
-        <div class="copy-wrapper">
-            <input type="text" id="ref-link" value="https://t.me/TuBot?start=7517815832" readonly>
-            <button onclick="copyRef()"><i class="fas fa-copy"></i></button>
-        </div>
-    </div>
-
-    <div class="levels-container">
-        <div class="level-row" onclick="viewLevel(1)">
-            <div class="level-badge">L1</div>
-            <div class="level-info">
-                <span class="users-count"><span id="l1-count">0</span> Usuarios</span>
-                <span class="volume">Volumen: $<span id="l1-vol">0.00</span></span>
-            </div>
-            <div class="level-reward">+2%</div>
-        </div>
-        
-        <div class="level-row" onclick="viewLevel(2)">
-            <div class="level-badge">L2</div>
-            <div class="level-info">
-                <span class="users-count"><span id="l2-count">0</span> Usuarios</span>
-                <span class="volume">Volumen: $<span id="l2-vol">0.00</span></span>
-            </div>
-            <div class="level-reward">+2%</div>
-        </div>
-
-        <div class="level-row" onclick="viewLevel(3)">
-            <div class="level-badge">L3</div>
-            <div class="level-info">
-                <span class="users-count"><span id="l3-count">0</span> Usuarios</span>
-                <span class="volume">Volumen: $<span id="l3-vol">0.00</span></span>
-            </div>
-            <div class="level-reward">+2%</div>
-        </div>
-
-        <div class="level-row" onclick="viewLevel(4)">
-            <div class="level-badge">L4</div>
-            <div class="level-info">
-                <span class="users-count"><span id="l4-count">0</span> Usuarios</span>
-                <span class="volume">Volumen: $<span id="l4-vol">0.00</span></span>
-            </div>
-            <div class="level-reward">+2%</div>
-        </div>
-
-        <div class="level-row" onclick="viewLevel(5)">
-            <div class="level-badge">L5</div>
-            <div class="level-info">
-                <span class="users-count"><span id="l5-count">0</span> Usuarios</span>
-                <span class="volume">Volumen: $<span id="l5-vol">0.00</span></span>
-            </div>
-            <div class="level-reward">+2%</div>
-        </div>
-    </div>
-</div>
 
     <div id="view-ajustes" class="view">
         <div class="header-profile" style="padding: 20px;">
@@ -295,21 +320,10 @@
     <div id="payment-modal" class="modal-overlay">
         <div class="payment-pro-card">
             <button class="close-x" onclick="closePaymentModal()">&times;</button>
-            
-            <div class="pay-timer-row">
-                Cuenta regresiva: <span id="timer" style="color: #16a34a;">30:00</span>
-            </div>
-
-            <div class="pay-amount-main">
-                <span id="pay-amount-display">1.00</span> <span style="font-size: 0.5em; color: #666;">USDT</span>
-            </div>
-            
+            <div class="pay-timer-row">Cuenta regresiva: <span id="timer" style="color: #16a34a;">30:00</span></div>
+            <div class="pay-amount-main"><span id="pay-amount-display">1.00</span> <span style="font-size: 0.5em; color: #666;">USDT</span></div>
             <p style="color: #666; font-size: 0.9em; margin-bottom: 15px;">Envía USDT-BSC a la siguiente dirección.</p>
-
-            <div class="qr-wrapper">
-                <img id="qr-img" src="" alt="Código QR">
-            </div>
-
+            <div class="qr-wrapper"><img id="qr-img" src="" alt="Código QR"></div>
             <div class="address-box-light">
                 <div style="font-size: 0.8em; color: #666; font-weight: bold;">Dirección</div>
                 <div class="addr-flex">
@@ -317,205 +331,7 @@
                     <button class="copy-btn-pro" onclick="copyAddress()"><i class="fas fa-copy"></i></button>
                 </div>
             </div>
-
-            <div style="font-size: 0.9em; font-weight: bold; margin-bottom: 5px; color: #1a1a1a;">
-                Red: <span style="color: #16a34a;">BSC/BEP20</span>
-            </div>
-            <p style="font-size: 0.75em; color: #999; margin-bottom: 15px;">* No envíes activos que no sean BEP20</p>
-
+            <div style="font-size: 0.9em; font-weight: bold; margin-bottom: 5px; color: #1a1a1a;">Red: <span style="color: #16a34a;">BSC/BEP20</span></div>
             <div class="status-box">
                 <div style="font-size: 0.85em; color: #666;">Estado del Pago:</div>
-                <div style="font-weight: bold; color: #1a1a1a; font-size: 1.1em; margin-top: 5px;">
-                    No Recibido ⏳
-                </div>
-            </div>
-
-            <button class="btn-confirm-pay" onclick="verifyOnChain()">
-                <i class="fas fa-download"></i> Continuar
-            </button>
-        </div>
-    </div>
-
-    <nav class="bottom-nav">
-        <div id="nav-inicio" class="nav-tab active" onclick="switchView('inicio', this)">
-            <i class="fas fa-home"></i><span>Inicio</span>
-        </div>
-        <div id="nav-tienda" class="nav-tab" onclick="switchView('tienda', this)">
-            <i class="fas fa-shopping-bag"></i><span>Tienda</span>
-        </div>
-        <div id="nav-equipo" class="nav-tab" onclick="switchView('equipo', this)">
-            <i class="fas fa-users"></i><span>Equipo</span>
-        </div>
-        <div id="nav-ajustes" class="nav-tab" onclick="switchView('ajustes', this)">
-            <i class="fas fa-cog"></i><span>Ajustes</span>
-        </div>
-    </nav>
-
-    <script>
-        // 1. INICIALIZAR TELEGRAM Y DATOS DEL USUARIO DE FORMA DINÁMICA
-        const tg = window.Telegram.WebApp;
-        tg.expand(); // Expandir la app a pantalla completa
-
-        // Capturar datos del usuario que abre la app
-        const user = tg.initDataUnsafe?.user;
-        
-        if (user) {
-            // Pone el nombre real del usuario
-            let fullName = user.first_name;
-            if(user.last_name) fullName += " " + user.last_name;
-            document.getElementById('profile-name').innerText = fullName;
-            
-            // Pone el ID real del usuario
-            document.getElementById('u-id').innerText = user.id;
-            
-            // Pone la foto del usuario si tiene una
-            if (user.photo_url) {
-                document.getElementById('user-photo').src = user.photo_url;
-            } else {
-                // Imagen por defecto si no tiene foto en Telegram
-                document.getElementById('user-photo').src = 'https://ui-avatars.com/api/?name=' + user.first_name + '&background=c9a55c&color=000';
-            }
-        }
-
-        // 2. SISTEMA DE NAVEGACIÓN DE PESTAÑAS
-        function switchView(viewId, element) {
-            // Ocultar todas las vistas
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            // Mostrar la vista seleccionada
-            document.getElementById('view-' + viewId).classList.add('active');
-            
-            // Si se tocó la barra de navegación inferior, cambiar el color del icono
-            if(element) {
-                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-                element.classList.add('active');
-            } else {
-                // Si se navegó por botón, actualizar la barra inferior manualmente
-                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-                let navIcon = document.getElementById('nav-' + viewId);
-                if(navIcon) navIcon.classList.add('active');
-            }
-            
-            // Pequeña vibración en el móvil al tocar
-            tg.HapticFeedback.impactOccurred('light');
-        }
-
-        // 3. LÓGICA DE LA TIENDA Y CALCULADORA
-        let currentRate = 0.05; // 5% por defecto
-        let currentMin = 1;     // $1 mínimo por defecto
-        let timerInterval;      // Variable para el temporizador
-
-        function selectTier(id, minAmount, dailyRate) {
-            // Quitar clase activa a todos los tiers
-            document.querySelectorAll('.tier-card').forEach(card => card.classList.remove('active'));
-            // Poner clase activa al tier seleccionado
-            document.getElementById('tier-' + id).classList.add('active');
-            
-            currentRate = dailyRate;
-            currentMin = minAmount;
-            
-            const inputE = document.getElementById('invest-amount');
-            
-            // Si el valor actual es menor al mínimo del tier nuevo, lo subimos
-            if(parseFloat(inputE.value) < minAmount || inputE.value === "") {
-                inputE.value = minAmount; 
-            }
-            
-            calculateReturns(); // Recalcular
-            tg.HapticFeedback.selectionChanged();
-        }
-
-        function calculateReturns() {
-            const amount = parseFloat(document.getElementById('invest-amount').value) || 0;
-            const power = amount * 100; 
-            const dailyProfit = amount * currentRate;
-            
-            document.getElementById('power-amount').innerText = power.toLocaleString();
-            document.getElementById('usd-amount').innerText = amount.toFixed(2);
-            document.getElementById('ret-daily').innerText = `$${dailyProfit.toFixed(2)}`;
-            document.getElementById('ret-total').innerText = `$${(dailyProfit * 30).toFixed(2)}`;
-            document.getElementById('ret-profit').innerText = `$${((dailyProfit * 30) - amount).toFixed(2)}`;
-        }
-
-        // 4. LÓGICA DE LA PASARELA DE PAGO
-        async function abrirPasarela() {
-            const inputVal = document.getElementById('invest-amount').value;
-            const monto = parseFloat(inputVal);
-
-            if (isNaN(monto) || monto < currentMin) {
-                tg.showAlert(`❌ El monto mínimo para el plan seleccionado es de ${currentMin} USDT.`);
-                return;
-            }
-
-            // Poner el monto en el modal
-            document.getElementById('pay-amount-display').innerText = monto.toFixed(2);
-            
-            // Generar Wallet y QR (Usando una wallet por defecto o tu API)
-            try {
-                // Aquí usamos una wallet de prueba, reemplázala por tu generador si tienes uno
-                const wallet = "0x2597c5Fb67f036ff64a4C8bebdEdC69a7B3de405"; 
-                
-                document.getElementById('pay-address').innerText = wallet;
-                document.getElementById('qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${wallet}`;
-                
-                // Abrir el modal
-                document.getElementById('payment-modal').style.display = 'flex';
-                
-                // Iniciar contador de 30 minutos
-                startTimer(30 * 60); 
-                tg.HapticFeedback.impactOccurred('medium');
-
-            } catch (e) {
-                tg.showAlert("Error al generar la orden de pago.");
-            }
-        }
-
-        function startTimer(duration) {
-            let timer = duration;
-            clearInterval(timerInterval); 
-            
-            timerInterval = setInterval(() => {
-                let minutes = Math.floor(timer / 60);
-                let seconds = timer % 60;
-
-                minutes = minutes < 10 ? "0" + minutes : minutes;
-                seconds = seconds < 10 ? "0" + seconds : seconds;
-
-                document.getElementById('timer').textContent = `${minutes}:${seconds}`;
-
-                if (--timer < 0) {
-                    clearInterval(timerInterval);
-                    document.getElementById('timer').textContent = "00:00";
-                    tg.showAlert("⏰ El tiempo ha expirado.");
-                    closePaymentModal();
-                }
-            }, 1000);
-        }
-
-        function closePaymentModal() {
-            document.getElementById('payment-modal').style.display = 'none';
-            clearInterval(timerInterval);
-        }
-
-        function copyAddress() {
-            const addr = document.getElementById('pay-address').innerText;
-            navigator.clipboard.writeText(addr).then(() => {
-                tg.showAlert("✅ Dirección copiada al portapapeles");
-                tg.HapticFeedback.notificationOccurred('success');
-            });
-        }
-
-        function verifyOnChain() {
-            // Esto envía una señal a tu Bot de Telegram para que él verifique el pago
-            tg.showConfirm("¿Confirmas que ya realizaste el envío de los fondos?", (ok) => {
-                if(ok) {
-                    tg.sendData("verify_payment");
-                    tg.close(); // Cierra la Mini App y vuelve al chat
-                }
-            });
-        }
-        
-        // Ejecutar cálculo inicial al cargar
-        calculateReturns();
-    </script>
-</body>
-</html>
+                <div style="font-weight: bold; color: #1a1a1a; font-size:
