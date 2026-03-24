@@ -216,15 +216,71 @@
         </div>
     </div>
 
-    <div id="view-equipo" class="view">
-        <div class="header-profile" style="padding: 20px;">
-            <h2>Mi Equipo</h2>
-            <p style="color: var(--text-dim);">Invita amigos y gana comisiones.</p>
-        </div>
-        <div class="main-actions">
-            <button class="btn-primary" onclick="tg.sendData('btn_team')">Ver mis referidos en el Bot</button>
+    <div id="equipo-section" class="tab-content">
+    <div class="referral-header">
+        <h3>Programa de Referidos</h3>
+        <p>Gana un 2% por cada depósito de tus amigos en 5 niveles.</p>
+        <div class="total-referral-card">
+            <span class="label">Total Ganado</span>
+            <span class="amount" id="total-ganado-ref">0.00 USDT</span>
         </div>
     </div>
+
+    <div class="invite-box">
+        <p>Tu enlace de invitación</p>
+        <div class="copy-wrapper">
+            <input type="text" id="ref-link" value="https://t.me/TuBot?start=7517815832" readonly>
+            <button onclick="copyRef()"><i class="fas fa-copy"></i></button>
+        </div>
+    </div>
+
+    <div class="levels-container">
+        <div class="level-row" onclick="viewLevel(1)">
+            <div class="level-badge">L1</div>
+            <div class="level-info">
+                <span class="users-count"><span id="l1-count">0</span> Usuarios</span>
+                <span class="volume">Volumen: $<span id="l1-vol">0.00</span></span>
+            </div>
+            <div class="level-reward">+2%</div>
+        </div>
+        
+        <div class="level-row" onclick="viewLevel(2)">
+            <div class="level-badge">L2</div>
+            <div class="level-info">
+                <span class="users-count"><span id="l2-count">0</span> Usuarios</span>
+                <span class="volume">Volumen: $<span id="l2-vol">0.00</span></span>
+            </div>
+            <div class="level-reward">+2%</div>
+        </div>
+
+        <div class="level-row" onclick="viewLevel(3)">
+            <div class="level-badge">L3</div>
+            <div class="level-info">
+                <span class="users-count"><span id="l3-count">0</span> Usuarios</span>
+                <span class="volume">Volumen: $<span id="l3-vol">0.00</span></span>
+            </div>
+            <div class="level-reward">+2%</div>
+        </div>
+
+        <div class="level-row" onclick="viewLevel(4)">
+            <div class="level-badge">L4</div>
+            <div class="level-info">
+                <span class="users-count"><span id="l4-count">0</span> Usuarios</span>
+                <span class="volume">Volumen: $<span id="l4-vol">0.00</span></span>
+            </div>
+            <div class="level-reward">+2%</div>
+        </div>
+
+        <div class="level-row" onclick="viewLevel(5)">
+            <div class="level-badge">L5</div>
+            <div class="level-info">
+                <span class="users-count"><span id="l5-count">0</span> Usuarios</span>
+                <span class="volume">Volumen: $<span id="l5-vol">0.00</span></span>
+            </div>
+            <div class="level-reward">+2%</div>
+        </div>
+    </div>
+</div>
 
     <div id="view-ajustes" class="view">
         <div class="header-profile" style="padding: 20px;">
