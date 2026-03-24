@@ -201,3 +201,94 @@
     </script>
 </body>
     </html>
+
+<div id="view-share" class="view">
+    <div style="padding: 20px; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; text-align: center; border-radius: 0 0 30px 30px; margin-bottom: 20px;">
+        <i class="fas fa-users" style="font-size: 3em; margin-bottom: 10px; opacity: 0.9;"></i>
+        <h2 style="margin: 0;">Invite & Earn</h2>
+        <p style="font-size: 0.9em; opacity: 0.8;">Share the wealth with friends and earn rewards</p>
+    </div>
+
+    <div style="padding: 0 20px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+            <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #e2e8f0; text-align: center;">
+                <i class="fas fa-gift" style="color: #f97316; margin-bottom: 5px;"></i>
+                <div style="font-size: 1.2em; font-weight: bold;">$10</div>
+                <div style="font-size: 0.7em; color: #64748b; text-transform: uppercase;">Per qualified referral</div>
+            </div>
+            <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #e2e8f0; text-align: center;">
+                <i class="fas fa-chart-line" style="color: #2563eb; margin-bottom: 5px;"></i>
+                <div style="font-size: 1.2em; font-weight: bold;">5-1%</div>
+                <div style="font-size: 0.7em; color: #64748b; text-transform: uppercase;">Commission up to L10</div>
+            </div>
+        </div>
+
+        <div style="background: #eff6ff; border: 2px dashed #2563eb; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 25px;">
+            <div style="font-weight: bold; color: #1e293b; margin-bottom: 10px;">Your Invitation Link</div>
+            <div id="referral-link-display" style="font-size: 0.8em; color: #2563eb; background: white; padding: 10px; border-radius: 10px; margin-bottom: 15px; word-break: break-all; border: 1px solid #d1e2ff;">
+                https://t.me/SportsPay_bot?start=7517815832
+            </div>
+            <button onclick="copyRefLink()" style="width: 100%; background: #2563eb; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <i class="fas fa-copy"></i> Copy Link
+            </button>
+        </div>
+
+        <div style="background: white; padding: 20px; border-radius: 20px; border: 1px solid #e2e8f0;">
+            <h3 style="margin-top: 0; font-size: 1em;"><i class="fas fa-lightbulb" style="color: #eab308;"></i> How It Works</h3>
+            <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                <div style="background: #eef2ff; color: #2563eb; width: 25px; height: 25px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: bold; font-size: 0.8em;">1</div>
+                <div><strong style="font-size: 0.9em;">Referral signup</strong><p style="font-size: 0.8em; color: #64748b; margin: 2px 0;">User registers via your link.</p></div>
+            </div>
+            <div style="display: flex; gap: 15px;">
+                <div style="background: #eef2ff; color: #2563eb; width: 25px; height: 25px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: bold; font-size: 0.8em;">2</div>
+                <div><strong style="font-size: 0.9em;">Qualifying purchase</strong><p style="font-size: 0.8em; color: #64748b; margin: 2px 0;">Purchase of $50 USDT or more.</p></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+
+    // Nombre del bot (Cámbialo si el username es distinto)
+    const BOT_USERNAME = "SportsPay_bot"; 
+
+    function setupReferralSystem() {
+        const user = tg.initDataUnsafe?.user;
+        const userId = user ? user.id : "7517815832"; // ID real del usuario o el tuyo por defecto
+        
+        // Generar enlace real
+        const refLink = `https://t.me/${BOT_USERNAME}?start=${userId}`;
+        
+        // Mostrar en pantalla
+        document.getElementById('referral-link-display').innerText = refLink;
+        
+        // Actualizar el ID en el Home
+        const idDisplay = document.getElementById('display-id');
+        if(idDisplay) idDisplay.innerText = userId;
+    }
+
+    function copyRefLink() {
+        const link = document.getElementById('referral-link-display').innerText;
+        navigator.clipboard.writeText(link).then(() => {
+            tg.showPopup({
+                title: 'Success!',
+                message: 'Link copied to clipboard',
+                buttons: [{type: 'ok'}]
+            });
+        });
+    }
+
+    // Funciones de navegación entre pestañas
+    function showView(viewId) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        
+        document.getElementById('view-' + viewId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    // Inicializar al cargar
+    setupReferralSystem();
+</script>
