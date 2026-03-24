@@ -42,12 +42,6 @@
             color: var(--primary-blue); font-weight: bold; font-size: 1.2em; border: 1px solid var(--border-light);
         }
 
-        /* BALANCE */
-        .balance-section { padding: 15px 20px; background-color: var(--card-white); margin-bottom: 15px; border-bottom: 1px solid var(--border-light); }
-        .balance-row { display: flex; justify-content: space-between; align-items: center; }
-        .bal-value { font-size: 1.8em; font-weight: 800; margin: 5px 0; }
-        .btn-withdraw { background-color: var(--primary-blue); color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; }
-
         /* ENERGY CARD */
         .energy-card-container { padding: 0 15px; margin-bottom: 15px; }
         .energy-card {
@@ -59,16 +53,19 @@
         .e-stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center; margin-top: 15px; position: relative; z-index: 1;}
         .e-stat-box { background-color: rgba(255,255,255,0.1); padding: 10px 5px; border-radius: 12px;}
 
-        /* ACTIONS GRID (NUEVO/RECUPERADO) */
+        /* LISTAS Y TARJETAS */
         .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 15px; margin-bottom: 15px; }
         .act-card { background: var(--card-white); padding: 15px; border-radius: 16px; border: 1px solid var(--border-light); display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow-sm); }
+        
+        .info-row {
+            background: white; padding: 15px; border-radius: 15px; border: 1px solid var(--border-light);
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
+            cursor: pointer;
+        }
 
-        /* BANNERS */
-        .weekend-banner { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); border-radius: 16px; padding: 15px 20px; color: white; margin: 0 15px 15px; display: flex; justify-content: space-between; align-items: center; }
-
-        /* SHARE VIEW STYLES */
-        .share-header { padding: 20px; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; text-align: center; border-radius: 0 0 30px 30px; margin-bottom: 20px; }
-        .ref-box { background: #eff6ff; border: 2px dashed #2563eb; padding: 20px; border-radius: 20px; text-align: center; margin: 0 20px 25px; }
+        /* VISTA ABOUT */
+        .about-header { padding: 30px 20px; background: white; text-align: center; border-bottom: 1px solid var(--border-light); margin-bottom: 20px; }
+        .about-logo { font-size: 3em; color: var(--primary-blue); margin-bottom: 10px; }
 
         /* NAV */
         .bottom-nav { position: fixed; bottom: 0; width: 100%; background: var(--card-white); display: flex; padding: 12px 0 25px; border-top: 1px solid var(--border-light); z-index: 9999; }
@@ -88,13 +85,13 @@
             </div>
         </div>
 
-        <div class="balance-section">
-            <div class="balance-row">
+        <div style="padding: 15px 20px; background: white; border-bottom: 1px solid var(--border-light); margin-bottom: 15px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
                     <div style="font-size: 0.85em; color: var(--text-dim);">Total Earned <i class="fas fa-history"></i></div>
-                    <div class="bal-value">$ <span id="total-val">0.3592</span></div>
+                    <div style="font-size: 1.8em; font-weight: 800; margin: 5px 0;">$ <span id="total-val">0.3592</span></div>
                 </div>
-                <button class="btn-withdraw" onclick="tg.sendData('withdraw')">Withdraw</button>
+                <button style="background: var(--primary-blue); color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold;" onclick="tg.sendData('withdraw')">Withdraw</button>
             </div>
         </div>
 
@@ -123,45 +120,57 @@
                 <div><b style="font-size: 0.9em; display:block;">Refer</b><span style="font-size: 0.7em; color: var(--text-dim);">Get $10 Bonus</span></div>
             </div>
         </div>
-
-        <div class="weekend-banner">
-            <div>
-                <div style="color: var(--primary-blue); font-size: 0.7em; font-weight: bold;"><i class="fas fa-star"></i> WEEKEND SPECIAL</div>
-                <div style="font-weight: bold; margin: 5px 0;">Earn up to <span style="color: #22c55e;">30% ROI</span></div>
-            </div>
-            <button style="background: white; color: var(--primary-blue); border: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 0.8em;">START</button>
-        </div>
     </div>
 
     <div id="view-share" class="view">
-        <div class="share-header">
-            <i class="fas fa-users" style="font-size: 3em; margin-bottom: 10px; opacity: 0.9;"></i>
+        <div style="padding: 20px; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; text-align: center; border-radius: 0 0 30px 30px; margin-bottom: 20px;">
+            <i class="fas fa-users" style="font-size: 3em; margin-bottom: 10px;"></i>
             <h2 style="margin: 0;">Invite & Earn</h2>
-            <p style="font-size: 0.9em; opacity: 0.8;">Build your team at Sports Pay</p>
+            <p style="font-size: 0.9em; opacity: 0.8;">Share your link and build your team</p>
         </div>
 
-        <div class="ref-box">
-            <div style="font-weight: bold; color: #1e293b; margin-bottom: 10px;">Your Invitation Link</div>
-            <div id="referral-link-display" style="font-size: 0.8em; color: #2563eb; background: white; padding: 10px; border-radius: 10px; margin-bottom: 15px; word-break: break-all; border: 1px solid #d1e2ff; font-family: monospace;">
-                Generating link...
-            </div>
-            <button onclick="copyRefLink()" style="width: 100%; background: #2563eb; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                <i class="fas fa-copy"></i> Copy Link
-            </button>
+        <div style="background: #eff6ff; border: 2px dashed #2563eb; padding: 20px; border-radius: 20px; text-align: center; margin: 0 20px 25px;">
+            <div style="font-weight: bold; color: #1e293b; margin-bottom: 10px;">Invitation Link</div>
+            <div id="referral-link-display" style="font-size: 0.8em; color: #2563eb; background: white; padding: 10px; border-radius: 10px; margin-bottom: 15px; word-break: break-all; border: 1px solid #d1e2ff;">Generating...</div>
+            <button onclick="copyRefLink()" style="width: 100%; background: #2563eb; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold;">Copy Link</button>
+        </div>
+    </div>
+
+    <div id="view-about" class="view">
+        <div class="about-header">
+            <div class="about-logo"><i class="fas fa-shield-halved"></i></div>
+            <h2 style="margin: 0;">Sports Pay Info</h2>
+            <p style="color: var(--text-dim); font-size: 0.9em;">Verified Investment Platform</p>
         </div>
 
         <div style="padding: 0 20px;">
-            <div style="background: white; padding: 20px; border-radius: 20px; border: 1px solid var(--border-light);">
-                <h3 style="margin-top: 0; font-size: 1em;"><i class="fas fa-sitemap" style="color: var(--primary-blue);"></i> Referral Levels</h3>
-                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f1f5f9;">
-                    <span>Level 1 (Direct)</span><b style="color: #22c55e;">+10%</b>
+            <div class="info-row" onclick="tg.showAlert('Official Sports Pay Whitepaper v2.0')">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <i class="fas fa-file-lines" style="color: var(--primary-blue);"></i>
+                    <b>Whitepaper</b>
                 </div>
-                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f1f5f9;">
-                    <span>Level 2</span><b style="color: #22c55e;">+5%</b>
+                <i class="fas fa-chevron-right" style="color: #cbd5e1;"></i>
+            </div>
+
+            <div class="info-row" onclick="tg.showAlert('Sports Pay is a registered entity specializing in AI-driven sports arbitrage.')">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <i class="fas fa-building" style="color: var(--primary-blue);"></i>
+                    <b>Company Profile</b>
                 </div>
-                <div style="display: flex; justify-content: space-between; padding: 10px 0;">
-                    <span>Level 3</span><b style="color: #22c55e;">+2%</b>
+                <i class="fas fa-chevron-right" style="color: #cbd5e1;"></i>
+            </div>
+
+            <div class="info-row" onclick="tg.showAlert('Telegram Support: @Danny_Support')">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <i class="fas fa-headset" style="color: var(--primary-blue);"></i>
+                    <b>Online Support</b>
                 </div>
+                <i class="fas fa-chevron-right" style="color: #cbd5e1;"></i>
+            </div>
+
+            <div style="margin-top: 30px; text-align: center; color: var(--text-dim); font-size: 0.75em;">
+                <p>© 2026 Sports Pay. All Rights Reserved.</p>
+                <p>Version 1.0.4 (Stable)</p>
             </div>
         </div>
     </div>
@@ -169,7 +178,7 @@
     <nav class="bottom-nav">
         <div class="nav-tab active" onclick="switchTab('home')"><i class="fas fa-home"></i>Home</div>
         <div class="nav-tab" onclick="switchTab('share')"><i class="fas fa-share-alt"></i>Share</div>
-        <div class="nav-tab" onclick="tg.showAlert('Coming soon')"><i class="fas fa-user"></i>Account</div>
+        <div class="nav-tab" onclick="switchTab('about')"><i class="fas fa-info-circle"></i>About</div>
     </nav>
 
     <script>
@@ -177,51 +186,37 @@
         tg.ready();
         tg.expand();
 
-        const BOT_USERNAME = "SportsPay_bot"; // Asegúrate de que este es el nombre de tu bot
+        const BOT_USERNAME = "SportsPay_bot"; 
 
         function initApp() {
             const user = tg.initDataUnsafe?.user;
             const userId = user ? user.id : "7517815832";
-            
-            // 1. Cargar ID Real en Home
             document.getElementById('display-id').innerText = userId;
-
-            // 2. Generar Enlace de Referido Real
-            const refLink = `https://t.me/${BOT_USERNAME}?start=${userId}`;
-            document.getElementById('referral-link-display').innerText = refLink;
+            document.getElementById('referral-link-display').innerText = `https://t.me/${BOT_USERNAME}?start=${userId}`;
         }
 
         function switchTab(viewId) {
-            // Ocultar todas las vistas
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            // Quitar active de todos los botones nav
             document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-
-            // Activar vista seleccionada
             document.getElementById('view-' + viewId).classList.add('active');
             
-            // Activar botón de navegación (si existe)
+            // Lógica para marcar activo el botón correcto
             const tabs = document.querySelectorAll('.nav-tab');
             if(viewId === 'home') tabs[0].classList.add('active');
             if(viewId === 'share') tabs[1].classList.add('active');
+            if(viewId === 'about') tabs[2].classList.add('active');
 
             tg.HapticFeedback.impactOccurred('light');
         }
 
         function copyRefLink() {
             const link = document.getElementById('referral-link-display').innerText;
-            const tempInput = document.createElement("input");
-            document.body.appendChild(tempInput);
-            tempInput.value = link;
-            tempInput.select();
-            document.execCommand("copy");
-            document.body.removeChild(tempInput);
-            
-            tg.showAlert("✅ Referral link copied to clipboard!");
+            navigator.clipboard.writeText(link).then(() => {
+                tg.showAlert("✅ Link copied!");
+            });
         }
 
-        // Iniciar
         initApp();
     </script>
 </body>
-    </html>
+                </html>
