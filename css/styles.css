@@ -70,3 +70,67 @@ body {
 
 .btn-capsule { transition: 0.2s opacity; cursor: pointer; }
 .btn-capsule:active { opacity: 0.7; }
+
+/* --- AJUSTES DE BALANCE Y WITHDRAW --- */
+.bal-title { color: var(--text-gray); font-size: 0.85em; margin-bottom: 8px; }
+
+.bal-amount { 
+    font-size: 2em; /* Balance un poco más pequeño */
+    font-weight: 700; 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+}
+
+.btn-withdraw { 
+    background: var(--ae-blue); 
+    color: white; 
+    border: none; 
+    padding: 8px 14px; 
+    border-radius: 8px; /* Bordes menos redondos como en el original */
+    font-weight: 600; 
+    font-size: 14px; /* Tamaño fijo para que no se haga gigante */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* --- NUEVO BOTÓN HISTORY --- */
+.history-btn { 
+    font-size: 0.85em; 
+    color: var(--text-gray); 
+    cursor: pointer; 
+    margin-left: 10px; 
+    transition: 0.2s; 
+}
+.history-btn:active { color: var(--ae-blue); }
+
+/* --- AJUSTES DE LA CAJA ROJA (ESTADÍSTICAS) --- */
+.stats-grid { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr 1fr; 
+    gap: 8px; /* Menos espacio entre cajas */
+    margin-top: 15px; 
+}
+
+.stat-item { 
+    background: rgba(255,255,255,0.15); 
+    padding: 8px 5px; /* Menos padding lateral para que quepa todo */
+    border-radius: 8px; 
+    text-align: center; 
+}
+
+.stat-label { 
+    font-size: 0.55em; /* Letra de los títulos más pequeña */
+    opacity: 0.9; 
+    margin-bottom: 4px; 
+    text-transform: uppercase; 
+    white-space: nowrap; /* Evita que el texto salte a la segunda línea */
+}
+
+.stat-val { 
+    font-size: 0.85em; 
+    font-weight: 700; 
+    white-space: nowrap; /* Evita que los números salten de línea */
+                  }
