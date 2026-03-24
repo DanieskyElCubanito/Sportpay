@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>KubaPay Premier</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="view-inicio" class="view active">
+        <div class="header-profile">
+            <div class="avatar-container"><img id="user-photo" src="https://via.placeholder.com/100"></div>
+            <h2 id="profile-name">Cargando...</h2>
+            <div class="user-badge">ID: <span id="u-id">--------</span></div>
+        </div>
+        <div class="dashboard-grid">
+            <div class="db-card"><span class="db-label">Saldo</span><div class="db-value bal-val">0.00 USDT</div></div>
+            <div class="db-card"><span class="db-label">Equipo</span><div class="db-value team-val">0.00 USDT</div></div>
+        </div>
+        <div class="main-actions">
+            <button class="btn-primary" onclick="switchView('tienda')">Invertir</button>
+            <button class="btn-ghost" onclick="switchView('historial')">Historial</button>
+        </div>
+    </div>
+
+    <div id="view-tienda" class="view">
+        <div class="tiers-header-title"><i class="fas fa-chart-line"></i> Tiers de Retorno</div>
+        <div class="tiers-list-container" id="tiers-container">
+            <div class="tier-card active" id="tier-1" onclick="selectTier(1, 1, 0.05)">
+                <div class="tier-left"><div class="tier-num">1</div><div><span class="t-label">Min</span><span class="t-val">$1</span></div></div>
+                <div><span class="t-label">Retorno</span><span class="t-val">5%</span></div>
+            </div>
+            <div class="tier-card" id="tier-2" onclick="selectTier(2, 20, 0.055)">
+                <div class="tier-left"><div class="tier-num">2</div><div><span class="t-label">Min</span><span class="t-val">$20</span></div></div>
+                <div><span class="t-label">Retorno</span><span class="t-val">5.5%</span></div>
+            </div>
+        </div>
+        <div class="calculator-section">
+            <input type="number" id="invest-amount" value="1" oninput="calculateReturns()">
+            <div class="return-grid">
+                <div class="r-box"><div class="t-label">DIARIO</div><div id="ret-daily">$0.05</div></div>
+                <div class="r-box"><div class="t-label">PODER</div><div id="power-amount">100 GH/s</div></div>
+            </div>
+            <button class="btn-primary" style="margin-top:20px;" onclick="abrirPasarela()">Continuar</button>
+        </div>
+    </div>
+
+    <div id="view-historial" class="view">
+        <div class="nav-header"><i class="fas fa-chevron-left" onclick="switchView('inicio')"></i> Historial</div>
+        <div id="history-content" class="history-container"></div>
+    </div>
+
+    <div id="payment-modal" class="modal-overlay">
+        <div class="payment-pro-card">
+            <button class="close-x" onclick="closePaymentModal()">&times;</button>
+            <div id="timer" style="color:#22c55e;">30:00</div>
+            <div class="pay-amount-main"><span id="pay-amount-display">0.00</span> USDT</div>
+            <div class="qr-wrapper"><img id="qr-img" src=""></div>
+            <div class="address-box">
+                <code id="pay-address">Cargando...</code>
+                <button class="copy-btn-pro" onclick="copyAddress()"><i class="fas fa-copy"></i></button>
+            </div>
+            <button class="btn-primary" onclick="verifyOnChain()">YA HE PAGADO</button>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <div class="nav-tab active" onclick="switchView('inicio', this)"><i class="fas fa-home"></i><span>Inicio</span></div>
+        <div class="nav-tab" onclick="switchView('tienda', this)"><i class="fas fa-shopping-bag"></i><span>Tienda</span></div>
+        <div class="nav-tab" onclick="tg.sendData('btn_team')"><i class="fas fa-users"></i><span>Equipo</span></div>
+    </nav>
+
+    <script src="main.js"></script>
+    <script src="inicio.js"></script>
+    <script src="tienda.js"></script>
+    <script src="pasarela.js"></script>
+</body>
+                                                                                                       </html>
