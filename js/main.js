@@ -36,7 +36,16 @@ window.simulatePaymentSuccess = simulatePaymentSuccess;
 
 // Inicialización
 window.onload = () => {
-    if(state.tg) state.tg.ready();
+    if(state.tg) {
+        state.tg.ready();
+        state.tg.expand(); // Abre la app a pantalla completa automáticamente
+
+        // Detección de Modo Oscuro nativo de Telegram
+        if (state.tg.colorScheme === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+    }
+    
     document.getElementById('user-id').innerText = state.tg?.initDataUnsafe?.user?.id || Math.floor(Math.random() * 900000) + 100000;
     updateDashboard();
     
