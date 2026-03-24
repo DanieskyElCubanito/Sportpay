@@ -26,95 +26,53 @@
             margin: 0; padding: 0; overflow-x: hidden;
         }
 
+        /* SISTEMA DE VISTAS */
         .view { display: none; padding-bottom: 100px; animation: fadeIn 0.3s ease; }
         .view.active { display: block !important; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         /* HEADER */
         .home-header {
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background-color: var(--card-white);
-            border-bottom: 1px solid var(--border-light);
+            padding: 20px; display: flex; align-items: center; gap: 15px;
+            background-color: var(--card-white); border-bottom: 1px solid var(--border-light);
         }
         .header-logo {
-            width: 50px; height: 50px;
-            background-color: #eef2ff;
-            border-radius: 12px;
+            width: 50px; height: 50px; background-color: #eef2ff; border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
-            color: var(--primary-blue); font-weight: bold; font-size: 1.2em;
-            border: 1px solid var(--border-light);
+            color: var(--primary-blue); font-weight: bold; font-size: 1.2em; border: 1px solid var(--border-light);
         }
-        .header-info h2 { margin: 0; font-size: 1.1em; font-weight: 700; }
-        .header-info p { margin: 2px 0 0; font-size: 0.8em; color: var(--text-dim); }
 
         /* BALANCE */
-        .balance-section {
-            padding: 15px 20px;
-            background-color: var(--card-white);
-            margin-bottom: 15px;
-            border-bottom: 1px solid var(--border-light);
-        }
+        .balance-section { padding: 15px 20px; background-color: var(--card-white); margin-bottom: 15px; border-bottom: 1px solid var(--border-light); }
         .balance-row { display: flex; justify-content: space-between; align-items: center; }
-        .bal-label-group { display: flex; align-items: center; gap: 8px; font-size: 0.85em; color: var(--text-dim); }
         .bal-value { font-size: 1.8em; font-weight: 800; margin: 5px 0; }
-        
-        .btn-withdraw {
-            background-color: var(--primary-blue);
-            color: white; border: none; padding: 10px 20px;
-            border-radius: 10px; font-weight: bold; font-size: 0.9em;
-        }
+        .btn-withdraw { background-color: var(--primary-blue); color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; }
 
-        /* ENERGY CARD GH/s */
+        /* ENERGY CARD */
         .energy-card-container { padding: 0 15px; margin-bottom: 15px; }
         .energy-card {
-            background-color: var(--primary-blue);
-            color: white; padding: 20px; border-radius: 20px;
-            position: relative; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2);
-            overflow: hidden;
+            background-color: var(--primary-blue); color: white; padding: 20px; border-radius: 20px;
+            position: relative; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2); overflow: hidden;
         }
-        .energy-card::after {
-            content: "SP"; position: absolute; right: -20px; bottom: -30px;
-            font-size: 10em; font-weight: 900; color: rgba(255,255,255,0.07);
-        }
-        
-        .e-header { display: flex; align-items: center; justify-content: space-between; font-size: 0.85em; font-weight: bold; margin-bottom: 15px;}
-        .e-title { display: flex; align-items: center; gap: 8px; }
+        .energy-card::after { content: "SP"; position: absolute; right: -20px; bottom: -30px; font-size: 10em; font-weight: 900; color: rgba(255,255,255,0.07); }
         .e-value { text-align: center; font-size: 3em; font-weight: 800; margin: 10px 0;}
-        .e-unit { font-size: 0.4em; margin-left: 5px; opacity: 0.8; }
-        
         .e-stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center; margin-top: 15px; position: relative; z-index: 1;}
         .e-stat-box { background-color: rgba(255,255,255,0.1); padding: 10px 5px; border-radius: 12px;}
-        .es-label { font-size: 0.65em; color: rgba(255,255,255,0.8); text-transform: uppercase; display: block;}
-        .es-val { font-size: 0.9em; font-weight: bold;}
 
-        /* RECORDS */
-        .record-item {
-            background-color: var(--card-white); padding: 15px;
-            border-radius: 12px; display: flex; align-items: center; gap: 12px;
-            margin-bottom: 8px; border: 1px solid var(--border-light);
-        }
-        .r-date-badge {
-            width: 40px; height: 40px; background-color: #f8fafc;
-            border-radius: 8px; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; border: 1px solid var(--border-light);
-        }
-        .r-date-day { font-size: 1.1em; font-weight: bold; color: var(--primary-blue); }
-        .r-date-unit { font-size: 0.6em; color: var(--text-dim); text-transform: uppercase; }
-        .r-info { flex: 1; }
-        .r-progress-bar { height: 6px; background-color: var(--bg-light); border-radius: 3px; margin-top: 5px; overflow: hidden;}
-        .r-progress-fill { height: 100%; background-color: var(--primary-blue); width: 60%; }
-        .rv-amount { color: var(--primary-blue); font-weight: bold; text-align: right;}
-        .rv-unit { font-size: 0.7em; color: var(--accent-orange); text-align: right;}
+        /* ACTIONS GRID (NUEVO/RECUPERADO) */
+        .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 15px; margin-bottom: 15px; }
+        .act-card { background: var(--card-white); padding: 15px; border-radius: 16px; border: 1px solid var(--border-light); display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow-sm); }
+
+        /* BANNERS */
+        .weekend-banner { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); border-radius: 16px; padding: 15px 20px; color: white; margin: 0 15px 15px; display: flex; justify-content: space-between; align-items: center; }
+
+        /* SHARE VIEW STYLES */
+        .share-header { padding: 20px; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; text-align: center; border-radius: 0 0 30px 30px; margin-bottom: 20px; }
+        .ref-box { background: #eff6ff; border: 2px dashed #2563eb; padding: 20px; border-radius: 20px; text-align: center; margin: 0 20px 25px; }
 
         /* NAV */
-        .bottom-nav { 
-            position: fixed; bottom: 0; width: 100%; background: var(--card-white); 
-            display: flex; padding: 12px 0 25px; border-top: 1px solid var(--border-light); 
-        }
-        .nav-tab { flex: 1; text-align: center; color: var(--text-dim); font-size: 0.75em; }
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: var(--card-white); display: flex; padding: 12px 0 25px; border-top: 1px solid var(--border-light); z-index: 9999; }
+        .nav-tab { flex: 1; text-align: center; color: var(--text-dim); font-size: 0.75em; cursor: pointer; }
         .nav-tab.active { color: var(--primary-blue); }
         .nav-tab i { display: block; font-size: 1.5em; margin-bottom: 4px; }
     </style>
@@ -133,8 +91,8 @@
         <div class="balance-section">
             <div class="balance-row">
                 <div>
-                    <div class="bal-label-group"><span>Total Earned</span><i class="fas fa-history"></i></div>
-                    <div class="bal-value">$ <span id="total-val">0.0000</span></div>
+                    <div style="font-size: 0.85em; color: var(--text-dim);">Total Earned <i class="fas fa-history"></i></div>
+                    <div class="bal-value">$ <span id="total-val">0.3592</span></div>
                 </div>
                 <button class="btn-withdraw" onclick="tg.sendData('withdraw')">Withdraw</button>
             </div>
@@ -142,153 +100,128 @@
 
         <div class="energy-card-container">
             <div class="energy-card">
-                <div class="e-header">
-                    <div class="e-title"><i class="fas fa-bolt" style="color:var(--accent-orange)"></i> AI MINING POWER</div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.85em; font-weight: bold;">
+                    <div><i class="fas fa-bolt" style="color:var(--accent-orange)"></i> AI MINING POWER</div>
                     <i class="fas fa-sync-alt" onclick="location.reload()"></i>
                 </div>
-                <div class="e-value">6530<span class="e-unit">GH/s</span></div>
+                <div class="e-value">6530<span style="font-size: 0.4em; margin-left:5px;">GH/s</span></div>
                 <div class="e-stats-grid">
-                    <div class="e-stat-box"><span class="es-label">Daily profit</span><span class="es-val">$ 0.3592</span></div>
-                    <div class="e-stat-box"><span class="es-label">Power</span><span class="es-val">Active</span></div>
-                    <div class="e-stat-box"><span class="es-label">Settlement</span><span class="es-val">10:32:03</span></div>
+                    <div class="e-stat-box"><span style="font-size: 0.6em; display:block; opacity:0.8;">DAILY PROFIT</span><span style="font-size: 0.9em; font-weight: bold;">$ 0.3592</span></div>
+                    <div class="e-stat-box"><span style="font-size: 0.6em; display:block; opacity:0.8;">RETURN</span><span style="font-size: 0.9em; font-weight: bold;">5.5%</span></div>
+                    <div class="e-stat-box"><span style="font-size: 0.6em; display:block; opacity:0.8;">SETTLEMENT</span><span style="font-size: 0.9em; font-weight: bold;">10:32:03</span></div>
                 </div>
             </div>
         </div>
 
-        <div style="padding: 0 15px;">
-            <div style="font-weight: bold; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
-                <i class="fas fa-microchip" style="color:var(--primary-blue)"></i> Mining Records
+        <div class="actions-grid">
+            <div class="act-card">
+                <i class="fas fa-charging-station" style="color:var(--accent-orange); font-size: 1.5em;"></i>
+                <div><b style="font-size: 0.9em; display:block;">Buy GH/s</b><span style="font-size: 0.7em; color: var(--text-dim);">Boost power</span></div>
             </div>
-            <div class="record-item">
-                <div class="r-date-badge"><span class="r-date-day">1</span><span class="r-date-unit">Day</span></div>
-                <div class="r-info">
-                    <span style="font-size: 0.7em; color: var(--text-dim);">2026-03-24</span>
-                    <div class="r-progress-bar"><div class="r-progress-fill"></div></div>
-                </div>
-                <div>
-                    <div class="rv-amount">+1233.8</div>
-                    <div class="rv-unit">GH/s</div>
-                </div>
+            <div class="act-card" onclick="switchTab('share')">
+                <i class="fas fa-gift" style="color:var(--primary-blue); font-size: 1.5em;"></i>
+                <div><b style="font-size: 0.9em; display:block;">Refer</b><span style="font-size: 0.7em; color: var(--text-dim);">Get $10 Bonus</span></div>
             </div>
+        </div>
+
+        <div class="weekend-banner">
+            <div>
+                <div style="color: var(--primary-blue); font-size: 0.7em; font-weight: bold;"><i class="fas fa-star"></i> WEEKEND SPECIAL</div>
+                <div style="font-weight: bold; margin: 5px 0;">Earn up to <span style="color: #22c55e;">30% ROI</span></div>
+            </div>
+            <button style="background: white; color: var(--primary-blue); border: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 0.8em;">START</button>
         </div>
     </div>
 
-    <nav class="bottom-nav">
-        <div class="nav-tab active"><i class="fas fa-home"></i>Home</div>
-        <div class="nav-tab" onclick="tg.showAlert('Coming soon')"><i class="fas fa-share-alt"></i>Share</div>
-        <div class="nav-tab" onclick="tg.showAlert('Coming soon')"><i class="fas fa-user"></i>Account</div>
-    </nav>
-
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.ready(); // Muy importante para que el ID cargue rápido
-        tg.expand();
-
-        function loadUserData() {
-            const user = tg.initDataUnsafe?.user;
-            const idElement = document.getElementById('display-id');
-            
-            if (user && user.id) {
-                idElement.innerText = user.id;
-            } else {
-                // Fallback si no detecta el ID (por ejemplo en PC sin sesión)
-                idElement.innerText = "Guest User";
-            }
-        }
-
-        // Ejecutar carga de datos
-        loadUserData();
-    </script>
-</body>
-    </html>
-
-<div id="view-share" class="view">
-    <div style="padding: 20px; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; text-align: center; border-radius: 0 0 30px 30px; margin-bottom: 20px;">
-        <i class="fas fa-users" style="font-size: 3em; margin-bottom: 10px; opacity: 0.9;"></i>
-        <h2 style="margin: 0;">Invite & Earn</h2>
-        <p style="font-size: 0.9em; opacity: 0.8;">Share the wealth with friends and earn rewards</p>
-    </div>
-
-    <div style="padding: 0 20px;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
-            <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #e2e8f0; text-align: center;">
-                <i class="fas fa-gift" style="color: #f97316; margin-bottom: 5px;"></i>
-                <div style="font-size: 1.2em; font-weight: bold;">$10</div>
-                <div style="font-size: 0.7em; color: #64748b; text-transform: uppercase;">Per qualified referral</div>
-            </div>
-            <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #e2e8f0; text-align: center;">
-                <i class="fas fa-chart-line" style="color: #2563eb; margin-bottom: 5px;"></i>
-                <div style="font-size: 1.2em; font-weight: bold;">5-1%</div>
-                <div style="font-size: 0.7em; color: #64748b; text-transform: uppercase;">Commission up to L10</div>
-            </div>
+    <div id="view-share" class="view">
+        <div class="share-header">
+            <i class="fas fa-users" style="font-size: 3em; margin-bottom: 10px; opacity: 0.9;"></i>
+            <h2 style="margin: 0;">Invite & Earn</h2>
+            <p style="font-size: 0.9em; opacity: 0.8;">Build your team at Sports Pay</p>
         </div>
 
-        <div style="background: #eff6ff; border: 2px dashed #2563eb; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 25px;">
+        <div class="ref-box">
             <div style="font-weight: bold; color: #1e293b; margin-bottom: 10px;">Your Invitation Link</div>
-            <div id="referral-link-display" style="font-size: 0.8em; color: #2563eb; background: white; padding: 10px; border-radius: 10px; margin-bottom: 15px; word-break: break-all; border: 1px solid #d1e2ff;">
-                https://t.me/SportsPay_bot?start=7517815832
+            <div id="referral-link-display" style="font-size: 0.8em; color: #2563eb; background: white; padding: 10px; border-radius: 10px; margin-bottom: 15px; word-break: break-all; border: 1px solid #d1e2ff; font-family: monospace;">
+                Generating link...
             </div>
             <button onclick="copyRefLink()" style="width: 100%; background: #2563eb; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px;">
                 <i class="fas fa-copy"></i> Copy Link
             </button>
         </div>
 
-        <div style="background: white; padding: 20px; border-radius: 20px; border: 1px solid #e2e8f0;">
-            <h3 style="margin-top: 0; font-size: 1em;"><i class="fas fa-lightbulb" style="color: #eab308;"></i> How It Works</h3>
-            <div style="display: flex; gap: 15px; margin-bottom: 15px;">
-                <div style="background: #eef2ff; color: #2563eb; width: 25px; height: 25px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: bold; font-size: 0.8em;">1</div>
-                <div><strong style="font-size: 0.9em;">Referral signup</strong><p style="font-size: 0.8em; color: #64748b; margin: 2px 0;">User registers via your link.</p></div>
-            </div>
-            <div style="display: flex; gap: 15px;">
-                <div style="background: #eef2ff; color: #2563eb; width: 25px; height: 25px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: bold; font-size: 0.8em;">2</div>
-                <div><strong style="font-size: 0.9em;">Qualifying purchase</strong><p style="font-size: 0.8em; color: #64748b; margin: 2px 0;">Purchase of $50 USDT or more.</p></div>
+        <div style="padding: 0 20px;">
+            <div style="background: white; padding: 20px; border-radius: 20px; border: 1px solid var(--border-light);">
+                <h3 style="margin-top: 0; font-size: 1em;"><i class="fas fa-sitemap" style="color: var(--primary-blue);"></i> Referral Levels</h3>
+                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f1f5f9;">
+                    <span>Level 1 (Direct)</span><b style="color: #22c55e;">+10%</b>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f1f5f9;">
+                    <span>Level 2</span><b style="color: #22c55e;">+5%</b>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 10px 0;">
+                    <span>Level 3</span><b style="color: #22c55e;">+2%</b>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-    const tg = window.Telegram.WebApp;
-    tg.ready();
+    <nav class="bottom-nav">
+        <div class="nav-tab active" onclick="switchTab('home')"><i class="fas fa-home"></i>Home</div>
+        <div class="nav-tab" onclick="switchTab('share')"><i class="fas fa-share-alt"></i>Share</div>
+        <div class="nav-tab" onclick="tg.showAlert('Coming soon')"><i class="fas fa-user"></i>Account</div>
+    </nav>
 
-    // Nombre del bot (Cámbialo si el username es distinto)
-    const BOT_USERNAME = "SportsPay_bot"; 
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
 
-    function setupReferralSystem() {
-        const user = tg.initDataUnsafe?.user;
-        const userId = user ? user.id : "7517815832"; // ID real del usuario o el tuyo por defecto
-        
-        // Generar enlace real
-        const refLink = `https://t.me/${BOT_USERNAME}?start=${userId}`;
-        
-        // Mostrar en pantalla
-        document.getElementById('referral-link-display').innerText = refLink;
-        
-        // Actualizar el ID en el Home
-        const idDisplay = document.getElementById('display-id');
-        if(idDisplay) idDisplay.innerText = userId;
-    }
+        const BOT_USERNAME = "SportsPay_bot"; // Asegúrate de que este es el nombre de tu bot
 
-    function copyRefLink() {
-        const link = document.getElementById('referral-link-display').innerText;
-        navigator.clipboard.writeText(link).then(() => {
-            tg.showPopup({
-                title: 'Success!',
-                message: 'Link copied to clipboard',
-                buttons: [{type: 'ok'}]
-            });
-        });
-    }
+        function initApp() {
+            const user = tg.initDataUnsafe?.user;
+            const userId = user ? user.id : "7517815832";
+            
+            // 1. Cargar ID Real en Home
+            document.getElementById('display-id').innerText = userId;
 
-    // Funciones de navegación entre pestañas
-    function showView(viewId) {
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-        
-        document.getElementById('view-' + viewId).classList.add('active');
-        event.currentTarget.classList.add('active');
-    }
+            // 2. Generar Enlace de Referido Real
+            const refLink = `https://t.me/${BOT_USERNAME}?start=${userId}`;
+            document.getElementById('referral-link-display').innerText = refLink;
+        }
 
-    // Inicializar al cargar
-    setupReferralSystem();
-</script>
+        function switchTab(viewId) {
+            // Ocultar todas las vistas
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            // Quitar active de todos los botones nav
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+
+            // Activar vista seleccionada
+            document.getElementById('view-' + viewId).classList.add('active');
+            
+            // Activar botón de navegación (si existe)
+            const tabs = document.querySelectorAll('.nav-tab');
+            if(viewId === 'home') tabs[0].classList.add('active');
+            if(viewId === 'share') tabs[1].classList.add('active');
+
+            tg.HapticFeedback.impactOccurred('light');
+        }
+
+        function copyRefLink() {
+            const link = document.getElementById('referral-link-display').innerText;
+            const tempInput = document.createElement("input");
+            document.body.appendChild(tempInput);
+            tempInput.value = link;
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            
+            tg.showAlert("✅ Referral link copied to clipboard!");
+        }
+
+        // Iniciar
+        initApp();
+    </script>
+</body>
+    </html>
