@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        //#1____________________________
+        /*#1____________________________*/
         /* ESTILOS BASE Y VARIABLES */
         :root {
             --bg-light: #f4f7fa;
@@ -27,7 +27,7 @@
             margin: 0; padding: 0;
         }
 
-        //#2____________________________
+        /*#2____________________________*/
         /* VISTAS Y NAVEGACIÓN */
         .view { display: none; padding-bottom: 100px; animation: fadeIn 0.2s ease; }
         .view.active { display: block !important; }
@@ -38,7 +38,7 @@
         .nav-tab.active { color: var(--primary-blue); }
         .nav-tab i { display: block; font-size: 1.5em; margin-bottom: 4px; }
 
-        //#3____________________________
+        /*#3____________________________*/
         /* TARJETAS Y COMPONENTES */
         .card { background: white; border-radius: 16px; border: 1px solid var(--border-light); padding: 15px; margin: 15px; }
         
@@ -59,7 +59,7 @@
 </head>
 <body>
 
-    //#4____________________________
+    /*#4____________________________*/
     /* VISTA: HOME */
     <div id="view-home" class="view active">
         <div style="padding: 20px; background: white; border-bottom: 1px solid var(--border-light);">
@@ -97,7 +97,7 @@
         </div>
     </div>
 
-    //#5____________________________
+    /*#5____________________________*/
     /* VISTA: BUY GH/s (CORREGIDA) */
     <div id="view-buy" class="view">
         <div style="padding: 20px; text-align: center;">
@@ -124,7 +124,7 @@
         </div>
     </div>
 
-    //#6____________________________
+    /*#6____________________________*/
     /* VISTA: SHARE & ABOUT (SIMPLIFICADO) */
     <div id="view-share" class="view">
         <div class="card" style="text-align: center; padding: 40px 20px;">
@@ -141,7 +141,7 @@
         </div>
     </div>
 
-    //#7____________________________
+    /*#7____________________________*/
     /* NAVEGACIÓN INFERIOR */
     <nav class="bottom-nav">
         <div class="nav-tab active" onclick="switchTab('home')"><i class="fas fa-home"></i>Home</div>
@@ -153,7 +153,7 @@
         const tg = window.Telegram.WebApp;
         tg.ready();
 
-        //#8____________________________
+       /* #8____________________________*/
         /* LÓGICA DE INICIO */
         function init() {
             const uid = tg.initDataUnsafe?.user?.id || "7517815832";
@@ -162,7 +162,7 @@
             startTimer();
         }
 
-        //#9____________________________
+        /*#9____________________________*/
         /* LÓGICA DE COMPRA */
         function processPurchase() {
             const amount = document.getElementById('buy-amount').value;
@@ -173,7 +173,7 @@
             }
         }
 
-        //#10____________________________
+        /*10____________________________*/
         /* FUNCIONES DE UTILIDAD */
         function switchTab(id) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
