@@ -8,232 +8,255 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        /* #1____________________________ ESTILOS BASE */
+        /* #1____________________________ ESTILOS BASE (AE TECH STYLE) */
         :root {
-            --bg-light: #f4f7fa;
-            --card-white: #ffffff;
-            --text-dark: #1e293b;
-            --text-dim: #64748b;
-            --primary-blue: #2563eb;
-            --accent-orange: #f97316;
-            --border-light: #e2e8f0;
-            --badge-red: #ef4444;
+            --bg-gray: #f2f2f2;
+            --text-main: #333333;
+            --text-muted: #999999;
+            --ae-blue: #007aff;
+            --white: #ffffff;
         }
 
         body {
-            background-color: var(--bg-light);
-            color: var(--text-dark);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            margin: 0; padding: 0; overflow-x: hidden;
+            background-color: var(--bg-gray);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0; padding: 0;
         }
 
         /* #2____________________________ SISTEMA DE VISTAS */
-        .view { display: none; padding-bottom: 100px; animation: fadeIn 0.2s ease; }
+        .view { display: none; min-height: 100vh; animation: fadeIn 0.1s ease; }
         .view.active { display: block !important; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; padding: 12px 0 25px; border-top: 1px solid var(--border-light); z-index: 999; }
-        .nav-tab { flex: 1; text-align: center; color: var(--text-dim); font-size: 0.75em; cursor: pointer; }
-        .nav-tab.active { color: var(--primary-blue); }
-        .nav-tab i { display: block; font-size: 1.5em; margin-bottom: 4px; }
-
-        /* #3____________________________ COMPONENTES VISUALES */
-        .card { background: white; border-radius: 16px; border: 1px solid var(--border-light); padding: 15px; margin: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        
-        .energy-card {
-            background: linear-gradient(135deg, var(--primary-blue), #1d4ed8); color: white; padding: 25px 20px; border-radius: 24px; margin: 15px;
-            text-align: center; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2);
+        /* #3____________________________ COMPONENTES AE TECH */
+        .header-ae {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 15px; background: var(--white);
+            font-size: 1.1em; font-weight: 500;
         }
 
-        .tier-row { 
-            display: flex; align-items: center; justify-content: space-between; 
-            padding: 15px 0; border-bottom: 1px solid var(--border-light); position: relative;
+        .section-block {
+            background: var(--white);
+            padding: 15px 20px;
+            margin-top: 10px;
         }
-        .tier-row:last-child { border-bottom: none; }
-        .tier-box { 
-            width: 35px; height: 35px; background: #f1f5f9; border-radius: 8px; 
-            display: flex; align-items: center; justify-content: center; 
-            font-weight: 800; color: var(--text-dark); font-size: 1.1em;
+
+        .label-muted {
+            color: var(--text-muted);
+            font-size: 0.9em;
+            margin-bottom: 5px;
         }
-        .tier-info { flex: 1; padding-left: 15px; }
-        .tier-label { font-size: 0.75em; color: var(--text-dim); margin-bottom: 2px; }
-        .tier-val { font-size: 1.1em; font-weight: 800; color: var(--text-dark); }
-        .tier-return { text-align: right; }
-        .tier-return .tier-val { color: var(--primary-blue); }
+
+        .balance-big {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .input-ae {
+            width: 100%;
+            padding: 12px 0;
+            border: none;
+            border-bottom: 1px solid #eeeeee;
+            font-size: 1em;
+            outline: none;
+            background: transparent;
+            margin-bottom: 20px;
+        }
+
+        .btn-ae {
+            width: 100%;
+            background: var(--ae-blue);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 25px; /* Más redondeado como AE Tech */
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
+        /* Estilo de la tabla de Tiers */
+        .tier-list { margin-top: 10px; background: white; }
+        .tier-item {
+            display: flex; align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #f9f9f9;
+        }
+        .tier-num {
+            width: 32px; height: 32px; background: #f5f5f5;
+            border-radius: 6px; display: flex; align-items: center;
+            justify-content: center; font-weight: bold; margin-right: 15px;
+        }
+        .tier-data { flex: 1; }
+        .tier-subtext { color: var(--text-muted); font-size: 0.75em; margin-bottom: 2px; }
+        .tier-maintext { font-weight: bold; font-size: 1em; }
         
-        .badge-popular {
-            position: absolute; right: 0; top: 0; background: #fee2e2; color: var(--badge-red);
-            font-size: 0.65em; font-weight: 800; padding: 3px 8px; border-radius: 12px; letter-spacing: 0.5px;
+        .nav-bottom {
+            position: fixed; bottom: 0; width: 100%; background: white;
+            display: flex; padding: 10px 0 25px; border-top: 1px solid #eee;
         }
+        .nav-item { flex: 1; text-align: center; color: #999; font-size: 0.7em; }
+        .nav-item.active { color: var(--ae-blue); }
+        .nav-item i { display: block; font-size: 1.6em; margin-bottom: 3px; }
     </style>
 </head>
 <body>
 
     <div id="view-home" class="view active">
-        <div style="padding: 20px; background: white; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; gap: 12px;">
-            <div style="width:45px; height:45px; background:#eef2ff; border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--primary-blue); font-weight:bold; border:1px solid var(--border-light);">SP</div>
-            <div>
-                <p style="margin:0; color:var(--text-dim); font-size:0.8em;">Welcome back,</p>
-                <h3 style="margin:0;">ID: <span id="display-id">Detecting...</span></h3>
-            </div>
+        <div class="header-ae" style="justify-content: center;">Sports Pay Mining</div>
+        
+        <div class="section-block">
+            <div class="label-muted">Available Balance</div>
+            <div class="balance-big">$ <span id="home-bal">0.0000</span></div>
         </div>
 
-        <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <span style="font-size: 0.8em; color: var(--text-dim);">Available Balance</span>
-                <div style="font-size: 1.8em; font-weight: 800;">$ <span id="total-val">0.0000</span></div>
-            </div>
-            <button onclick="tg.sendData('withdraw')" style="background:var(--primary-blue); color:white; border:none; padding:12px 20px; border-radius:12px; font-weight:bold;">Withdraw</button>
-        </div>
-
-        <div class="energy-card">
-            <div style="font-size: 0.8em; opacity: 0.9; font-weight: 600; letter-spacing: 1px;"><i class="fas fa-bolt"></i> MINING POWER</div>
-            <div style="font-size: 2.8em; font-weight: 800; margin: 10px 0;"><span id="mining-power">0</span> <span style="font-size: 0.4em;">GH/s</span></div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px; font-size: 0.7em;">
-                <div style="background:rgba(255,255,255,0.1); padding:8px; border-radius:10px;">DAILY PROFIT<br><b id="daily-profit" style="font-size:1.2em;">$ 0.0000</b></div>
-                <div style="background:rgba(255,255,255,0.1); padding:8px; border-radius:10px;">RETURN<br><b id="return-rate" style="font-size:1.2em;">0.0%</b></div>
-                <div style="background:rgba(255,255,255,0.1); padding:8px; border-radius:10px;">SETTLEMENT<br><b id="settlement-timer" style="font-size:1.2em;">00:00:00</b></div>
-            </div>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 15px;">
-            <div class="card" onclick="switchTab('buy')" style="margin:0; text-align:center; cursor:pointer; padding: 20px 10px;">
-                <i class="fas fa-charging-station" style="color:var(--accent-orange); font-size: 1.8em; margin-bottom:8px;"></i>
-                <div style="font-weight:bold; font-size:0.95em;">Buy GH/s</div>
-            </div>
-            <div class="card" onclick="switchTab('share')" style="margin:0; text-align:center; cursor:pointer; padding: 20px 10px;">
-                <i class="fas fa-gift" style="color:var(--primary-blue); font-size: 1.8em; margin-bottom:8px;"></i>
-                <div style="font-weight:bold; font-size:0.95em;">Refer & Earn</div>
-            </div>
+        <div class="section-block" style="text-align: center; background: linear-gradient(to right, #007aff, #00c6ff); color: white; border-radius: 15px; margin: 15px;">
+            <div style="font-size: 0.8em; opacity: 0.8;">MINING POWER</div>
+            <div style="font-size: 2em; font-weight: bold; margin: 10px 0;"><span id="home-power">0</span> GH/s</div>
+            <button onclick="switchTab('buy')" style="background: white; color: #007aff; border: none; padding: 8px 20px; border-radius: 20px; font-weight: bold; font-size: 0.8em;">UPGRADE</button>
         </div>
     </div>
 
-    <div id="view-buy" class="view" style="background: var(--bg-light);">
-        <div style="display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; background: white; font-weight: bold; font-size: 1.1em;">
-            <i class="fas fa-chevron-left" onclick="switchTab('home')" style="cursor: pointer; color: var(--text-dark); font-size: 1.2em;"></i>
+    <div id="view-buy" class="view">
+        <div class="header-ae">
+            <i class="fas fa-chevron-left" onclick="switchTab('home')"></i>
             <span>Buy GH/s</span>
-            <i class="fas fa-file-invoice" style="color: var(--text-dark); font-size: 1.2em; cursor: pointer;"></i>
+            <i class="fas fa-history"></i>
         </div>
 
-        <div style="background: white; padding: 20px; margin-top: 10px;">
-            <div style="color: var(--text-dim); font-size: 0.9em; margin-bottom: 8px;">My total valid GH/s:</div>
-            <div style="font-size: 1.8em; font-weight: 800; color: var(--text-dark);">
-                <span id="buy-total-power">0</span> <span style="font-size: 0.6em;">GH/s</span>
+        <div class="section-block">
+            <div class="label-muted">My total valid GH/s:</div>
+            <div class="balance-big"><span id="buy-power-display">0</span> <span style="font-size: 0.6em; color: var(--text-muted);">GH/s</span></div>
+        </div>
+
+        <div class="section-block">
+            <input type="number" class="input-ae" id="buy-amount" placeholder="Please enter the amount of GH/s to buy">
+            <button class="btn-ae" onclick="processPurchase()">Buy Now</button>
+        </div>
+
+        <div class="tier-list">
+            <div class="tier-item">
+                <div class="tier-num">1</div>
+                <div class="tier-data">
+                    <div class="tier-subtext">Amount</div>
+                    <div class="tier-maintext">>= $0</div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="tier-subtext">Return</div>
+                    <div class="tier-maintext" style="color: var(--ae-blue);">5.5%</div>
+                </div>
             </div>
-        </div>
-        
-        <div style="background: white; padding: 20px; margin-top: 10px;">
-            <input type="number" id="buy-amount" placeholder="Please enter the amount of GH/s to buy" 
-                   style="width: 100%; padding: 16px; border: 1px solid var(--border-light); border-radius: 8px; background: #f8fafc; margin-bottom: 15px; font-size: 0.9em; box-sizing: border-box; outline: none;">
-            <button onclick="processPurchase()" style="width: 100%; background: var(--primary-blue); color: white; border: none; padding: 16px; border-radius: 8px; font-weight: bold; font-size: 1.05em;">Buy Now</button>
-        </div>
-
-        <div style="background: white; padding: 5px 20px; margin-top: 10px;">
-            <div class="tier-row"><div class="tier-box">1</div><div class="tier-info"><div class="tier-label">Amount</div><div class="tier-val">>= $0</div></div><div class="tier-return"><div class="tier-label">Return</div><div class="tier-val">5.5%</div></div></div>
-            <div class="tier-row"><div class="tier-box">2</div><div class="tier-info"><div class="tier-label">Amount</div><div class="tier-val">>= $20</div></div><div class="tier-return"><div class="tier-label">Return</div><div class="tier-val">6.0%</div></div></div>
-            <div class="tier-row"><div class="tier-box">3</div><div class="tier-info"><div class="tier-label">Amount</div><div class="tier-val">>= $300</div></div><div class="tier-return"><div class="tier-label">Return</div><div class="tier-val">6.5%</div></div></div>
-            <div class="tier-row"><span class="badge-popular">POPULAR</span><div class="tier-box">4</div><div class="tier-info"><div class="tier-label">Amount</div><div class="tier-val">>= $3000+</div></div><div class="tier-return"><div class="tier-label">Return</div><div class="tier-val" style="color: var(--badge-red);">Contact</div></div></div>
+            <div class="tier-item">
+                <div class="tier-num">2</div>
+                <div class="tier-data">
+                    <div class="tier-subtext">Amount</div>
+                    <div class="tier-maintext">>= $20</div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="tier-subtext">Return</div>
+                    <div class="tier-maintext" style="color: var(--ae-blue);">6.0%</div>
+                </div>
+            </div>
+            <div class="tier-item">
+                <div class="tier-num">3</div>
+                <div class="tier-data">
+                    <div class="tier-subtext">Amount</div>
+                    <div class="tier-maintext">>= $300</div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="tier-subtext">Return</div>
+                    <div class="tier-maintext" style="color: var(--ae-blue);">6.5%</div>
+                </div>
+            </div>
+            <div class="tier-item" style="position: relative;">
+                <div style="position: absolute; right: 20px; top: 0; background: #ffebeb; color: #ff3b30; font-size: 0.6em; padding: 2px 8px; border-radius: 10px; font-weight: bold;">POPULAR</div>
+                <div class="tier-num">4</div>
+                <div class="tier-data">
+                    <div class="tier-subtext">Amount</div>
+                    <div class="tier-maintext">>= $3000+</div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="tier-subtext">Return</div>
+                    <div class="tier-maintext" style="color: #ff3b30;">Contact</div>
+                </div>
+            </div>
         </div>
     </div>
 
     <div id="view-share" class="view">
-        <div style="padding: 40px 20px; text-align: center;">
-            <i class="fas fa-users" style="font-size: 3em; color: var(--primary-blue); margin-bottom: 15px;"></i>
-            <h3>Referral Program</h3>
-            <div id="ref-link" style="background: white; padding: 15px; border-radius: 12px; font-size: 0.85em; color: var(--primary-blue); border: 2px dashed var(--primary-blue); margin: 20px 0; word-break: break-all;"></div>
-            <button onclick="copyRef()" style="width: 100%; background:var(--primary-blue); color:white; border:none; padding:15px; border-radius:12px; font-weight:bold;">Copy Link</button>
+        <div class="header-ae" style="justify-content: center;">Referral</div>
+        <div class="section-block" style="text-align: center; margin-top: 50px;">
+            <i class="fas fa-link" style="font-size: 3em; color: var(--ae-blue); margin-bottom: 20px;"></i>
+            <div id="ref-link" style="word-break: break-all; color: var(--ae-blue); font-weight: 500; margin-bottom: 20px;"></div>
+            <button class="btn-ae" onclick="copyRef()">Copy Referral Link</button>
         </div>
     </div>
 
     <div id="view-about" class="view">
-        <div style="padding: 40px 20px; text-align: center;">
-            <h2 style="margin:0;">Sports Pay</h2>
-            <p style="color: var(--text-dim); font-size: 0.9em;">Version 1.0.0</p>
-        </div>
-        <div class="card" onclick="tg.showAlert('Support Contact: @Danny_Support')" style="display:flex; justify-content:space-between; align-items:center;">
-            <b>Online Support</b><i class="fas fa-chevron-right" style="color:#cbd5e1"></i>
+        <div class="header-ae" style="justify-content: center;">About</div>
+        <div class="section-block" onclick="tg.showAlert('Support: @Danny_Support')">
+            <div style="display: flex; justify-content: space-between;">
+                <span>Online Support</span>
+                <i class="fas fa-chevron-right" style="color: #ccc;"></i>
+            </div>
         </div>
     </div>
 
-    <nav class="bottom-nav" id="main-nav">
-        <div class="nav-tab active" onclick="switchTab('home')"><i class="fas fa-home"></i>Home</div>
-        <div class="nav-tab" onclick="switchTab('share')"><i class="fas fa-share-alt"></i>Share</div>
-        <div class="nav-tab" onclick="switchTab('about')"><i class="fas fa-info-circle"></i>About</div>
+    <nav class="nav-bottom" id="ae-nav">
+        <div class="nav-item active" onclick="switchTab('home')"><i class="fas fa-home"></i>Home</div>
+        <div class="nav-item" onclick="switchTab('share')"><i class="fas fa-share-alt"></i>Share</div>
+        <div class="nav-item" onclick="switchTab('about')"><i class="fas fa-info-circle"></i>About</div>
     </nav>
 
     <script>
-        // // #9____________________________ LÓGICA DE INICIO... (el resto del JS sigue igual)
         const tg = window.Telegram.WebApp;
         tg.ready();
 
         function init() {
             const user = tg.initDataUnsafe?.user;
             if (user) {
-                document.getElementById('display-id').innerText = user.id;
                 document.getElementById('ref-link').innerText = "https://t.me/SportsPay_bot?start=" + user.id;
-            } else {
-                document.getElementById('display-id').innerText = "Web_Guest";
-                document.getElementById('ref-link').innerText = "Open in Telegram to get link";
             }
-            updateUI(0, 0, 0, 0); 
-            startTimer();
+            // Aseguramos que empiece en 0
+            updateData(0, 0);
         }
 
-        function updateUI(bal, power, profit, rate) {
-            document.getElementById('total-val').innerText = bal.toFixed(4);
-            document.getElementById('mining-power').innerText = power;
-            document.getElementById('buy-total-power').innerText = power;
-            document.getElementById('daily-profit').innerText = "$ " + profit.toFixed(4);
-            document.getElementById('return-rate').innerText = rate + "%";
+        function updateData(bal, power) {
+            document.getElementById('home-bal').innerText = bal.toFixed(4);
+            document.getElementById('home-power').innerText = power;
+            document.getElementById('buy-power-display').innerText = power;
         }
 
         function switchTab(id) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.getElementById('view-' + id).classList.add('active');
-            const nav = document.getElementById('main-nav');
+            
+            const nav = document.getElementById('ae-nav');
             if(id === 'buy') {
                 nav.style.display = 'none';
             } else {
                 nav.style.display = 'flex';
-                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-                const tabs = document.querySelectorAll('.nav-tab');
-                if(id === 'home') tabs[0].classList.add('active');
-                if(id === 'share') tabs[1].classList.add('active');
-                if(id === 'about') tabs[2].classList.add('active');
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                const items = document.querySelectorAll('.nav-item');
+                if(id === 'home') items[0].classList.add('active');
+                if(id === 'share') items[1].classList.add('active');
+                if(id === 'about') items[2].classList.add('active');
             }
             tg.HapticFeedback.impactOccurred('light');
         }
 
         function processPurchase() {
-            const amount = document.getElementById('buy-amount').value;
-            if(amount > 0) tg.sendData("buy_" + amount);
-            else tg.showAlert("Enter a valid amount");
-        }
-
-        function startTimer() {
-            setInterval(() => {
-                const power = parseInt(document.getElementById('mining-power').innerText);
-                if(power > 0) {
-                    const now = new Date();
-                    const target = new Date();
-                    target.setHours(24, 0, 0, 0);
-                    const diff = target - now;
-                    const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
-                    const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-                    const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
-                    document.getElementById('settlement-timer').innerText = `${h}:${m}:${s}`;
-                }
-            }, 1000);
+            const val = document.getElementById('buy-amount').value;
+            if(val > 0) tg.sendData("buy_" + val);
+            else tg.showAlert("Please enter a valid amount");
         }
 
         function copyRef() {
             const link = document.getElementById('ref-link').innerText;
-            if(link.includes("http")) {
-                navigator.clipboard.writeText(link).then(() => tg.showAlert("Copied!"));
-            }
+            navigator.clipboard.writeText(link).then(() => tg.showAlert("Link Copied!"));
         }
 
         init();
     </script>
 </body>
-                                                                                                                              </html>
+                    </html>
