@@ -18,9 +18,14 @@
         </div>
 
         <div class="main-card">
-            <div class="bal-title">Total Earned <i class="far fa-clock"></i> History</div>
+            <div class="bal-title" style="display: flex; align-items: center;">
+                Total Earned 
+                <span class="history-btn" onclick="alert('Historial en construcción 🛠️')">
+                    <i class="far fa-clock"></i> History
+                </span>
+            </div>
             <div class="bal-amount">
-                $ <span id="main-bal">0.0000</span>
+                <div>$<span id="main-bal">0.0000</span></div>
                 <button class="btn-withdraw" onclick="window.switchTab('buy')"><i class="fas fa-wallet"></i> withdraw</button>
             </div>
         </div>
@@ -70,7 +75,7 @@
         <div class="buy-input-container">
             <div class="tier-label" style="margin-bottom: 15px; font-weight: bold; text-transform: uppercase;">You want to buy the quantity</div>
             <div class="input-group">
-                <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="usdt">
+                <img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdt.png" alt="usdt">
                 <input type="number" id="buy-qty" placeholder="Min $1 USDT" oninput="window.calculateReturns()">
             </div>
             <div style="margin-top: 15px; font-size: 0.9em; text-align: center;">
