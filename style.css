@@ -1,0 +1,96 @@
+.referral-header {
+    text-align: center;
+    padding: 20px 10px;
+}
+
+.total-referral-card {
+    background: linear-gradient(135deg, #ffca28 0%, #ff8f00 100%);
+    color: #000;
+    padding: 15px;
+    border-radius: 15px;
+    margin-top: 15px;
+    box-shadow: 0 4px 15px rgba(255, 143, 0, 0.3);
+}
+
+.total-referral-card .amount {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.invite-box {
+    background: #1e1e1e;
+    padding: 15px;
+    border-radius: 12px;
+    margin: 10px 0;
+    border: 1px solid #333;
+}
+
+.copy-wrapper {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.copy-wrapper input {
+    flex: 1;
+    background: #121212;
+    border: 1px solid #444;
+    color: #bbb;
+    padding: 8px;
+    border-radius: 5px;
+    font-size: 12px;
+}
+
+.levels-container {
+    margin-top: 20px;
+}
+
+.level-row {
+    display: flex;
+    align-items: center;
+    background: #1e1e1e;
+    padding: 12px;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+.level-row:active {
+    transform: scale(0.98);
+    background: #252525;
+}
+
+.level-badge {
+    background: #333;
+    color: #ffca28;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-weight: bold;
+    margin-right: 15px;
+}
+
+.level-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.level-info .users-count {
+    color: #fff;
+    font-weight: 500;
+}
+
+.level-info .volume {
+    color: #888;
+    font-size: 12px;
+}
+
+.level-reward {
+    color: #4caf50;
+    font-weight: bold;
+}
