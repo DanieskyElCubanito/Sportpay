@@ -3,79 +3,463 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KubaPay Premier</title>
+    <title>Sports Pay Premier</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* =========================================
+           DISEÑO Y ESTILOS (TODO INTEGRADO AQUÍ)
+           ========================================= */
+        :root {
+            --primary: #c9a55c; 
+            --bg: #0f141a;
+            --card-bg: #1a222c;
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0; padding: 0; overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .view { display: none; padding-bottom: 90px; animation: fadeIn 0.3s ease; }
+        .view.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* HEADER Y DASHBOARD */
+        .header-profile { text-align: center; padding: 30px 20px; background: linear-gradient(180deg, rgba(201,165,92,0.1) 0%, rgba(15,20,26,0) 100%); }
+        .avatar-container img { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary); object-fit: cover; background: #2a3441; }
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 20px; }
+        .db-card { background: var(--card-bg); padding: 20px 15px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); }
+        .db-label { font-size: 0.75em; color: var(--text-dim); display: block; margin-bottom: 5px; }
+        .db-value { font-size: 1.1em; font-weight: 700; color: var(--text-main); }
+        .main-actions { padding: 20px; }
+
+        /* TIENDA Y TIERS */
+        .tiers-header-title { padding: 15px 20px; font-size: 1em; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
+        .tiers-list-container { padding: 0 15px; display: flex; flex-direction: column; gap: 10px; }
+        .tier-card { 
+            background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; 
+            padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+            position: relative;
+        }
+        .tier-card.active { border: 1px solid var(--primary); background: rgba(201,165,92,0.05); }
+        .popular-badge { position: absolute; top: -10px; right: 15px; background: var(--primary); color: #000; font-size: 0.65em; font-weight: bold; padding: 3px 8px; border-radius: 8px; }
+        .tier-left { display: flex; align-items: center; gap: 12px; }
+        .tier-num { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 0.9em; font-weight: bold; }
+        .tier-card.active .tier-num { background: var(--primary); color: #000; }
+        .t-label { font-size: 0.7em; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 2px;}
+        .t-val { font-size: 1em; font-weight: 700; color: #fff; }
+
+        /* CALCULADORA */
+        .calculator-section { background: var(--card-bg); margin: 20px 15px; padding: 20px; border-radius: 16px; }
+        .calc-label { font-size: 0.8em; color: var(--text-dim); font-weight: bold; margin-bottom: 10px; text-transform: uppercase;}
+        .input-usdt-wrapper { 
+            display: flex; align-items: center; background: rgba(0,0,0,0.3); 
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 15px; margin-bottom: 15px; gap: 10px;
+        }
+        .usdt-icon-circle { background: #26a17b; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.9em; }
+        .input-usdt-wrapper input { background: transparent; border: none; color: #fff; font-size: 1.2em; font-weight: bold; width: 100%; outline: none; }
+        .conversion-text { text-align: center; color: var(--text-dim); font-size: 0.9em; margin-bottom: 20px; }
+        .power-display { font-size: 1.2em; color: #fff; font-weight: bold; margin-top: 5px; }
+        .return-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .r-box { background: rgba(255,255,255,0.03); padding: 12px 5px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.05);}
+        .r-title { font-size: 0.7em; color: var(--text-dim); margin-bottom: 5px; }
+        .r-value { font-weight: bold; color: #fff; font-size: 1em; }
+        .profit-box { background: rgba(201,165,92,0.1); border-color: rgba(201,165,92,0.3); }
+        .profit-val { color: var(--primary); }
+
+        /* BOTONES */
+        .btn-primary { background: var(--primary); color: #000; border: none; padding: 16px; border-radius: 12px; font-size: 1em; font-weight: bold; width: 100%; cursor: pointer; transition: 0.2s; }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 16px; border-radius: 12px; font-size: 1em; font-weight: bold; width: 100%; cursor: pointer; margin-top: 10px; }
+        .btn-ghost { background: transparent; color: var(--primary); border: 1px solid var(--primary); padding: 14px; border-radius: 12px; width: 100%; margin-top: 10px; font-weight: bold;}
+
+        /* PASARELA MODERNA */
+        .modal-overlay { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; 
+            backdrop-filter: blur(5px);
+        }
+        .payment-pro-card { background: #ffffff; color: #1a1a1a; width: 90%; max-width: 360px; border-radius: 24px; padding: 25px 20px; text-align: center; position: relative; }
+        .close-x { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 1.5em; color: #999; cursor: pointer; }
+        .pay-timer-row { font-weight: bold; color: #1a1a1a; margin-bottom: 10px; font-size: 1.1em; }
+        .pay-amount-main { font-size: 2.2em; font-weight: 900; margin: 10px 0; color: #1a1a1a; }
+        .qr-wrapper img { width: 180px; height: 180px; border-radius: 10px; }
+        .address-box-light { background: #f4f4f5; padding: 12px; border-radius: 12px; text-align: left; margin: 15px 0; border: 1px solid #e4e4e7; }
+        .addr-flex { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
+        .copy-btn-pro { background: #2563eb; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+        .status-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 12px; margin-bottom: 15px; }
+        .btn-confirm-pay { background: #16a34a; color: white; border: none; padding: 16px; border-radius: 12px; font-weight: bold; width: 100%; font-size: 1.1em; }
+
+        /* NAVEGACIÓN */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: var(--card-bg); display: flex; padding: 12px 0 20px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000; }
+        .nav-tab { flex: 1; text-align: center; color: var(--text-dim); font-size: 0.75em; cursor: pointer; transition: 0.2s; }
+        .nav-tab.active { color: var(--primary); }
+        .nav-tab i { display: block; font-size: 1.5em; margin-bottom: 4px; }
+    </style>
 </head>
 <body>
 
     <div id="view-inicio" class="view active">
         <div class="header-profile">
-            <div class="avatar-container"><img id="user-photo" src="https://via.placeholder.com/100"></div>
-            <h2 id="profile-name">Cargando...</h2>
-            <div class="user-badge">ID: <span id="u-id">--------</span></div>
+            <div class="avatar-container">
+                <img id="user-photo" src="https://via.placeholder.com/100" alt="Avatar">
+            </div>
+            <h2 id="profile-name">Cargando Usuario...</h2>
+            <div style="color: var(--text-dim); font-size: 0.9em; margin-top: 5px;">ID: <span id="u-id">--------</span></div>
         </div>
+
         <div class="dashboard-grid">
-            <div class="db-card"><span class="db-label">Saldo</span><div class="db-value bal-val">0.00 USDT</div></div>
-            <div class="db-card"><span class="db-label">Equipo</span><div class="db-value team-val">0.00 USDT</div></div>
+            <div class="db-card">
+                <span class="db-label">Saldo Disponible</span>
+                <div class="db-value bal-val">0.00 USDT</div>
+            </div>
+            <div class="db-card">
+                <span class="db-label">Comisión Equipo</span>
+                <div class="db-value team-val" style="color: #22c55e;">0.00 USDT</div>
+            </div>
         </div>
+
         <div class="main-actions">
-            <button class="btn-primary" onclick="switchView('tienda')">Invertir</button>
-            <button class="btn-ghost" onclick="switchView('historial')">Historial</button>
+            <button class="btn-primary" onclick="switchView('tienda')">Invertir Ahora</button>
+            <button class="btn-secondary" onclick="tg.sendData('btn_withdraw')">Retirar Fondos</button>
         </div>
     </div>
 
     <div id="view-tienda" class="view">
-        <div class="tiers-header-title"><i class="fas fa-chart-line"></i> Tiers de Retorno</div>
-        <div class="tiers-list-container" id="tiers-container">
+        <div class="tiers-header-title">
+            <i class="fas fa-chart-line"></i> Tiers de Retorno Diario
+        </div>
+
+        <div class="tiers-list-container">
             <div class="tier-card active" id="tier-1" onclick="selectTier(1, 1, 0.05)">
-                <div class="tier-left"><div class="tier-num">1</div><div><span class="t-label">Min</span><span class="t-val">$1</span></div></div>
-                <div><span class="t-label">Retorno</span><span class="t-val">5%</span></div>
+                <div class="tier-left">
+                    <div class="tier-num">1</div>
+                    <div><span class="t-label">Monto</span><span class="t-val">>= $1</span></div>
+                </div>
+                <div><span class="t-label">Retorno</span><span class="t-val" style="color: var(--primary);">5.0%</span></div>
             </div>
+
             <div class="tier-card" id="tier-2" onclick="selectTier(2, 20, 0.055)">
-                <div class="tier-left"><div class="tier-num">2</div><div><span class="t-label">Min</span><span class="t-val">$20</span></div></div>
-                <div><span class="t-label">Retorno</span><span class="t-val">5.5%</span></div>
+                <div class="tier-left">
+                    <div class="tier-num">2</div>
+                    <div><span class="t-label">Monto</span><span class="t-val">>= $20</span></div>
+                </div>
+                <div><span class="t-label">Retorno</span><span class="t-val" style="color: var(--primary);">5.5%</span></div>
+            </div>
+
+            <div class="tier-card" id="tier-3" onclick="selectTier(3, 100, 0.06)">
+                <div class="popular-badge"><i class="fas fa-star"></i> POPULAR</div>
+                <div class="tier-left">
+                    <div class="tier-num">3</div>
+                    <div><span class="t-label">Monto</span><span class="t-val">>= $100</span></div>
+                </div>
+                <div><span class="t-label">Retorno</span><span class="t-val" style="color: var(--primary);">6.0%</span></div>
+            </div>
+
+            <div class="tier-card" id="tier-4" onclick="selectTier(4, 300, 0.065)">
+                <div class="tier-left">
+                    <div class="tier-num">4</div>
+                    <div><span class="t-label">Monto</span><span class="t-val">>= $300</span></div>
+                </div>
+                <div><span class="t-label">Retorno</span><span class="t-val" style="color: var(--primary);">6.5%</span></div>
+            </div>
+            
+            <div class="tier-card" id="tier-5" onclick="selectTier(5, 1000, 0.07)">
+                <div class="tier-left">
+                    <div class="tier-num">5</div>
+                    <div><span class="t-label">Monto</span><span class="t-val">>= $1000</span></div>
+                </div>
+                <div><span class="t-label">Retorno</span><span class="t-val" style="color: var(--primary);">7.0%</span></div>
             </div>
         </div>
+        
         <div class="calculator-section">
-            <input type="number" id="invest-amount" value="1" oninput="calculateReturns()">
-            <div class="return-grid">
-                <div class="r-box"><div class="t-label">DIARIO</div><div id="ret-daily">$0.05</div></div>
-                <div class="r-box"><div class="t-label">PODER</div><div id="power-amount">100 GH/s</div></div>
+            <div class="calc-label">CANTIDAD QUE DESEAS COMPRAR</div>
+            
+            <div class="input-usdt-wrapper">
+                <div class="usdt-icon-circle"><i class="fas fa-dollar-sign"></i></div>
+                <input type="number" id="invest-amount" value="1" oninput="calculateReturns()">
             </div>
-            <button class="btn-primary" style="margin-top:20px;" onclick="abrirPasarela()">Continuar</button>
+
+            <div class="conversion-text">
+                Tu poder total será:
+                <div class="power-display">
+                    <i class="fas fa-bolt" style="color: var(--primary);"></i> 
+                    <span id="power-amount">100</span> GH/s = $<span id="usd-amount">1.00</span>
+                </div>
+            </div>
+
+            <div class="calc-label" style="margin-top: 20px;">RETORNO ESTIMADO (30 DÍAS):</div>
+            <div class="return-grid">
+                <div class="r-box">
+                    <div class="r-title">DIARIO</div>
+                    <div class="r-value" id="ret-daily">$0.05</div>
+                </div>
+                <div class="r-box">
+                    <div class="r-title">TOTAL</div>
+                    <div class="r-value" id="ret-total">$1.50</div>
+                </div>
+                <div class="r-box profit-box">
+                    <div class="r-title">PROFIT</div>
+                    <div class="r-value profit-val" id="ret-profit">$0.50</div>
+                </div>
+            </div>
+
+            <button class="btn-primary" style="margin-top: 20px;" onclick="abrirPasarela()">Continuar al Pago</button>
         </div>
     </div>
 
-    <div id="view-historial" class="view">
-        <div class="nav-header"><i class="fas fa-chevron-left" onclick="switchView('inicio')"></i> Historial</div>
-        <div id="history-content" class="history-container"></div>
+    <div id="view-equipo" class="view">
+        <div class="header-profile" style="padding: 20px;">
+            <h2>Mi Equipo</h2>
+            <p style="color: var(--text-dim);">Invita amigos y gana comisiones.</p>
+        </div>
+        <div class="main-actions">
+            <button class="btn-primary" onclick="tg.sendData('btn_team')">Ver mis referidos en el Bot</button>
+        </div>
+    </div>
+
+    <div id="view-ajustes" class="view">
+        <div class="header-profile" style="padding: 20px;">
+            <h2>Ajustes</h2>
+        </div>
+        <div class="main-actions">
+            <button class="btn-secondary" onclick="tg.sendData('set_wallet')">Configurar Wallet de Retiro</button>
+            <button class="btn-ghost" onclick="window.open('https://t.me/TuSoporteAca', '_blank')">Soporte Técnico</button>
+        </div>
     </div>
 
     <div id="payment-modal" class="modal-overlay">
         <div class="payment-pro-card">
             <button class="close-x" onclick="closePaymentModal()">&times;</button>
-            <div id="timer" style="color:#22c55e;">30:00</div>
-            <div class="pay-amount-main"><span id="pay-amount-display">0.00</span> USDT</div>
-            <div class="qr-wrapper"><img id="qr-img" src=""></div>
-            <div class="address-box">
-                <code id="pay-address">Cargando...</code>
-                <button class="copy-btn-pro" onclick="copyAddress()"><i class="fas fa-copy"></i></button>
+            
+            <div class="pay-timer-row">
+                Cuenta regresiva: <span id="timer" style="color: #16a34a;">30:00</span>
             </div>
-            <button class="btn-primary" onclick="verifyOnChain()">YA HE PAGADO</button>
+
+            <div class="pay-amount-main">
+                <span id="pay-amount-display">1.00</span> <span style="font-size: 0.5em; color: #666;">USDT</span>
+            </div>
+            
+            <p style="color: #666; font-size: 0.9em; margin-bottom: 15px;">Envía USDT-BSC a la siguiente dirección.</p>
+
+            <div class="qr-wrapper">
+                <img id="qr-img" src="" alt="Código QR">
+            </div>
+
+            <div class="address-box-light">
+                <div style="font-size: 0.8em; color: #666; font-weight: bold;">Dirección</div>
+                <div class="addr-flex">
+                    <code id="pay-address" style="font-size: 0.8em; color: #1a1a1a; word-break: break-all; padding-right: 10px;">Generando...</code>
+                    <button class="copy-btn-pro" onclick="copyAddress()"><i class="fas fa-copy"></i></button>
+                </div>
+            </div>
+
+            <div style="font-size: 0.9em; font-weight: bold; margin-bottom: 5px; color: #1a1a1a;">
+                Red: <span style="color: #16a34a;">BSC/BEP20</span>
+            </div>
+            <p style="font-size: 0.75em; color: #999; margin-bottom: 15px;">* No envíes activos que no sean BEP20</p>
+
+            <div class="status-box">
+                <div style="font-size: 0.85em; color: #666;">Estado del Pago:</div>
+                <div style="font-weight: bold; color: #1a1a1a; font-size: 1.1em; margin-top: 5px;">
+                    No Recibido ⏳
+                </div>
+            </div>
+
+            <button class="btn-confirm-pay" onclick="verifyOnChain()">
+                <i class="fas fa-download"></i> Continuar
+            </button>
         </div>
     </div>
 
     <nav class="bottom-nav">
-        <div class="nav-tab active" onclick="switchView('inicio', this)"><i class="fas fa-home"></i><span>Inicio</span></div>
-        <div class="nav-tab" onclick="switchView('tienda', this)"><i class="fas fa-shopping-bag"></i><span>Tienda</span></div>
-        <div class="nav-tab" onclick="tg.sendData('btn_team')"><i class="fas fa-users"></i><span>Equipo</span></div>
+        <div id="nav-inicio" class="nav-tab active" onclick="switchView('inicio', this)">
+            <i class="fas fa-home"></i><span>Inicio</span>
+        </div>
+        <div id="nav-tienda" class="nav-tab" onclick="switchView('tienda', this)">
+            <i class="fas fa-shopping-bag"></i><span>Tienda</span>
+        </div>
+        <div id="nav-equipo" class="nav-tab" onclick="switchView('equipo', this)">
+            <i class="fas fa-users"></i><span>Equipo</span>
+        </div>
+        <div id="nav-ajustes" class="nav-tab" onclick="switchView('ajustes', this)">
+            <i class="fas fa-cog"></i><span>Ajustes</span>
+        </div>
     </nav>
 
-    <script src="main.js"></script>
-    <script src="inicio.js"></script>
-    <script src="tienda.js"></script>
-    <script src="pasarela.js"></script>
+    <script>
+        // 1. INICIALIZAR TELEGRAM Y DATOS DEL USUARIO DE FORMA DINÁMICA
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Expandir la app a pantalla completa
+
+        // Capturar datos del usuario que abre la app
+        const user = tg.initDataUnsafe?.user;
+        
+        if (user) {
+            // Pone el nombre real del usuario
+            let fullName = user.first_name;
+            if(user.last_name) fullName += " " + user.last_name;
+            document.getElementById('profile-name').innerText = fullName;
+            
+            // Pone el ID real del usuario
+            document.getElementById('u-id').innerText = user.id;
+            
+            // Pone la foto del usuario si tiene una
+            if (user.photo_url) {
+                document.getElementById('user-photo').src = user.photo_url;
+            } else {
+                // Imagen por defecto si no tiene foto en Telegram
+                document.getElementById('user-photo').src = 'https://ui-avatars.com/api/?name=' + user.first_name + '&background=c9a55c&color=000';
+            }
+        }
+
+        // 2. SISTEMA DE NAVEGACIÓN DE PESTAÑAS
+        function switchView(viewId, element) {
+            // Ocultar todas las vistas
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            // Mostrar la vista seleccionada
+            document.getElementById('view-' + viewId).classList.add('active');
+            
+            // Si se tocó la barra de navegación inferior, cambiar el color del icono
+            if(element) {
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                element.classList.add('active');
+            } else {
+                // Si se navegó por botón, actualizar la barra inferior manualmente
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                let navIcon = document.getElementById('nav-' + viewId);
+                if(navIcon) navIcon.classList.add('active');
+            }
+            
+            // Pequeña vibración en el móvil al tocar
+            tg.HapticFeedback.impactOccurred('light');
+        }
+
+        // 3. LÓGICA DE LA TIENDA Y CALCULADORA
+        let currentRate = 0.05; // 5% por defecto
+        let currentMin = 1;     // $1 mínimo por defecto
+        let timerInterval;      // Variable para el temporizador
+
+        function selectTier(id, minAmount, dailyRate) {
+            // Quitar clase activa a todos los tiers
+            document.querySelectorAll('.tier-card').forEach(card => card.classList.remove('active'));
+            // Poner clase activa al tier seleccionado
+            document.getElementById('tier-' + id).classList.add('active');
+            
+            currentRate = dailyRate;
+            currentMin = minAmount;
+            
+            const inputE = document.getElementById('invest-amount');
+            
+            // Si el valor actual es menor al mínimo del tier nuevo, lo subimos
+            if(parseFloat(inputE.value) < minAmount || inputE.value === "") {
+                inputE.value = minAmount; 
+            }
+            
+            calculateReturns(); // Recalcular
+            tg.HapticFeedback.selectionChanged();
+        }
+
+        function calculateReturns() {
+            const amount = parseFloat(document.getElementById('invest-amount').value) || 0;
+            const power = amount * 100; 
+            const dailyProfit = amount * currentRate;
+            
+            document.getElementById('power-amount').innerText = power.toLocaleString();
+            document.getElementById('usd-amount').innerText = amount.toFixed(2);
+            document.getElementById('ret-daily').innerText = `$${dailyProfit.toFixed(2)}`;
+            document.getElementById('ret-total').innerText = `$${(dailyProfit * 30).toFixed(2)}`;
+            document.getElementById('ret-profit').innerText = `$${((dailyProfit * 30) - amount).toFixed(2)}`;
+        }
+
+        // 4. LÓGICA DE LA PASARELA DE PAGO
+        async function abrirPasarela() {
+            const inputVal = document.getElementById('invest-amount').value;
+            const monto = parseFloat(inputVal);
+
+            if (isNaN(monto) || monto < currentMin) {
+                tg.showAlert(`❌ El monto mínimo para el plan seleccionado es de ${currentMin} USDT.`);
+                return;
+            }
+
+            // Poner el monto en el modal
+            document.getElementById('pay-amount-display').innerText = monto.toFixed(2);
+            
+            // Generar Wallet y QR (Usando una wallet por defecto o tu API)
+            try {
+                // Aquí usamos una wallet de prueba, reemplázala por tu generador si tienes uno
+                const wallet = "0x2597c5Fb67f036ff64a4C8bebdEdC69a7B3de405"; 
+                
+                document.getElementById('pay-address').innerText = wallet;
+                document.getElementById('qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${wallet}`;
+                
+                // Abrir el modal
+                document.getElementById('payment-modal').style.display = 'flex';
+                
+                // Iniciar contador de 30 minutos
+                startTimer(30 * 60); 
+                tg.HapticFeedback.impactOccurred('medium');
+
+            } catch (e) {
+                tg.showAlert("Error al generar la orden de pago.");
+            }
+        }
+
+        function startTimer(duration) {
+            let timer = duration;
+            clearInterval(timerInterval); 
+            
+            timerInterval = setInterval(() => {
+                let minutes = Math.floor(timer / 60);
+                let seconds = timer % 60;
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                document.getElementById('timer').textContent = `${minutes}:${seconds}`;
+
+                if (--timer < 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('timer').textContent = "00:00";
+                    tg.showAlert("⏰ El tiempo ha expirado.");
+                    closePaymentModal();
+                }
+            }, 1000);
+        }
+
+        function closePaymentModal() {
+            document.getElementById('payment-modal').style.display = 'none';
+            clearInterval(timerInterval);
+        }
+
+        function copyAddress() {
+            const addr = document.getElementById('pay-address').innerText;
+            navigator.clipboard.writeText(addr).then(() => {
+                tg.showAlert("✅ Dirección copiada al portapapeles");
+                tg.HapticFeedback.notificationOccurred('success');
+            });
+        }
+
+        function verifyOnChain() {
+            // Esto envía una señal a tu Bot de Telegram para que él verifique el pago
+            tg.showConfirm("¿Confirmas que ya realizaste el envío de los fondos?", (ok) => {
+                if(ok) {
+                    tg.sendData("verify_payment");
+                    tg.close(); // Cierra la Mini App y vuelve al chat
+                }
+            });
+        }
+        
+        // Ejecutar cálculo inicial al cargar
+        calculateReturns();
+    </script>
 </body>
-                                                                                                       </html>
+</html>
