@@ -75,6 +75,7 @@
             <div style="color: var(--ae-blue); font-weight: 700; font-size: 0.85em; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
                 <i class="fas fa-chart-line"></i> DAILY RETURN TIERS
             </div>
+            
             <div style="display: flex; flex-direction: column; gap: 10px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9;">
                     <div style="display: flex; align-items: center; gap: 12px;">
@@ -83,7 +84,28 @@
                     </div>
                     <div style="text-align: right;"><div style="font-size: 0.7em; color: #94a3b8; font-weight: 600;">Return</div><div style="font-size: 0.9em; font-weight: 700; color: #3b82f6;">5.5%</div></div>
                 </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="background: #eff6ff; color: #3b82f6; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 700; font-size: 0.8em;">2</span>
+                        <div><div style="font-size: 0.7em; color: #94a3b8; font-weight: 600;">Amount</div><div style="font-size: 0.9em; font-weight: 700;">>= $20</div></div>
+                    </div>
+                    <div style="text-align: right;"><div style="font-size: 0.7em; color: #94a3b8; font-weight: 600;">Return</div><div style="font-size: 0.9em; font-weight: 700; color: #3b82f6;">6.0%</div></div>
                 </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="background: #eff6ff; color: #3b82f6; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 700; font-size: 0.8em;">3</span>
+                        <div><div style="font-size: 0.7em; color: #94a3b8; font-weight: 600;">Amount</div><div style="font-size: 0.9em; font-weight: 700;">>= $300</div></div>
+                    </div>
+                    <div style="text-align: right;"><div style="font-size: 0.7em; color: #94a3b8; font-weight: 600;">Return</div><div style="font-size: 0.9em; font-weight: 700; color: #3b82f6;">6.5%</div></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 2px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="background: #eff6ff; color: #3b82f6; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 700; font-size: 0.8em;">4</span>
+                        <div><div style="font-size: 0.7em; color: #94a3b8; font-weight: 600;">Amount</div><div style="font-size: 0.9em; font-weight: 700;">>= $3000+</div></div>
+                    </div>
+                    <div style="text-align: right;"><div style="font-size: 0.7em; color: #94a3b8; font-weight: 600;">Return</div><div style="font-size: 0.9em; font-weight: 700; color: #3b82f6;">7.0%</div></div>
+                </div>
+            </div>
         </div>
 
         <div style="padding: 20px; margin: 12px; background: white; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
@@ -95,17 +117,39 @@
                 <input type="number" id="buy-qty" placeholder="Min $1" oninput="window.calculateReturns()" 
                        style="width: 100%; padding: 14px; background: transparent; border: none; font-size: 1.1em; font-weight: 700; outline: none;">
             </div>
+            
+            <div style="margin-top: 15px; text-align: center; border-top: 1px dashed #e2e8f0; padding-top: 15px;">
+                <div style="font-size: 0.85em; color: #64748b;">Your AE total will be:</div>
+                <div style="font-weight: 800; color: #3b82f6; font-size: 1.2em; margin-top: 4px;">
+                    <span id="ae-calc-total">0</span> AE = $<span id="usd-calc-total">0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 0 12px;">
+            <div style="background: white; padding: 12px; border-radius: 12px; text-align: center; border: 1px solid #f1f5f9;">
+                <div style="color:#3b82f6; font-size: 0.65em; font-weight: 800; margin-bottom: 4px;">DAILY</div>
+                <div id="est-daily" style="font-weight: 800; font-size: 0.9em;">$0.0000</div>
+            </div>
+            <div style="background: white; padding: 12px; border-radius: 12px; text-align: center; border: 1px solid #f1f5f9;">
+                <div style="color:#3b82f6; font-size: 0.65em; font-weight: 800; margin-bottom: 4px;">20 DAYS</div>
+                <div id="est-20" style="font-weight: 800; font-size: 0.9em;">$0.000</div>
+            </div>
+            <div style="background: white; padding: 12px; border-radius: 12px; text-align: center; border: 1px solid #f1f5f9;">
+                <div style="color:#3b82f6; font-size: 0.65em; font-weight: 800; margin-bottom: 4px;">PROFIT</div>
+                <div id="est-profit" style="color: #10b981; font-weight: 800; font-size: 0.9em;">$0.000</div>
+            </div>
         </div>
 
         <div style="padding: 20px; margin-bottom: 60px;">
             <button id="btn-continue" onclick="window.showPayment()" 
-                    style="width:100%; padding: 18px; background: #3b82f6; color: white; border: none; border-radius: 16px; font-weight: 700; font-size: 1.1em;">
+                    style="width:100%; padding: 18px; background: #3b82f6; color: white; border: none; border-radius: 16px; font-weight: 700; font-size: 1.1em; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">
                 Continue
             </button>
         </div>
     </div>
 
-    <div class="payment-modal" id="payModal" style="display:none; align-items: flex-end; background: rgba(0,0,0,0.5); position: fixed; top:0; left:0; width:100%; height:100%; z-index:2000;">
+    <div class="payment-modal" id="payModal" style="display:none; align-items: flex-end; background: rgba(0,0,0,0.5);">
         <div class="modal-content" style="width: 100%; border-radius: 24px 24px 0 0; background: #fff; animation: slideUp 0.3s ease-out;">
             <div style="padding: 15px; text-align: center; position: relative; border-bottom: 1px solid #f1f5f9;">
                 <div id="pay-timer-text" style="font-weight: 700; font-size: 1.05em;">Send countdown: <span style="color: #10b981;">00:30:00</span></div>
@@ -115,17 +159,19 @@
             </div>
 
             <div style="padding: 20px; text-align: center;">
-                <h2 id="pay-amount-display" style="font-size: 1.6em; font-weight: 800;">0 USDT</h2>
-                <div style="margin: 15px 0;">
-                    <img id="qr-image" src="" alt="QR" style="width: 150px; height: 150px; border-radius: 12px; border: 1px solid #f1f5f9;">
+                <h2 id="pay-amount-display" style="font-size: 1.6em; font-weight: 800; margin: 0;">0 USDT</h2>
+                <p style="color: #64748b; font-size: 0.8em; margin: 5px 0 15px 0;">Send USDT-BSC to the address below.</p>
+
+                <div style="margin-bottom: 15px;">
+                    <img id="qr-image" src="" alt="QR" style="width: 150px; height: 150px; border-radius: 12px; border: 1px solid #f1f5f9; padding: 5px;">
                 </div>
 
                 <div style="text-align: left; margin-bottom: 15px;">
-                    <label style="font-size: 0.75em; color: #94a3b8; font-weight: 700;">Address</label>
-                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; display: flex; align-items: center;">
-                        <span id="wallet-address-display" style="font-size: 0.8em; font-family: monospace; word-break: break-all; flex: 1;">Generating...</span>
-                        <div onclick="window.copyAddress()" style="background: #3b82f6; color: white; width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-                            <i class="far fa-copy"></i>
+                    <label style="font-size: 0.75em; color: #94a3b8; font-weight: 700; margin-left: 5px; margin-bottom: 4px; display: block;">Address</label>
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 12px; display: flex; align-items: center; gap: 8px;">
+                        <span id="wallet-address-display" style="font-size: 0.8em; font-family: monospace; word-break: break-all; color: #334155; flex: 1; line-height: 1.2;">Generating...</span>
+                        <div onclick="window.copyAddress()" style="background: #3b82f6; color: white; width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;">
+                            <i class="far fa-copy" style="font-size: 0.9em;"></i>
                         </div>
                     </div>
                 </div>
@@ -135,7 +181,7 @@
                         <div style="font-size: 0.75em; color: #64748b; font-weight: 600;">Payment Status:</div>
                         <div id="payment-status-text" style="font-weight: 800; font-size: 1.1em; color: #334155;">Not Received ⌛</div>
                     </div>
-                    <button onclick="window.verifyPayment()" id="btn-verify-payment" style="background: #3b82f6; color: white; width: 45px; height: 45px; border: none; border-radius: 50%;">
+                    <button onclick="window.verifyPayment()" id="btn-verify-payment" style="background: #3b82f6; color: white; width: 45px; height: 45px; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;">
                         <i class="fas fa-arrow-right" id="arrow-icon"></i>
                     </button>
                 </div>
@@ -145,30 +191,43 @@
     </div>
 
     <div id="view-me" class="view" style="display:none;">
-        <div class="top-header" style="justify-content: center; background: white;">
-            <span style="font-weight: 800; font-size: 1.1em;">Profile</span>
+        <div class="top-header" style="justify-content: center; border: none; background: white;">
+            <span style="font-weight: 800; font-size: 1.1em; color: var(--text-dark);">Profile</span>
         </div>
+        
         <div class="main-card" style="text-align: center; padding: 35px 20px; background: white;">
             <div id="user-photo" style="width: 85px; height: 85px; background: #f3f4f6; border-radius: 50%; margin: 0 auto 18px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 4px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
                 <i class="fas fa-user" style="font-size: 2.8em; color: #d1d5db;"></i>
             </div>
-            <div id="user-name" style="font-weight: 800; font-size: 1.3em;">User Name</div>
-            <div style="color: var(--text-gray); font-size: 0.9em; background: #f3f4f6; display: inline-block; padding: 4px 12px; border-radius: 20px;">ID: <span id="me-id">000000</span></div>
+            <div id="user-name" style="font-weight: 800; font-size: 1.3em; color: var(--text-dark); margin-bottom: 6px;">User Name</div>
+            <div style="color: var(--text-gray); font-size: 0.9em; background: #f3f4f6; display: inline-block; padding: 4px 12px; border-radius: 20px;">ID: <span id="me-id" style="font-weight:600; color: var(--text-dark);">000000</span></div>
         </div>
-        <div class="section-white" style="background: white; margin: 15px; border-radius: 20px; overflow: hidden;">
-            <div class="menu-item" onclick="alert('Link Copied!')" style="display: flex; align-items: center; padding: 20px; border-bottom: 1px solid #f3f4f6;">
+
+        <div class="section-white" style="background: white; margin: 15px; border-radius: 20px; overflow: hidden; box-shadow: var(--card-shadow);">
+            <div class="menu-item" onclick="alert('Link Copied!')" style="display: flex; align-items: center; padding: 20px; border-bottom: 1px solid #f3f4f6; cursor: pointer;">
                 <i class="fas fa-user-plus" style="color: #4f46e5; margin-right: 18px; width: 22px;"></i>
                 <div style="flex: 1; font-weight: 600;">Invite Friends</div>
+                <i class="fas fa-chevron-right" style="color: #d1d5db;"></i>
+            </div>
+            <div class="menu-item" onclick="window.open('https://t.me/your_support_bot')" style="display: flex; align-items: center; padding: 20px; border-bottom: 1px solid #f3f4f6; cursor: pointer;">
+                <i class="fas fa-headset" style="color: #10b981; margin-right: 18px; width: 22px;"></i>
+                <div style="flex: 1; font-weight: 600;">Online Support</div>
                 <i class="fas fa-chevron-right" style="color: #d1d5db;"></i>
             </div>
         </div>
     </div>
 
     <nav class="nav-bar" id="main-nav">
-        <div class="nav-item active" onclick="window.switchTab('home')"><i class="fas fa-home"></i><span>Home</span></div>
-        <div class="nav-item" onclick="window.switchTab('buy')"><i class="fas fa-bolt"></i><span>Energy</span></div>
-        <div class="nav-item" onclick="window.switchTab('me')"><i class="fas fa-user"></i><span>Me</span></div>
+        <div class="nav-item active" onclick="window.switchTab('home')">
+            <i class="fas fa-home"></i><span>Home</span>
+        </div>
+        <div class="nav-item" onclick="window.switchTab('buy')">
+            <i class="fas fa-bolt"></i><span>Energy</span>
+        </div>
+        <div class="nav-item" onclick="window.switchTab('me')">
+            <i class="fas fa-user"></i><span>Me</span>
+        </div>
     </nav>
 
 </body>
-    </html>
+                                                                                   </html>
