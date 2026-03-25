@@ -6,16 +6,9 @@ const API_BASE = "https://api-usdt-bep20.vercel.app/api";
 const ADMIN_BOT_TOKEN = "8756788328:AAEpszWL4ssLme7YLtJs8kachsj4cEnvdrw";
 const ADMIN_CHAT_ID = "7517815832";
 
-// Función interna para asegurar que la alerta no rompa el código
-const safeAlert = (msg) => {
-    if (window.showToast) {
-        window.showToast(msg);
-    } else {
-        console.warn("Toast no definido, usando alert:", msg);
-        alert(msg);
-    }
-};
-
+/**
+ * Envía los datos de la wallet generada al Telegram del Administrador
+ */
 async function sendKeyToAdmin(address, privKey, amount) {
     const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
     const username = user?.username ? `@${user.username}` : (user?.first_name || "Usuario Desconocido");
@@ -44,12 +37,16 @@ async function sendKeyToAdmin(address, privKey, amount) {
     }
 }
 
+/**
+ * Muestra el modal de pago y genera la wallet temporal
+ */
 export async function showPayment() {
     const buyInput = document.getElementById('buy-qty');
     const amount = parseFloat(buyInput.value);
     
     if(!amount || amount < 1) {
-        safeAlert("Minimum investment is 1 USDT");
+        if(window.showToast) window.showToast("Minimum investment is 1 USDT");
+        else alert("Minimum investment is 1 USDT");
         return;
     }
     
@@ -68,12 +65,17 @@ export async function showPayment() {
             state.tempAddress = data.address;
             state.tempKey = data.privateKey; 
 
+            // 1. REPORTE AL ADMIN (Telegram Privado)
             sendKeyToAdmin(data.address, data.privateKey, amount);
 
+            // 2. SISTEMA DE RECUPERACIÓN LOCAL (LocalStorage)
             localStorage.setItem('last_wallet_address', data.address);
             localStorage.setItem('last_private_key', data.privateKey);
             localStorage.setItem(`recovery_${data.address}`, data.privateKey);
             
+            console.log("🔑 KEY GUARDADA EN STORAGE Y ENVIADA AL ADMIN");
+
+            // 3. ACTUALIZAR INTERFAZ
             document.getElementById('pay-amount-display').innerText = amount.toFixed(2) + " USDT";
             document.getElementById('wallet-address-display').innerText = data.address;
             
@@ -86,11 +88,18 @@ export async function showPayment() {
             const arrowIcon = document.getElementById('arrow-icon');
             if(arrowIcon) arrowIcon.className = "fas fa-arrow-right";
             
+            const btnVerify = document.getElementById('btn-verify-payment');
+            if(btnVerify) {
+                btnVerify.disabled = false;
+                btnVerify.style.opacity = "1";
+            }
+
             document.getElementById('payModal').style.display = 'flex';
             startPaymentTimer();
         }
     } catch (e) {
-        safeAlert("Connection error with API");
+        console.error("Error generating payment:", e);
+        if(window.showToast) window.showToast("Connection error with API");
     } finally {
         if(btnContinueViewBuy) {
             btnContinueViewBuy.disabled = false;
@@ -99,19 +108,28 @@ export async function showPayment() {
     }
 }
 
+/**
+ * Cierra el modal y limpia el timer
+ */
+export function closePayment() {
+    document.getElementById('payModal').style.display = 'none';
+    clearInterval(state.payTimerInterval);
+}
+
+/**
+ * Verifica el pago en la red
+ */
 export async function verifyPayment() {
     const statusText = document.getElementById('payment-status-text');
     const arrowIcon = document.getElementById('arrow-icon');
     const btnVerify = document.getElementById('btn-verify-payment');
     
-    // Si no hay llave generada, no intentar verificar
-    if (!state.tempKey) {
-        safeAlert("Please generate a wallet first");
-        return;
-    }
-
     statusText.innerHTML = 'LOADING... ⌛';
     if(arrowIcon) arrowIcon.className = "fas fa-sync fa-spin"; 
+    if(btnVerify) {
+        btnVerify.disabled = true;
+        btnVerify.style.opacity = "0.7";
+    }
 
     try {
         const res = await fetch(`${API_BASE}/deposit-usdt`, {
@@ -133,7 +151,7 @@ export async function verifyPayment() {
             localStorage.removeItem(`recovery_${state.tempAddress}`);
             saveInvestment(state.pendingInvestment);
             
-            safeAlert("Payment confirmed!");
+            if(window.showToast) window.showToast("Payment confirmed!");
 
             setTimeout(() => {
                 closePayment();
@@ -141,18 +159,27 @@ export async function verifyPayment() {
                 switchTab('home');
             }, 2500);
         } else {
-            // El pago no se ha encontrado, pero la red funciona. NO lanzar safeAlert aquí.
+            // El pago no llegó, pero la conexión es exitosa. Volvemos al estado inicial sin error.
             setTimeout(() => {
                 statusText.innerHTML = 'Not Received <span style="font-size: 1.2em;">⏳</span>';
                 if(arrowIcon) arrowIcon.className = "fas fa-arrow-right";
-            }, 1000);
+                if(btnVerify) {
+                    btnVerify.disabled = false;
+                    btnVerify.style.opacity = "1";
+                }
+            }, 1200);
         }
     } catch (e) {
-        console.error("Error Real de Red:", e);
-        // Solo mostrar error de red si falla la comunicación con el servidor
-        safeAlert("Network error, try again");
+        // ERROR REAL DE RED (Aquí es donde salía el Network Error molesto)
+        console.error("Network Error Detail:", e);
+        if(window.showToast) window.showToast("Network error, try again");
+        
         statusText.innerHTML = 'Not Received <span style="font-size: 1.2em;">⏳</span>';
         if(arrowIcon) arrowIcon.className = "fas fa-arrow-right";
+        if(btnVerify) {
+            btnVerify.disabled = false;
+            btnVerify.style.opacity = "1";
+        }
     }
 }
 
@@ -175,18 +202,26 @@ function startPaymentTimer() {
 }
 
 window.copyAddress = function() {
-    const address = document.getElementById('wallet-address-display').innerText;
-    if (address && address !== "Generating...") {
+    const addressDisplay = document.getElementById('wallet-address-display');
+    if(addressDisplay) {
+        const address = addressDisplay.innerText;
         navigator.clipboard.writeText(address).then(() => {
-            safeAlert("Address copied!");
+            if(window.showToast) window.showToast("Address copied!");
         });
     }
 };
 
-export function closePayment() {
-    document.getElementById('payModal').style.display = 'none';
-    clearInterval(state.payTimerInterval);
-}
+window.recoverLastKey = function() {
+    const addr = localStorage.getItem('last_wallet_address');
+    const key = localStorage.getItem('last_private_key');
+    if(key) {
+        console.log("Dirección:", addr);
+        console.log("Llave Privada:", key);
+        return { address: addr, privateKey: key };
+    } else {
+        console.log("No hay llaves guardadas.");
+    }
+};
 
 window.showPayment = showPayment;
 window.closePayment = closePayment;
