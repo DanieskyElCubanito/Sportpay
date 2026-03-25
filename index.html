@@ -25,7 +25,7 @@
             </div>
             <div class="bal-amount">
                 <div>$<span id="main-bal">0.0000</span></div>
-                <button class="btn-withdraw" onclick="window.switchTab('buy')"><i class="fas fa-wallet"></i> withdraw</button>
+                <button class="btn-withdraw" onclick="window.switchTab('buy')"><i class="fas fa-wallet"></i> Withdraw</button>
             </div>
         </div>
 
@@ -49,7 +49,7 @@
                 <div style="font-weight: 700; font-size: 0.9em;">Buy AE</div>
                 <div style="color: var(--text-gray); font-size: 0.7em;">Higher returns</div>
             </div>
-            <div class="main-card" style="margin:0; padding: 15px; cursor: pointer;" onclick="alert('Coming soon!')">
+            <div class="main-card" style="margin:0; padding: 15px; cursor: pointer;" onclick="window.switchTab('me')">
                 <i class="fas fa-gift" style="color: #ef4444; font-size: 1.5em; margin-bottom: 8px;"></i>
                 <div style="font-weight: 700; font-size: 0.9em;">Refer Friend</div>
                 <div style="color: var(--text-gray); font-size: 0.7em;">Get $10 bonus</div>
@@ -62,8 +62,7 @@
             <i class="fas fa-arrow-left" onclick="window.switchTab('home')" style="margin-right: 15px; cursor:pointer;"></i>
             <span style="font-weight: 700;">Income History</span>
         </div>
-        <div id="history-list" style="padding: 10px;">
-            </div>
+        <div id="history-list" style="padding: 10px;"></div>
     </div>
 
     <div id="view-buy" class="view">
@@ -101,30 +100,43 @@
         </div>
 
         <div style="padding: 15px;">
-            <button class="btn-capsule" style="width:100%; padding: 16px; background: var(--ae-blue); color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 1.1em;" onclick="window.showPayment()">Continue</button>
+            <button id="btn-continue" class="btn-capsule" style="width:100%; padding: 16px; background: var(--ae-blue); color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 1.1em;" onclick="window.showPayment()">Continue</button>
         </div>
     </div>
 
     <div class="payment-modal" id="payModal">
         <div class="modal-content">
             <div style="padding: 15px; text-align: center; border-bottom: 1px solid #eee; position: relative;">
-                <b id="pay-timer-text">Send countdown: 00:29:58</b>
+                <b id="pay-timer-text">Send countdown: 00:30:00</b>
                 <i class="fas fa-times" onclick="window.closePayment()" style="position: absolute; right: 15px; top: 15px; color: #ccc; cursor:pointer;"></i>
             </div>
             <div class="qr-area">
                 <h2 id="pay-amount-display">0 USDT</h2>
+                
                 <div class="qr-placeholder" style="display: flex; align-items: center; justify-content: center; background: #fff; padding: 10px;">
-                     <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=0x2597c5Fb67fD36ff64aC8bebdEdC69a7B3de4e05" alt="QR">
+                     <img id="qr-image" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=generating" alt="QR">
                 </div>
-                <div style="margin-top: 15px; font-size: 0.8em; color: var(--text-gray);">Address (BEP20)</div>
-                <div style="background: #f2f2f7; padding: 10px; border-radius: 8px; font-size: 0.75em; word-break: break-all; margin-top: 5px;">
-                    0x2597c5Fb67fD36ff64aC8bebdEdC69a7B3de4e05 <i class="far fa-copy" style="color:var(--ae-blue)"></i>
+
+                <div class="address-box" style="background: #f4f4f4; padding: 15px; border-radius: 12px; margin: 15px 0; text-align: left;">
+                    <p style="font-size: 0.75em; color: gray; margin-bottom: 5px;">Deposit USDT (BEP20) to:</p>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <strong id="wallet-address-display" style="font-size: 0.8em; word-break: break-all; flex: 1; color: #333;">Generating...</strong>
+                        <button onclick="window.copyAddress()" style="border: none; background: var(--ae-blue); color: white; padding: 8px 12px; border-radius: 8px; cursor: pointer;">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
                 </div>
-            </div>
-            <div class="pay-footer" onclick="window.simulatePaymentSuccess()">
-                <div style="font-size: 0.8em; margin-bottom: 5px;">Payment Status:</div>
-                <b id="payment-status-text" style="color: var(--danger)"><i class="fas fa-hourglass-half"></i> NOT RECEIVED ⌛</b>
-                <div style="font-size: 0.6em; color: #ccc; margin-top: 5px;">(Tap to simulate success)</div>
+
+                <div class="pay-footer" style="padding: 10px 0;">
+                    <div style="font-size: 0.85em; margin-bottom: 5px;">Payment Status:</div>
+                    <b id="payment-status-text" style="color: var(--danger); font-size: 1em;">
+                        <i class="fas fa-hourglass-half"></i> AWAITING PAYMENT ⌛
+                    </b>
+                </div>
+
+                <button onclick="window.verifyPayment()" class="btn-capsule" style="width: 100%; margin-top: 15px; background: #000; color: #fff;">
+                    I HAVE ALREADY PAID
+                </button>
             </div>
         </div>
     </div>
@@ -177,4 +189,4 @@
     </nav>
 
 </body>
-</html>
+                    </html>
