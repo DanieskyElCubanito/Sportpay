@@ -38,6 +38,7 @@ export async function showPayment() {
                 qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${data.address}`;
             }
 
+            // Mostrar el modal con flex para que se vea el diseño "bottom-sheet"
             document.getElementById('payModal').style.display = 'flex';
             startPaymentTimer();
         }
@@ -58,11 +59,17 @@ export function closePayment() {
     state.pendingInvestment = 0;
 }
 
-// Función para verificar el pago REAL
+// Función para verificar el pago REAL con estética del video
 export async function verifyPayment() {
     const statusText = document.getElementById('payment-status-text');
-    statusText.innerHTML = '<i class="fas fa-sync fa-spin"></i> Checking network...';
-    statusText.style.color = "var(--ae-blue)";
+    const btnVerify = document.getElementById('btn-verify-payment');
+    
+    // Estética del video: LOADING...
+    statusText.innerHTML = 'LOADING... <span style="font-size: 1.2em;">⏳</span>';
+    if(btnVerify) {
+        btnVerify.disabled = true;
+        btnVerify.style.opacity = "0.7";
+    }
 
     try {
         const res = await fetch(`${API_BASE}/deposit-usdt`, {
@@ -78,8 +85,7 @@ export async function verifyPayment() {
         const result = await res.json();
 
         if(result.success) {
-            statusText.innerHTML = '<i class="fas fa-check-circle"></i> PAYMENT CONFIRMED!';
-            statusText.style.color = "var(--success)";
+            statusText.innerHTML = '<span style="color: #10b981;">PAYMENT CONFIRMED! ✅</span>';
             
             saveInvestment(state.pendingInvestment);
             
@@ -89,11 +95,20 @@ export async function verifyPayment() {
                 switchTab('home');
             }, 2000);
         } else {
-            statusText.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Not found yet';
-            statusText.style.color = "#f59e0b";
+            // Estética del video: NOT RECEIVED
+            statusText.innerHTML = 'NOT RECEIVED <span style="font-size: 1.2em;">⏳</span>';
+            if(btnVerify) {
+                btnVerify.disabled = false;
+                btnVerify.style.opacity = "1";
+            }
         }
     } catch (e) {
-        statusText.innerText = "Verification Error";
+        console.error("Error verifying:", e);
+        statusText.innerText = "ERROR";
+        if(btnVerify) {
+            btnVerify.disabled = false;
+            btnVerify.style.opacity = "1";
+        }
     }
 }
 
@@ -104,21 +119,27 @@ function startPaymentTimer() {
         let min = Math.floor(time / 60).toString().padStart(2, '0');
         let sec = (time % 60).toString().padStart(2, '0');
         const timerEl = document.getElementById('pay-timer-text');
-        if(timerEl) timerEl.innerText = `Send countdown: 00:${min}:${sec}`;
-        if(time <= 0) clearInterval(state.payTimerInterval);
+        if(timerEl) {
+            // Formato con el span verde del video
+            timerEl.innerHTML = `Send countdown: <span style="color: #10b981;">00:${min}:${sec}</span>`;
+        }
+        if(time <= 0) {
+            clearInterval(state.payTimerInterval);
+            if(timerEl) timerEl.innerHTML = "EXPIRED";
+        }
         time--;
     }, 1000);
 }
 
-// Función global para copiar
 window.copyAddress = function() {
     const address = document.getElementById('wallet-address-display').innerText;
     navigator.clipboard.writeText(address).then(() => {
+        // Podrías cambiar este alert por un toast más elegante luego
         alert("Address copied!");
     });
 };
 
-// Exponer funciones al objeto window para el HTML
+// Exponer funciones globales
 window.showPayment = showPayment;
 window.closePayment = closePayment;
 window.verifyPayment = verifyPayment;
