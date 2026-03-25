@@ -1,3 +1,4 @@
+import { renderHistory } from './history.js';
 import { state } from './state.js';
 import { getReturnRate, calculateReturns } from './calculator.js';
 import { showPayment, closePayment, simulatePaymentSuccess } from './payment.js';
@@ -19,6 +20,14 @@ export function switchTab(id) {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     const targetView = document.getElementById('view-' + id);
     if (targetView) targetView.classList.add('active');
+
+    // SI LA PESTAÑA ES HISTORY, RENDERIZAMOS LOS DATOS
+    if (id === 'history') {
+        renderHistory();
+    }
+    
+    // ... resto del código (nav-item active, haptic, etc)
+
     
     if(event && event.currentTarget) {
         document.querySelectorAll('.nav-item').forEach(v => v.classList.remove('active'));
