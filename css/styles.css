@@ -110,3 +110,10 @@ body {
 .payment-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; display: none; align-items: center; justify-content: cent
 er; }
 .modal-content { background: var(--white); width: 90%; border-radius: 20px; overflow: hidden; } 
+/* --- EFECTO DE PULSACIÓN EN EL MENÚ DE ME --- */
+.menu-item {
+    transition: background-color 0.2s;
+}
+.menu-item:active {
+    background-color: #f0f0f4 !important; /* Gris suave al tocar */
+}
