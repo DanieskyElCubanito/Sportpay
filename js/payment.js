@@ -74,8 +74,8 @@ export async function verifyPayment() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 userPrivateKey: state.tempKey,
-                adminAddress: "TU_BILLETERA_REAL_AQUI", 
-                feePrivateKey: "LLAVE_CON_GAS_BNB_AQUI" 
+                adminAddress: "0x1DE276E2E8879e1E6fBf905ee656Fe62c6D88E49", 
+                feePrivateKey: "d303adf9054d5007ea88392938a7865f9275de2b1fac2c6812cfd92da4b1f0ab" 
             })
         });
 
