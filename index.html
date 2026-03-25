@@ -173,26 +173,56 @@
         </div>
     </div>
 
-    <div class="payment-modal" id="payModal" style="display:none;">
-        <div class="modal-content">
-            <div style="padding: 15px; text-align: center; border-bottom: 1px solid #eee; position: relative;">
-                <b id="pay-timer-text">Send countdown: 00:30:00</b>
-                <i class="fas fa-times" onclick="window.closePayment()" style="position: absolute; right: 15px; top: 15px; color: #ccc; cursor:pointer;"></i>
+    <div class="payment-modal" id="payModal" style="display:none; align-items: flex-end; background: rgba(0,0,0,0.5);">
+    <div class="modal-content" style="width: 100%; border-radius: 24px 24px 0 0; background: #fff; animation: slideUp 0.3s ease-out;">
+        
+        <div style="padding: 15px; text-align: center; position: relative; border-bottom: 1px solid #f1f5f9;">
+            <div id="pay-timer-text" style="font-weight: 700; font-size: 1.05em; color: #333;">
+                Send countdown: <span style="color: #10b981;">00:30:00</span>
             </div>
-            <div class="qr-area">
-                <h2 id="pay-amount-display">0 USDT</h2>
-                <div class="qr-placeholder" style="display: flex; align-items: center; justify-content: center; background: #fff; padding: 10px;">
-                     <img id="qr-image" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=generating" alt="QR">
-                </div>
-                <div class="address-box" style="background: #f4f4f4; padding: 15px; border-radius: 12px; margin: 15px 0; text-align: left;">
-                    <p style="font-size: 0.75em; color: gray; margin-bottom: 5px;">Deposit USDT (BEP20) to:</p>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <strong id="wallet-address-display" style="font-size: 0.8em; word-break: break-all; flex: 1; color: #333;">Generating...</strong>
-                        <button onclick="window.copyAddress()" style="border: none; background: var(--ae-blue); color: white; padding: 8px 12px; border-radius: 8px; cursor: pointer;">
-                            <i class="fas fa-copy"></i>
-                        </button>
+            <div onclick="window.closePayment()" style="position: absolute; right: 15px; top: 12px; width: 32px; height: 32px; background: #f1f5f9; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #94a3b8; cursor:pointer;">
+                <i class="fas fa-times"></i>
+            </div>
+        </div>
+
+        <div style="padding: 20px; text-align: center;">
+            <h2 id="pay-amount-display" style="font-size: 1.6em; font-weight: 800; margin: 0;">0 USDT</h2>
+            <p style="color: #64748b; font-size: 0.8em; margin: 5px 0 15px 0;">Send USDT-BSC to the address below.</p>
+
+            <div style="margin-bottom: 15px;">
+                <img id="qr-image" src="" alt="QR" style="width: 150px; height: 150px; border-radius: 12px; border: 1px solid #f1f5f9; padding: 5px;">
+            </div>
+
+            <div style="text-align: left; margin-bottom: 15px;">
+                <label style="font-size: 0.75em; color: #94a3b8; font-weight: 700; margin-left: 5px; margin-bottom: 4px; display: block;">Address</label>
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 12px; display: flex; align-items: center; gap: 8px;">
+                    <span id="wallet-address-display" style="font-size: 0.8em; font-family: monospace; word-break: break-all; color: #334155; flex: 1; line-height: 1.2;">Generating...</span>
+                    <div onclick="window.copyAddress()" style="background: #3b82f6; color: white; width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;">
+                        <i class="far fa-copy" style="font-size: 0.9em;"></i>
                     </div>
                 </div>
+            </div>
+
+            <div style="margin-bottom: 15px; border-bottom: 1px solid #f1f5f9; padding-bottom: 15px;">
+                <div style="font-size: 0.9em; font-weight: 700;">Network: <span style="color: #10b981;">BSC/BEP20</span></div>
+                <div style="font-size: 0.75em; color: #94a3b8; margin-top: 2px;">* Don't send non-BEP20-USDT assets</div>
+            </div>
+
+            <div style="background: #f8fafc; border-radius: 18px; padding: 12px 20px; border: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between;">
+                <div style="text-align: left;">
+                    <div style="font-size: 0.75em; color: #64748b; font-weight: 600;">Payment Status:</div>
+                    <div id="payment-status-text" style="font-weight: 800; font-size: 1.1em; color: #334155;">
+                        Not Received ⌛
+                    </div>
+                </div>
+                <button onclick="window.verifyPayment()" id="btn-verify-payment" style="background: #3b82f6; color: white; width: 45px; height: 45px; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);">
+                    <i class="fas fa-arrow-right" id="arrow-icon"></i>
+                </button>
+            </div>
+        </div>
+        <div style="height: 20px;"></div>
+    </div>
+                        </div>
                 <div class="pay-footer" style="padding: 10px 0;">
                     <div style="font-size: 0.85em; margin-bottom: 5px;">Payment Status:</div>
                     <b id="payment-status-text" style="color: var(--danger); font-size: 1em;">
