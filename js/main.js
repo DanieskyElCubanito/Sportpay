@@ -1,50 +1,27 @@
 import { renderHistory } from './history.js';
 import { state } from './state.js';
 import { getReturnRate, calculateReturns } from './calculator.js';
-import { showPayment, closePayment, simulatePaymentSuccess } from './payment.js';
+import { showPayment, closePayment, verifyPayment } from './payment.js';
 
-
-// ESTO DEBE IR ARRIBA PARA QUE EL HTML LO VEA SIEMPRE
+// --- REGISTRO DE FUNCIONES GLOBALES ---
+// Esto permite que el HTML encuentre las funciones desde onclick
 window.switchTab = switchTab;
 window.calculateReturns = calculateReturns;
 window.showPayment = showPayment;
 window.closePayment = closePayment;
 window.verifyPayment = verifyPayment;
-/**
- * Actualiza los valores numéricos en la interfaz principal basándose en el estado real
- */
-export function updateDashboard() {
-    // Cálculo de AE y ganancias basado en la inversión real (0 al inicio)
-    const currentAE = state.totalInvestedUSDT * 1000;
-    const currentRate = getReturnRate(state.totalInvestedUSDT);
-    const dailyEarn = state.totalInvestedUSDT * (currentRate / 100);
 
-    const mainBalEl = document.getElementById('main-bal');
-    const mainPowerEl = document.getElementById('main-power');
-    const statDailyEl = document.getElementById('stat-daily');
-    const statRateEl = document.getElementById('stat-rate');
-
-    // Actualización segura de textos
-    if(mainBalEl) mainBalEl.innerText = state.totalEarnedUSD.toFixed(4);
-    if(mainPowerEl) mainPowerEl.innerText = currentAE.toLocaleString();
-    if(statDailyEl) statDailyEl.innerText = dailyEarn.toFixed(4);
-    if(statRateEl) statRateEl.innerText = currentRate.toFixed(1);
-    
-    calculateReturns();
-import { renderHistory } from './history.js';
-import { state } from './state.js';
-import { getReturnRate, calculateReturns } from './calculator.js';
-import { showPayment, closePayment, verifyPayment } from './payment.js';
-
-    
 window.copyAddress = function() {
     const address = document.getElementById('wallet-address-display')?.innerText;
-    if(address) {
+    if(address && address !== "Generating...") {
         navigator.clipboard.writeText(address);
         alert("Address copied!");
     }
 };
 
+/**
+ * Actualiza la interfaz con los datos del estado
+ */
 export function updateDashboard() {
     const currentAE = (state.totalInvestedUSDT || 0) * 1000;
     const currentRate = getReturnRate(state.totalInvestedUSDT || 0);
@@ -61,11 +38,18 @@ export function updateDashboard() {
         const el = document.getElementById(id);
         if (el) el.innerText = val;
     }
-    calculateReturns();
+    
+    // Solo calcular retornos si el input existe en el DOM
+    if (document.getElementById('buy-qty')) {
+        calculateReturns();
+    }
 }
 
+/**
+ * Maneja el cambio de pestañas
+ */
 export function switchTab(id) {
-    console.log("Cambiando a pestaña:", id); // Para debug en consola
+    console.log("Navegando a:", id);
     
     // 1. Ocultar todas las vistas
     const views = document.querySelectorAll('.view');
@@ -81,18 +65,24 @@ export function switchTab(id) {
         targetView.style.display = 'block';
     }
 
+    // 3. Cargas lógicas según pestaña
     if (id === 'history') renderHistory();
+    if (id === 'buy') calculateReturns();
     
-    // 3. Actualizar Nav Bar
+    // 4. Actualizar estado visual de la Nav Bar
     document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
     const activeNav = document.querySelector(`.nav-item[onclick*="'${id}'"]`);
     if(activeNav) activeNav.classList.add('active');
 
+    // Feedback vibración para Telegram
     if(window.Telegram?.WebApp?.HapticFeedback) {
         window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
     }
 }
 
+/**
+ * Inicialización al cargar la página
+ */
 window.onload = () => {
     const tg = window.Telegram?.WebApp;
     if(tg) {
@@ -108,12 +98,13 @@ window.onload = () => {
     
     updateDashboard();
     
-    // Timer del Settlement
+    // Timer del Settlement (Cuenta regresiva diaria)
     setInterval(() => {
         const now = new Date();
-        const time = [23 - now.getHours(), 59 - now.getMinutes(), 59 - now.getSeconds()]
-            .map(n => n.toString().padStart(2, '0')).join(':');
+        const hrs = (23 - now.getHours()).toString().padStart(2, '0');
+        const min = (59 - now.getMinutes()).toString().padStart(2, '0');
+        const sec = (59 - now.getSeconds()).toString().padStart(2, '0');
         const timerEl = document.getElementById('timer');
-        if(timerEl) timerEl.innerText = time;
+        if(timerEl) timerEl.innerText = `${hrs}:${min}:${sec}`;
     }, 1000);
 };
