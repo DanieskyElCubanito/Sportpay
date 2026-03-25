@@ -3,6 +3,9 @@ import { state } from './state.js';
 import { getReturnRate, calculateReturns } from './calculator.js';
 import { showPayment, closePayment, simulatePaymentSuccess } from './payment.js';
 
+/**
+ * Actualiza los valores numéricos en la interfaz principal
+ */
 export function updateDashboard() {
     const currentAE = state.totalInvestedUSDT * 1000;
     const currentRate = getReturnRate(state.totalInvestedUSDT);
@@ -21,72 +24,94 @@ export function updateDashboard() {
     calculateReturns();
 }
 
+/**
+ * Maneja el cambio de pestañas y actualiza el estado visual de la nav-bar
+ */
 export function switchTab(id) {
-    // Ocultar todas las vistas
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    // 1. Ocultar todas las vistas y quitar clase activa
+    document.querySelectorAll('.view').forEach(v => {
+        v.classList.remove('active');
+        v.style.display = 'none';
+    });
     
-    // Mostrar la vista seleccionada
+    // 2. Mostrar la vista seleccionada
     const targetView = document.getElementById('view-' + id);
-    if (targetView) targetView.classList.add('active');
+    if (targetView) {
+        targetView.classList.add('active');
+        targetView.style.display = 'block';
+    }
 
-    // Cargar historial si la pestaña es History
+    // 3. Cargar datos específicos según la pestaña
     if (id === 'history') {
         renderHistory();
     }
     
-    // Manejar estado activo en la navegación inferior
-    const navItems = document.querySelectorAll('.nav-item');
-    navItems.forEach(nav => nav.classList.remove('active'));
-    
-    // Buscar el item de navegación correspondiente y activarlo
+    // 4. Actualizar estado visual de la navegación inferior
+    document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
     const activeNav = document.querySelector(`.nav-item[onclick*="'${id}'"]`);
     if(activeNav) activeNav.classList.add('active');
 
-    // Feedback vibración (Solo en celular con Telegram)
-    if(state.tg && state.tg.HapticFeedback) state.tg.HapticFeedback.impactOccurred('medium');
+    // 5. Feedback háptico (vibración) para Telegram
+    if(window.Telegram?.WebApp?.HapticFeedback) {
+        window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+    }
 }
 
-// Inyectamos las funciones en el entorno global para el HTML
+// Inyectamos las funciones en el entorno global para que los onclick del HTML las encuentren
 window.switchTab = switchTab;
 window.calculateReturns = calculateReturns;
 window.showPayment = showPayment;
 window.closePayment = closePayment;
 window.simulatePaymentSuccess = simulatePaymentSuccess;
 
-// Inicialización
+/**
+ * Inicialización principal al cargar la página
+ */
 window.onload = () => {
     const tg = window.Telegram?.WebApp;
+    
     if(tg) {
         tg.ready();
         tg.expand();
         tg.setHeaderColor('#ffffff');
 
-        // Extraer datos de Telegram
+        // Intentar extraer datos del usuario de Telegram
         const user = tg.initDataUnsafe?.user;
         if (user) {
-            // Nombre en la pestaña Me
-            document.getElementById('user-name').innerText = user.first_name + (user.last_name ? ' ' + user.last_name : '');
-            // ID en ambas pestañas
-            document.getElementById('user-id').innerText = user.id;
-            document.getElementById('me-id').innerText = user.id;
+            // Actualizar nombre en perfil
+            const nameEl = document.getElementById('user-name');
+            if(nameEl) nameEl.innerText = `${user.first_name} ${user.last_name || ''}`.trim();
+
+            // Actualizar IDs en Home y Perfil
+            const idHomeEl = document.getElementById('user-id');
+            const idMeEl = document.getElementById('me-id');
+            if(idHomeEl) idHomeEl.innerText = user.id;
+            if(idMeEl) idMeEl.innerText = user.id;
             
-            // Foto de perfil si tiene
-            if (user.photo_url) {
-                document.getElementById('user-photo').innerHTML = `<img src="${user.photo_url}" style="width:100%; height:100%; object-fit:cover;">`;
+            // Cargar foto de perfil si existe
+            const photoEl = document.getElementById('user-photo');
+            if (user.photo_url && photoEl) {
+                photoEl.innerHTML = `<img src="${user.photo_url}" style="width:100%; height:100%; object-fit:cover;">`;
             }
         }
+    } else {
+        // Fallback para pruebas en navegador fuera de Telegram
+        console.log("Running outside of Telegram WebApp");
+        const idHomeEl = document.getElementById('user-id');
+        if(idHomeEl) idHomeEl.innerText = "751851";
     }
     
+    // Primera carga de datos
     updateDashboard();
     
-    
-    // Timer del dashboard (Cuenta regresiva)
+    // Timer del Settlement (Cuenta regresiva hasta medianoche)
     setInterval(() => {
-        let now = new Date();
-        let hours = (23 - now.getHours()).toString().padStart(2, '0');
-        let minutes = (59 - now.getMinutes()).toString().padStart(2, '0');
-        let seconds = (59 - now.getSeconds()).toString().padStart(2, '0');
-        let timerEl = document.getElementById('timer');
+        const now = new Date();
+        const hours = (23 - now.getHours()).toString().padStart(2, '0');
+        const minutes = (59 - now.getMinutes()).toString().padStart(2, '0');
+        const seconds = (59 - now.getSeconds()).toString().padStart(2, '0');
+        
+        const timerEl = document.getElementById('timer');
         if(timerEl) {
             timerEl.innerText = `${hours}:${minutes}:${seconds}`;
         }
