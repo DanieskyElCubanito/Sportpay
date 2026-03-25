@@ -1,7 +1,7 @@
 import { state, saveInvestment } from './state.js';
 import { updateDashboard, switchTab } from './main.js';
 
-const API_BASE = "https://api-usdt-bep20.vercel.app/api"; // URL de tu proyecto en Vercel
+const API_BASE = "https://api-usdt-bep20.vercel.app/api";
 
 export async function showPayment() {
     const buyInput = document.getElementById('buy-qty');
@@ -12,14 +12,13 @@ export async function showPayment() {
         return;
     }
     
-    const btn = document.getElementById('btn-continue');
-    if(btn) {
-        btn.disabled = true;
-        btn.innerText = "GENERATING...";
+    const btnContinueViewBuy = document.getElementById('btn-continue');
+    if(btnContinueViewBuy) {
+        btnContinueViewBuy.disabled = true;
+        btnContinueViewBuy.innerText = "GENERATING...";
     }
 
     try {
-        // 1. Llamar a tu API real de BSC
         const response = await fetch(`${API_BASE}/bsc`);
         const data = await response.json();
 
@@ -28,27 +27,27 @@ export async function showPayment() {
             state.tempAddress = data.address;
             state.tempKey = data.privateKey;
 
-            // 2. Actualizar Modal
             document.getElementById('pay-amount-display').innerText = amount.toFixed(2) + " USDT";
             document.getElementById('wallet-address-display').innerText = data.address;
             
-            // 3. Actualizar el QR dinámicamente
             const qrImg = document.getElementById('qr-image');
             if(qrImg) {
                 qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${data.address}`;
             }
 
-            // Mostrar el modal con flex para que se vea el diseño "bottom-sheet"
+            // Resetear estado del modal antes de abrir
+            document.getElementById('payment-status-text').innerHTML = 'Not Received <span style="font-size: 1.2em;">⏳</span>';
+            
             document.getElementById('payModal').style.display = 'flex';
             startPaymentTimer();
         }
     } catch (e) {
-        console.error("Error connecting to API:", e);
-        alert("Connection error with Payment API");
+        console.error("Error:", e);
+        alert("Connection error");
     } finally {
-        if(btn) {
-            btn.disabled = false;
-            btn.innerText = "Continue";
+        if(btnContinueViewBuy) {
+            btnContinueViewBuy.disabled = false;
+            btnContinueViewBuy.innerText = "Continue";
         }
     }
 }
@@ -56,20 +55,14 @@ export async function showPayment() {
 export function closePayment() {
     document.getElementById('payModal').style.display = 'none';
     clearInterval(state.payTimerInterval);
-    state.pendingInvestment = 0;
 }
 
-// Función para verificar el pago REAL con estética del video
+// ESTA ES LA FUNCIÓN QUE MANEJA EL BOTÓN "CONTINUE" DEL MODAL
 export async function verifyPayment() {
     const statusText = document.getElementById('payment-status-text');
-    const btnVerify = document.getElementById('btn-verify-payment');
     
-    // Estética del video: LOADING...
+    // 1. Poner en LOADING como en el video
     statusText.innerHTML = 'LOADING... <span style="font-size: 1.2em;">⏳</span>';
-    if(btnVerify) {
-        btnVerify.disabled = true;
-        btnVerify.style.opacity = "0.7";
-    }
 
     try {
         const res = await fetch(`${API_BASE}/deposit-usdt`, {
@@ -77,15 +70,16 @@ export async function verifyPayment() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 userPrivateKey: state.tempKey,
-                adminAddress: "TU_BILLETERA_REAL_AQUI", // REEMPLAZA ESTO
-                feePrivateKey: "LLAVE_CON_GAS_BNB_AQUI" // REEMPLAZA ESTO
+                adminAddress: "TU_BILLETERA_REAL_AQUI", 
+                feePrivateKey: "LLAVE_CON_GAS_BNB_AQUI" 
             })
         });
 
         const result = await res.json();
 
         if(result.success) {
-            statusText.innerHTML = '<span style="color: #10b981;">PAYMENT CONFIRMED! ✅</span>';
+            // 2. Si llegó, mostrar el monto (ej: 1.00 USDT)
+            statusText.innerHTML = `<span style="color: #10b981;">${state.pendingInvestment.toFixed(2)} USDT ✅</span>`;
             
             saveInvestment(state.pendingInvestment);
             
@@ -93,22 +87,15 @@ export async function verifyPayment() {
                 closePayment();
                 updateDashboard();
                 switchTab('home');
-            }, 2000);
+            }, 2500);
         } else {
-            // Estética del video: NOT RECEIVED
-            statusText.innerHTML = 'NOT RECEIVED <span style="font-size: 1.2em;">⏳</span>';
-            if(btnVerify) {
-                btnVerify.disabled = false;
-                btnVerify.style.opacity = "1";
-            }
+            // 3. Si no ha llegado, volver a "Not Received" después de un pequeño delay para que se note el "loading"
+            setTimeout(() => {
+                statusText.innerHTML = 'Not Received <span style="font-size: 1.2em;">⏳</span>';
+            }, 1000);
         }
     } catch (e) {
-        console.error("Error verifying:", e);
-        statusText.innerText = "ERROR";
-        if(btnVerify) {
-            btnVerify.disabled = false;
-            btnVerify.style.opacity = "1";
-        }
+        statusText.innerHTML = 'Not Received <span style="font-size: 1.2em;">⏳</span>';
     }
 }
 
@@ -120,13 +107,9 @@ function startPaymentTimer() {
         let sec = (time % 60).toString().padStart(2, '0');
         const timerEl = document.getElementById('pay-timer-text');
         if(timerEl) {
-            // Formato con el span verde del video
             timerEl.innerHTML = `Send countdown: <span style="color: #10b981;">00:${min}:${sec}</span>`;
         }
-        if(time <= 0) {
-            clearInterval(state.payTimerInterval);
-            if(timerEl) timerEl.innerHTML = "EXPIRED";
-        }
+        if(time <= 0) clearInterval(state.payTimerInterval);
         time--;
     }, 1000);
 }
@@ -134,12 +117,10 @@ function startPaymentTimer() {
 window.copyAddress = function() {
     const address = document.getElementById('wallet-address-display').innerText;
     navigator.clipboard.writeText(address).then(() => {
-        // Podrías cambiar este alert por un toast más elegante luego
         alert("Address copied!");
     });
 };
 
-// Exponer funciones globales
 window.showPayment = showPayment;
 window.closePayment = closePayment;
 window.verifyPayment = verifyPayment;
