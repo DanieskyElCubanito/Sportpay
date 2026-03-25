@@ -3,6 +3,13 @@ import { state } from './state.js';
 import { getReturnRate, calculateReturns } from './calculator.js';
 import { showPayment, closePayment, simulatePaymentSuccess } from './payment.js';
 
+
+// ESTO DEBE IR ARRIBA PARA QUE EL HTML LO VEA SIEMPRE
+window.switchTab = switchTab;
+window.calculateReturns = calculateReturns;
+window.showPayment = showPayment;
+window.closePayment = closePayment;
+window.verifyPayment = verifyPayment;
 /**
  * Actualiza los valores numéricos en la interfaz principal basándose en el estado real
  */
@@ -29,13 +36,7 @@ import { state } from './state.js';
 import { getReturnRate, calculateReturns } from './calculator.js';
 import { showPayment, closePayment, verifyPayment } from './payment.js';
 
-// --- REGISTRO GLOBAL INMEDIATO ---
-// Esto asegura que el HTML encuentre las funciones aunque algo falle abajo
-window.switchTab = switchTab;
-window.calculateReturns = calculateReturns;
-window.showPayment = showPayment;
-window.closePayment = closePayment;
-window.verifyPayment = verifyPayment;
+    
 window.copyAddress = function() {
     const address = document.getElementById('wallet-address-display')?.innerText;
     if(address) {
