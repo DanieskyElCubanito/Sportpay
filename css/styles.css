@@ -1,148 +1,90 @@
 :root {
-    /* Colores base dinámicos */
-    --ae-blue: #007aff;
-    --success: #34c759;
-    --danger: #ff3b30;
-    
-    /* Variables que cambiarán con el tema de Telegram */
-    --bg-gray: #f2f2f7;
-    --text-dark: #1c1c1e;
-    --text-gray: #8e8e93;
+    --ae-blue: #0070f3;          /* Azul vibrante tipo Vercel/Apple */
+    --bg-gray: #f8f9fb;          /* Gris muy claro y limpio */
+    --text-dark: #111827;        /* Negro azulado profesional */
+    --text-gray: #6b7280;        /* Gris para subtítulos */
     --white: #ffffff;
-    --card-bg: #ffffff;
+    --success: #10b981;          /* Verde esmeralda */
+    --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
 }
 
-/* Esta clase se activará automáticamente vía JavaScript */
-body.dark-mode {
-    --bg-gray: #111111;
-    --text-dark: #ffffff;
-    --text-gray: #aaaaaa;
-    --white: #1c1c1e;
-    --card-bg: #1c1c1e;
-}
 body {
     background-color: var(--bg-gray);
     color: var(--text-dark);
-    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Inter', -apple-system, sans-serif;
     margin: 0; padding: 0; overflow-x: hidden;
 }
 
+/* --- ESTRUCTURA DE VISTAS --- */
 .view { display: none; min-height: 100vh; animation: fadeIn 0.15s ease; padding-bottom: 90px; }
 .view.active { display: block !important; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-.top-header { background: white; padding: 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e5e5ea; }
+/* --- COMPONENTES --- */
+.top-header { background: var(--white); padding: 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e5e5ea; }
 .id-badge { font-size: 0.9em; font-weight: 600; display: flex; align-items: center; gap: 5px; }
 
-.main-card { background: white; margin: 10px; padding: 20px; border-radius: 12px; }
-.bal-title { color: var(--text-gray); font-size: 0.85em; margin-bottom: 5px; }
-.bal-amount { font-size: 2.2em; font-weight: 700; display: flex; align-items: center; justify-content: space-between; }
-
-.btn-withdraw { background: var(--ae-blue); color: white; border: none; padding: 10px 18px; border-radius: 20px; font-weight: 600; font-size: 0.85em; cursor: pointer;}
-
-.energy-box {
-    background: linear-gradient(135deg, #007aff, #00c6ff); color: white;
-    margin: 10px; padding: 20px; border-radius: 15px; position: relative;
-}
-.stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 20px; }
-.stat-item { background: rgba(255,255,255,0.15); padding: 10px; border-radius: 10px; text-align: center; }
-.stat-label { font-size: 0.65em; opacity: 0.9; margin-bottom: 4px; text-transform: uppercase; }
-.stat-val { font-size: 0.9em; font-weight: 700; }
-
-.tier-row { display: flex; align-items: center; padding: 12px 15px; border-bottom: 1px solid #f2f2f7; }
-.tier-idx { width: 28px; height: 28px; background: #eef2ff; color: var(--ae-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 12px; font-size: 0.8em; }
-.tier-info { flex: 1; }
-.tier-label { font-size: 0.75em; color: var(--text-gray); }
-.tier-val { font-weight: 600; font-size: 0.95em; }
-
-.buy-input-container { background: white; padding: 20px; margin-top: 10px; }
-.input-group { position: relative; display: flex; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-.input-group img { width: 24px; margin-right: 10px; }
-.input-group input { border: none; outline: none; font-size: 1.1em; font-weight: 500; width: 100%; }
-
-.estimated-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 15px; background: white; margin-top: 10px; }
-.est-box { border: 1px solid #f0f0f0; padding: 10px; border-radius: 8px; text-align: center; }
-.est-label { font-size: 0.65em; color: var(--text-gray); font-weight: bold; margin-bottom: 5px; }
-.est-val { font-size: 0.85em; font-weight: 700; }
-
-.payment-modal {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5); z-index: 2000; display: none;
-    align-items: center; justify-content: center;
-}
-.modal-content { background: white; width: 90%; border-radius: 20px; overflow: hidden; position: relative; }
-.qr-area { padding: 30px; text-align: center; }
-.qr-placeholder { width: 180px; height: 180px; margin: 0 auto; background: #eee; border-radius: 10px; }
-.pay-footer { background: #f9f9f9; padding: 15px; text-align: center; border-top: 1px solid #eee; cursor: pointer; }
-
-.nav-bar { position: fixed; bottom: 0; width: 100%; background: white; display: flex; padding: 10px 0 25px; border-top: 1px solid #eee; z-index: 1000; }
-.nav-item { flex: 1; text-align: center; color: #999; font-size: 0.7em; cursor: pointer; }
-.nav-item.active { color: var(--ae-blue); }
-.nav-item i { display: block; font-size: 1.6em; margin-bottom: 3px; }
-
-.btn-capsule { transition: 0.2s opacity; cursor: pointer; }
-.btn-capsule:active { opacity: 0.7; }
-
-/* --- AJUSTES DE BALANCE Y WITHDRAW --- */
-.bal-title { color: var(--text-gray); font-size: 0.85em; margin-bottom: 8px; }
-
-.bal-amount { 
-    font-size: 2em; /* Balance un poco más pequeño */
-    font-weight: 700; 
-    display: flex; 
-    align-items: center; 
-    justify-content: space-between; 
+.main-card { 
+    background: var(--white); 
+    margin: 10px; 
+    padding: 20px; 
+    border-radius: 16px; 
+    box-shadow: var(--card-shadow);
 }
 
+.bal-title { color: var(--text-gray); font-size: 0.85em; margin-bottom: 8px; display: flex; align-items: center; }
+.bal-amount { font-size: 2em; font-weight: 700; display: flex; align-items: center; justify-content: space-between; }
+
+/* Botón Withdraw Profesional */
 .btn-withdraw { 
     background: var(--ae-blue); 
     color: white; 
     border: none; 
-    padding: 8px 14px; 
-    border-radius: 8px; /* Bordes menos redondos como en el original */
-    font-weight: 600; 
-    font-size: 14px; /* Tamaño fijo para que no se haga gigante */
+    padding: 8px 16px; 
+    border-radius: 10px; 
+    font-weight: 700; 
+    font-size: 14px; 
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 6px;
+    box-shadow: 0 4px 14px 0 rgba(0,112,243,0.3);
+    transition: 0.2s;
+}
+.btn-withdraw:active { transform: scale(0.95); }
+
+/* Caja de Energía (Azul) */
+.energy-box {
+    background: linear-gradient(135deg, #007aff, #00c6ff); 
+    color: white;
+    margin: 10px; 
+    padding: 20px; 
+    border-radius: 16px; 
+    position: relative;
+    box-shadow: var(--card-shadow);
 }
 
-/* --- NUEVO BOTÓN HISTORY --- */
-.history-btn { 
-    font-size: 0.85em; 
-    color: var(--text-gray); 
-    cursor: pointer; 
-    margin-left: 10px; 
-    transition: 0.2s; 
-}
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 15px; }
+.stat-item { background: rgba(255,255,255,0.15); padding: 8px 5px; border-radius: 8px; text-align: center; }
+.stat-label { font-size: 0.55em; opacity: 0.9; margin-bottom: 4px; text-transform: uppercase; white-space: nowrap; }
+.stat-val { font-size: 0.85em; font-weight: 700; white-space: nowrap; }
+
+/* Historial Botón */
+.history-btn { font-size: 0.9em; color: var(--text-gray); cursor: pointer; margin-left: 10px; }
 .history-btn:active { color: var(--ae-blue); }
 
-/* --- AJUSTES DE LA CAJA ROJA (ESTADÍSTICAS) --- */
-.stats-grid { 
-    display: grid; 
-    grid-template-columns: 1fr 1fr 1fr; 
-    gap: 8px; /* Menos espacio entre cajas */
-    margin-top: 15px; 
-}
+/* --- NAVEGACIÓN --- */
+.nav-bar { position: fixed; bottom: 0; width: 100%; background: var(--white); display: flex; padding: 10px 0 25px; border-top: 1px solid #eee; z-index: 1000; }
+.nav-item { flex: 1; text-align: center; color: #999; font-size: 0.7em; cursor: pointer; }
+.nav-item.active { color: var(--ae-blue); }
+.nav-item i { display: block; font-size: 1.6em; margin-bottom: 3px; }
 
-.stat-item { 
-    background: rgba(255,255,255,0.15); 
-    padding: 8px 5px; /* Menos padding lateral para que quepa todo */
-    border-radius: 8px; 
-    text-align: center; 
-}
+/* --- INPUTS Y OTROS --- */
+.buy-input-container { background: var(--white); padding: 20px; margin-top: 10px; }
+.input-group { display: flex; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+.input-group img { width: 24px; margin-right: 10px; }
+.input-group input { border: none; outline: none; font-size: 1.1em; font-weight: 500; width: 100%; background: transparent; }
 
-.stat-label { 
-    font-size: 0.55em; /* Letra de los títulos más pequeña */
-    opacity: 0.9; 
-    margin-bottom: 4px; 
-    text-transform: uppercase; 
-    white-space: nowrap; /* Evita que el texto salte a la segunda línea */
-}
-
-.stat-val { 
-    font-size: 0.85em; 
-    font-weight: 700; 
-    white-space: nowrap; /* Evita que los números salten de línea */
-                  }
+/* Modales */
+.payment-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; display: none; align-items: center; justify-content: center; }
+.modal-content { background: var(--white); width: 90%; border-radius: 20px; overflow: hidden; }
