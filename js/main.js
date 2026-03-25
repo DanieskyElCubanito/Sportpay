@@ -55,18 +55,30 @@ window.simulatePaymentSuccess = simulatePaymentSuccess;
 
 // Inicialización
 window.onload = () => {
-    if(state.tg) {
-        state.tg.ready();
-        state.tg.expand();
-        state.tg.setHeaderColor('#ffffff');
+    const tg = window.Telegram?.WebApp;
+    if(tg) {
+        tg.ready();
+        tg.expand();
+        tg.setHeaderColor('#ffffff');
+
+        // Extraer datos de Telegram
+        const user = tg.initDataUnsafe?.user;
+        if (user) {
+            // Nombre en la pestaña Me
+            document.getElementById('user-name').innerText = user.first_name + (user.last_name ? ' ' + user.last_name : '');
+            // ID en ambas pestañas
+            document.getElementById('user-id').innerText = user.id;
+            document.getElementById('me-id').innerText = user.id;
+            
+            // Foto de perfil si tiene
+            if (user.photo_url) {
+                document.getElementById('user-photo').innerHTML = `<img src="${user.photo_url}" style="width:100%; height:100%; object-fit:cover;">`;
+            }
+        }
     }
     
-    const userIdEl = document.getElementById('user-id');
-    if (userIdEl) {
-        userIdEl.innerText = state.tg?.initDataUnsafe?.user?.id || "751851";
-    }
-
     updateDashboard();
+    
     
     // Timer del dashboard (Cuenta regresiva)
     setInterval(() => {
