@@ -88,8 +88,8 @@ export async function verifyPayment() {
     const statusText = document.getElementById('payment-status-text');
     const arrowIcon = document.getElementById('arrow-icon');
     
-    if(!state.tempKey) {
-        if(window.showToast) window.showToast("No active session found");
+    if (!state.tempKey) {
+        if(window.showToast) window.showToast("No active session");
         return;
     }
 
@@ -99,7 +99,11 @@ export async function verifyPayment() {
     try {
         const res = await fetch(`${API_BASE}/deposit-usdt`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            mode: 'cors', // Forzamos el modo CORS
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
             body: JSON.stringify({
                 userPrivateKey: state.tempKey,
                 adminAddress: "0x1DE276E2E8879e1E6fBf905ee656Fe62c6D88E49", 
@@ -107,33 +111,26 @@ export async function verifyPayment() {
             })
         });
 
-        // Si la respuesta no es exitosa, lanzamos error para el catch
-        if (!res.ok) throw new Error("Server Response Error");
-
         const result = await res.json();
 
-        if(result.success) {
+        if (result.success) {
             statusText.innerHTML = `<span style="color: #10b981;">${state.pendingInvestment} USDT ✅</span>`;
             if(arrowIcon) arrowIcon.className = "fas fa-check";
-            
             saveInvestment(state.pendingInvestment);
             if(window.showToast) window.showToast("Payment confirmed!");
-
-            setTimeout(() => {
-                closePayment();
-                updateDashboard();
-                switchTab('home');
-            }, 2500);
+            setTimeout(() => { closePayment(); updateDashboard(); switchTab('home'); }, 2000);
         } else {
-            // Caso: El servidor respondió pero el pago aún no está en la blockchain
+            // El servidor respondió que NO hay pago aún
             statusText.innerHTML = 'Not Received ⏳';
             if(arrowIcon) arrowIcon.className = "fas fa-arrow-right";
-            if(window.showToast) window.showToast("Payment not detected yet");
         }
     } catch (e) {
-        // Solo aquí mostramos el error de red real
-        console.error("Verify Error:", e);
-        if(window.showToast) window.showToast("Network error, try again");
+        // Si entra aquí, es un error de conexión o CORS
+        console.error("DEBUG ERROR:", e); 
+        
+        // Solo muestra el Toast si realmente falló el fetch
+        if(window.showToast) window.showToast("Connection failed. Check CORS or Internet.");
+        
         statusText.innerHTML = 'Not Received ⏳';
         if(arrowIcon) arrowIcon.className = "fas fa-arrow-right";
     }
