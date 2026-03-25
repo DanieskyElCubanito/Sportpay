@@ -45,7 +45,7 @@ export async function showPayment() {
     const amount = parseFloat(buyInput.value);
     
     if(!amount || amount < 1) {
-        alert("Minimum investment is 1 USDT");
+        window.showToast("Minimum investment is 1 USDT");
         return;
     }
     
@@ -98,7 +98,7 @@ export async function showPayment() {
         }
     } catch (e) {
         console.error("Error generating payment:", e);
-        alert("Connection error with API");
+        window.showToast("Connection error with API");
     } finally {
         if(btnContinueViewBuy) {
             btnContinueViewBuy.disabled = false;
@@ -150,12 +150,15 @@ export async function verifyPayment() {
             localStorage.removeItem(`recovery_${state.tempAddress}`);
             saveInvestment(state.pendingInvestment);
             
+            window.showToast("Payment confirmed!");
+
             setTimeout(() => {
                 closePayment();
                 updateDashboard();
                 switchTab('home');
             }, 2500);
         } else {
+            window.showToast("No payment detected yet");
             setTimeout(() => {
                 statusText.innerHTML = 'Not Received <span style="font-size: 1.2em;">⏳</span>';
                 if(arrowIcon) arrowIcon.className = "fas fa-arrow-right";
@@ -166,6 +169,7 @@ export async function verifyPayment() {
             }, 1200);
         }
     } catch (e) {
+        window.showToast("Network error, try again");
         statusText.innerHTML = 'Not Received <span style="font-size: 1.2em;">⏳</span>';
         if(arrowIcon) arrowIcon.className = "fas fa-arrow-right";
         if(btnVerify) {
@@ -196,7 +200,7 @@ function startPaymentTimer() {
 window.copyAddress = function() {
     const address = document.getElementById('wallet-address-display').innerText;
     navigator.clipboard.writeText(address).then(() => {
-        alert("Address copied!");
+        window.showToast("Address copied!");
     });
 };
 
