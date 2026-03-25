@@ -4,14 +4,16 @@ export function renderHistory() {
     const container = document.getElementById('history-list');
     if (!container) return;
 
-    // Simulamos 5 registros de los últimos días
-    const dailyReturn = (state.totalInvestedUSDT * 0.065).toFixed(4); // 6.5% promedio
+    // Calculamos una ganancia simulada basada en el balance actual
+    // Si no hay inversión, ponemos 0.0000
+    const dailyReturn = state.totalInvestedUSDT > 0 
+        ? (state.totalInvestedUSDT * (6.5 / 100)).toFixed(4) 
+        : "0.0000";
+
     const logs = [
-        { date: '2024-03-24 10:30', amount: dailyReturn },
-        { date: '2024-03-23 10:30', amount: dailyReturn },
-        { date: '2024-03-22 10:30', amount: dailyReturn },
-        { date: '2024-03-21 10:30', amount: dailyReturn },
-        { date: '2024-03-20 10:30', amount: dailyReturn }
+        { date: '2026-03-24 10:30', amount: dailyReturn },
+        { date: '2026-03-23 10:30', amount: dailyReturn },
+        { date: '2026-03-22 10:30', amount: dailyReturn }
     ];
 
     container.innerHTML = logs.map(log => `
