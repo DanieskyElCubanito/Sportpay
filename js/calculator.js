@@ -8,10 +8,12 @@ export function getReturnRate(amount) {
 }
 
 export function calculateReturns() {
-    const input = document.getElementById('buy-qty').value || 0;
-    const newAmount = parseFloat(input);
+    const inputEl = document.getElementById('buy-qty');
+    if (!inputEl) return; // Si no existe el input, no hace nada y no rompe la app
+
+    const newAmount = parseFloat(inputEl.value) || 0;
     
-    const currentAE = state.totalInvestedUSDT * 1000;
+    const currentAE = (state.totalInvestedUSDT || 0) * 1000;
     const newAE = newAmount * 1000;
     const totalAE = currentAE + newAE;
     
@@ -22,10 +24,15 @@ export function calculateReturns() {
     const days20 = daily * 20;
     const profit = days20 - totalUSD;
 
-    document.getElementById('ae-calc-total').innerText = totalAE.toLocaleString();
-    document.getElementById('usd-calc-total').innerText = totalUSD.toFixed(2);
-    
-    document.getElementById('est-daily').innerText = "$" + daily.toFixed(4);
-    document.getElementById('est-20').innerText = "$" + days20.toFixed(3);
-    document.getElementById('est-profit').innerText = "$" + (profit > 0 ? profit.toFixed(3) : "0.000");
-}
+    // Actualización segura de textos
+    const setText = (id, text) => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = text;
+    };
+
+    setText('ae-calc-total', totalAE.toLocaleString());
+    setText('usd-calc-total', totalUSD.toFixed(2));
+    setText('est-daily', "$" + daily.toFixed(4));
+    setText('est-20', "$" + days20.toFixed(3));
+    setText('est-profit', "$" + (profit > 0 ? profit.toFixed(3) : "0.000"));
+                     }
