@@ -8,60 +8,67 @@ export function updateDashboard() {
     const currentRate = getReturnRate(state.totalInvestedUSDT);
     const dailyEarn = state.totalInvestedUSDT * (currentRate / 100);
 
-    document.getElementById('main-bal').innerText = state.totalEarnedUSD.toFixed(4);
-    document.getElementById('main-power').innerText = currentAE.toLocaleString();
-    document.getElementById('stat-daily').innerText = dailyEarn.toFixed(4);
-    document.getElementById('stat-rate').innerText = currentRate.toFixed(1);
+    const mainBalEl = document.getElementById('main-bal');
+    const mainPowerEl = document.getElementById('main-power');
+    const statDailyEl = document.getElementById('stat-daily');
+    const statRateEl = document.getElementById('stat-rate');
+
+    if(mainBalEl) mainBalEl.innerText = state.totalEarnedUSD.toFixed(4);
+    if(mainPowerEl) mainPowerEl.innerText = currentAE.toLocaleString();
+    if(statDailyEl) statDailyEl.innerText = dailyEarn.toFixed(4);
+    if(statRateEl) statRateEl.innerText = currentRate.toFixed(1);
     
     calculateReturns();
 }
 
 export function switchTab(id) {
+    // Ocultar todas las vistas
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    
+    // Mostrar la vista seleccionada
     const targetView = document.getElementById('view-' + id);
     if (targetView) targetView.classList.add('active');
 
-    // SI LA PESTAÑA ES HISTORY, RENDERIZAMOS LOS DATOS
+    // Cargar historial si la pestaña es History
     if (id === 'history') {
         renderHistory();
     }
     
-    // ... resto del código (nav-item active, haptic, etc)
-
+    // Manejar estado activo en la navegación inferior
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(nav => nav.classList.remove('active'));
     
-    if(event && event.currentTarget) {
-        document.querySelectorAll('.nav-item').forEach(v => v.classList.remove('active'));
-        event.currentTarget.classList.add('active');
-    }
+    // Buscar el item de navegación correspondiente y activarlo
+    const activeNav = document.querySelector(`.nav-item[onclick*="'${id}'"]`);
+    if(activeNav) activeNav.classList.add('active');
 
+    // Feedback vibración (Solo en celular con Telegram)
     if(state.tg && state.tg.HapticFeedback) state.tg.HapticFeedback.impactOccurred('medium');
 }
 
-// Inyectamos las funciones en el entorno global
+// Inyectamos las funciones en el entorno global para el HTML
 window.switchTab = switchTab;
 window.calculateReturns = calculateReturns;
 window.showPayment = showPayment;
 window.closePayment = closePayment;
 window.simulatePaymentSuccess = simulatePaymentSuccess;
 
-// Inicialización Única
+// Inicialización
 window.onload = () => {
     if(state.tg) {
         state.tg.ready();
         state.tg.expand();
-        // Forzamos encabezado blanco para look profesional
         state.tg.setHeaderColor('#ffffff');
     }
     
-    // ID de usuario (Telegram o Aleatorio)
     const userIdEl = document.getElementById('user-id');
     if (userIdEl) {
-        userIdEl.innerText = state.tg?.initDataUnsafe?.user?.id || Math.floor(Math.random() * 900000) + 100000;
+        userIdEl.innerText = state.tg?.initDataUnsafe?.user?.id || "751851";
     }
 
     updateDashboard();
     
-    // Timer del dashboard (Settlement)
+    // Timer del dashboard (Cuenta regresiva)
     setInterval(() => {
         let now = new Date();
         let hours = (23 - now.getHours()).toString().padStart(2, '0');
