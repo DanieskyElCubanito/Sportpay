@@ -177,18 +177,14 @@
                 </div>
 
                 <div style="background: #f8fafc; border-radius: 18px; padding: 12px 20px; border: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between;">
-                    <div style="text-align: left;">
-                        <div style="font-size: 0.75em; color: #64748b; font-weight: 600;">Payment Status:</div>
-                        <div id="payment-status-text" style="font-weight: 800; font-size: 1.1em; color: #334155;">Not Received ⌛</div>
-                    </div>
-                    <button onclick="window.verifyPayment()" id="btn-verify-payment" style="background: #3b82f6; color: white; width: 45px; height: 45px; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-                        <i class="fas fa-arrow-right" id="arrow-icon"></i>
-                    </button>
-                </div>
-            </div>
-            <div style="height: 20px;"></div>
-        </div>
+    <div style="text-align: left;">
+        <div style="font-size: 0.75em; color: #64748b; font-weight: 600;">Payment Status:</div>
+        <div id="payment-status-text" style="font-weight: 800; font-size: 1.1em; color: #334155;">Not Received ⏳</div>
     </div>
+    <button onclick="verifyPayment()" id="btn-verify-payment" style="background: #3b82f6; color: white; width: 45px; height: 45px; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+        <i class="fas fa-arrow-right" id="arrow-icon"></i>
+    </button>
+</div>
 
     <div id="view-me" class="view" style="display:none;">
         <div class="top-header" style="justify-content: center; border: none; background: white;">
