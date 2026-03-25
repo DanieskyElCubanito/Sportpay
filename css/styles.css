@@ -36,6 +36,10 @@ body {
 .bal-title { color: var(--text-gray); font-size: 0.85em; margin-bottom: 8px; display: flex; align-items: center; }
 .bal-amount { font-size: 2em; font-weight: 700; display: flex; align-items: center; justify-content: space-between; }
 
+.menu-item:active {
+    background-color: #f9f9fb;
+}
+
 /* Botón Withdraw Profesional */
 .btn-withdraw { 
     background: var(--ae-blue); 
