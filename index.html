@@ -134,5 +134,36 @@
         <div class="nav-item" onclick="alert('Profile Coming Soon')"><i class="fas fa-user"></i>Me</div>
     </nav>
 
+    <div id="view-me" class="view">
+        <div class="top-header" style="justify-content: center; border: none;">
+            <span style="font-weight: 800; font-size: 1.1em;">Profile</span>
+        </div>
+
+        <div class="main-card" style="text-align: center; padding: 30px 20px;">
+            <div id="user-photo" style="width: 80px; height: 80px; background: #eee; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 3px solid var(--ae-blue);">
+                <i class="fas fa-user" style="font-size: 2.5em; color: #ccc;"></i>
+            </div>
+            <div id="user-name" style="font-weight: 800; font-size: 1.2em; margin-bottom: 5px;">User Name</div>
+            <div style="color: var(--text-gray); font-size: 0.85em;">ID: <span id="me-id">000000</span></div>
+        </div>
+
+        <div class="section-white" style="background: white; margin: 10px; border-radius: 16px; overflow: hidden; box-shadow: var(--card-shadow);">
+            <div class="menu-item" onclick="alert('Link Copied!')" style="display: flex; align-items: center; padding: 18px; border-bottom: 1px solid #f2f2f7; cursor: pointer;">
+                <i class="fas fa-user-plus" style="color: #4f46e5; margin-right: 15px; width: 20px;"></i>
+                <div style="flex: 1; font-weight: 600; font-size: 0.9em;">Invite Friends</div>
+                <i class="fas fa-chevron-right" style="color: #ccc; font-size: 0.8em;"></i>
+            </div>
+            <div class="menu-item" onclick="window.open('https://t.me/your_support_bot')" style="display: flex; align-items: center; padding: 18px; border-bottom: 1px solid #f2f2f7; cursor: pointer;">
+                <i class="fas fa-headset" style="color: #10b981; margin-right: 15px; width: 20px;"></i>
+                <div style="flex: 1; font-weight: 600; font-size: 0.9em;">Online Support</div>
+                <i class="fas fa-chevron-right" style="color: #ccc; font-size: 0.8em;"></i>
+            </div>
+            <div class="menu-item" style="display: flex; align-items: center; padding: 18px; cursor: pointer;">
+                <i class="fas fa-shield-alt" style="color: #f59e0b; margin-right: 15px; width: 20px;"></i>
+                <div style="flex: 1; font-weight: 600; font-size: 0.9em;">Security Center</div>
+                <i class="fas fa-chevron-right" style="color: #ccc; font-size: 0.8em;"></i>
+            </div>
+        </div>
+    </div>
 </body>
     </html>
