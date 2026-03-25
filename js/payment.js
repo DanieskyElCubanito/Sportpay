@@ -165,6 +165,8 @@ window.copyAddress = function() {
     }
 };
 
+// Asegurar que las funciones sean visibles para el HTML
 window.showPayment = showPayment;
 window.closePayment = closePayment;
 window.verifyPayment = verifyPayment;
+window.copyAddress = copyAddress;
