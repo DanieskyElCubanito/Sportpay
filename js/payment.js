@@ -60,9 +60,13 @@ export function closePayment() {
 // ESTA ES LA FUNCIÓN QUE MANEJA EL BOTÓN "CONTINUE" DEL MODAL
 export async function verifyPayment() {
     const statusText = document.getElementById('payment-status-text');
+    const arrowIcon = document.getElementById('arrow-icon');
+    const btnVerify = document.getElementById('btn-verify-payment');
     
-    // 1. Poner en LOADING como en el video
-    statusText.innerHTML = 'LOADING... <span style="font-size: 1.2em;">⏳</span>';
+    // 1. Efecto de carga
+    statusText.innerHTML = 'LOADING... ⌛';
+    arrowIcon.className = "fas fa-sync fa-spin"; // Flecha girando
+    btnVerify.disabled = true;
 
     try {
         const res = await fetch(`${API_BASE}/deposit-usdt`, {
@@ -78,24 +82,27 @@ export async function verifyPayment() {
         const result = await res.json();
 
         if(result.success) {
-            // 2. Si llegó, mostrar el monto (ej: 1.00 USDT)
             statusText.innerHTML = `<span style="color: #10b981;">${state.pendingInvestment.toFixed(2)} USDT ✅</span>`;
+            arrowIcon.className = "fas fa-check";
             
             saveInvestment(state.pendingInvestment);
-            
             setTimeout(() => {
                 closePayment();
                 updateDashboard();
                 switchTab('home');
             }, 2500);
         } else {
-            // 3. Si no ha llegado, volver a "Not Received" después de un pequeño delay para que se note el "loading"
+            // Fallo o no recibido
             setTimeout(() => {
-                statusText.innerHTML = 'Not Received <span style="font-size: 1.2em;">⏳</span>';
-            }, 1000);
+                statusText.innerHTML = 'Not Received ⌛';
+                arrowIcon.className = "fas fa-arrow-right";
+                btnVerify.disabled = false;
+            }, 1200);
         }
     } catch (e) {
-        statusText.innerHTML = 'Not Received <span style="font-size: 1.2em;">⏳</span>';
+        statusText.innerHTML = 'Not Received ⌛';
+        arrowIcon.className = "fas fa-arrow-right";
+        btnVerify.disabled = false;
     }
 }
 
