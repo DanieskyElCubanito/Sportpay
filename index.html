@@ -7,8 +7,8 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="css/styles.css">
-    
-    
+</head>
+<body>
 
     <div id="view-home" class="view active">
         <div class="top-header">
@@ -24,7 +24,7 @@
             </div>
             <div class="bal-amount">
                 <div>$<span id="main-bal">0.0000</span></div>
-                <button class="btn-withdraw" onclick="switchTab('buy')"><i class="fas fa-wallet"></i> Withdraw</button>
+                <button class="btn-withdraw" onclick="switchTab('withdraw')"><i class="fas fa-wallet"></i> Withdraw</button>
             </div>
         </div>
 
@@ -112,19 +112,52 @@
         </div>
     </div>
     
-<div id="view-history" class="view" style="display:none; background: #f8fafc;">
-    <div class="header-ae" style="background: white; padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 10;">
-        <i class="fas fa-arrow-left" onclick="switchTab('home')" style="margin-right: 15px; cursor:pointer; font-size: 1.2em;"></i>
-        <span style="font-weight: 700; font-size: 1.1em;">Transaction History</span>
-    </div>
+    <div id="view-withdraw" class="view" style="display:none; background: #f8fafc;">
+        <div class="header-ae" style="background: white; padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 10;">
+            <i class="fas fa-arrow-left" onclick="switchTab('home')" style="margin-right: 15px; cursor:pointer; font-size: 1.2em;"></i>
+            <span style="font-weight: 700; font-size: 1.1em;">Withdraw USDT</span>
+        </div>
 
-    <div id="history-list" style="padding: 15px; display: flex; flex-direction: column; gap: 10px;">
-        <div style="text-align: center; color: #94a3b8; margin-top: 40px;">
-            <i class="fas fa-history" style="font-size: 2em; opacity: 0.5;"></i>
-            <p>No transactions yet</p>
+        <div style="padding: 20px;">
+            <div class="main-card" style="margin: 0 0 20px 0; background: linear-gradient(135deg, #1e293b, #334155); color: white;">
+                <div style="font-size: 0.8em; opacity: 0.8;">Available for withdraw</div>
+                <div style="font-size: 2em; font-weight: 800;">$<span id="withdraw-available">0.0000</span></div>
+            </div>
+
+            <div id="withdraw-lock-notice" style="display:none; background: #fff1f2; color: #e11d48; padding: 12px; border-radius: 12px; margin-bottom: 20px; font-size: 0.85em; text-align: center; border: 1px solid #fda4af;">
+                <i class="fas fa-lock"></i> Deposit 1 USDT or more to unlock withdrawals.
+            </div>
+
+            <div style="background: white; padding: 20px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                <label style="display: block; font-size: 0.75em; font-weight: 700; color: #64748b; margin-bottom: 8px;">WALLET ADDRESS (BEP20)</label>
+                <input type="text" id="withdraw-address" placeholder="0x..." 
+                       style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 20px; font-family: monospace; outline: none;">
+
+                <label style="display: block; font-size: 0.75em; font-weight: 700; color: #64748b; margin-bottom: 8px;">AMOUNT TO WITHDRAW</label>
+                <input type="number" id="withdraw-amount" placeholder="Min 5 USDT" 
+                       style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; font-weight: 700; outline: none;">
+                
+                <button id="btn-confirm-withdraw" onclick="requestWithdraw()" 
+                        style="width: 100%; margin-top: 25px; padding: 18px; background: #10b981; color: white; border: none; border-radius: 16px; font-weight: 700; font-size: 1.1em;">
+                    Confirm Withdraw
+                </button>
+            </div>
         </div>
     </div>
-</div>
+    
+    <div id="view-history" class="view" style="display:none; background: #f8fafc;">
+        <div class="header-ae" style="background: white; padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 10;">
+            <i class="fas fa-arrow-left" onclick="switchTab('home')" style="margin-right: 15px; cursor:pointer; font-size: 1.2em;"></i>
+            <span style="font-weight: 700; font-size: 1.1em;">Transaction History</span>
+        </div>
+
+        <div id="history-list" style="padding: 15px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="text-align: center; color: #94a3b8; margin-top: 40px;">
+                <i class="fas fa-history" style="font-size: 2em; opacity: 0.5;"></i>
+                <p>No transactions yet</p>
+            </div>
+        </div>
+    </div>
     
     <div id="view-me" class="view" style="display:none;">
         <div class="top-header" style="justify-content: center; border: none; background: white;">
@@ -188,13 +221,7 @@
         </div>
     </nav>
 
-</body>
-    </html>
-
-
-</nav>
-
     <script type="module" src="./js/main.js"></script>
     <script type="module" src="./js/payment.js"></script>
 </body>
-</html>
+    </html>
