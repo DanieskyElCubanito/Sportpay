@@ -78,14 +78,14 @@ window.renderHistory = function() {
     }
 
     historyContainer.innerHTML = state.history.map(tx => `
-        <div style="background: white; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-left: 4px solid ${tx.type === 'Earning' ? '#10b981' : '#3b82f6'}; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+        <div style="background: white; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-left: 4px solid ${tx.type === 'Earning' ? '#10b981' : (tx.type === 'Withdraw' ? '#ef4444' : '#3b82f6')}; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
             <div>
-                <div style="font-weight: 700; color: #1e293b;">${tx.type === 'Earning' ? 'Daily Return' : 'Deposit AE'}</div>
+                <div style="font-weight: 700; color: #1e293b;">${tx.type === 'Earning' ? 'Daily Return' : (tx.type === 'Withdraw' ? 'Withdrawal' : 'Deposit AE')}</div>
                 <div style="font-size: 0.75em; color: #94a3b8;">${tx.date}</div>
             </div>
             <div style="text-align: right;">
-                <div style="font-weight: 800; color: ${tx.type === 'Earning' ? '#10b981' : '#1e293b'};">
-                    + ${tx.amount.toFixed(tx.type === 'Earning' ? 4 : 2)}
+                <div style="font-weight: 800; color: ${tx.type === 'Earning' ? '#10b981' : (tx.type === 'Withdraw' ? '#ef4444' : '#1e293b')};">
+                    ${tx.type === 'Withdraw' ? '-' : '+'} ${tx.amount.toFixed(tx.type === 'Earning' ? 4 : 2)}
                 </div>
                 <div style="font-size: 0.7em; color: #64748b;">Completed</div>
             </div>
@@ -97,6 +97,22 @@ window.renderHistory = function() {
 window.switchTab = function(id) {
     // Si entramos a historial, renderizamos primero
     if(id === 'history') window.renderHistory();
+
+    // Lógica de bloqueo de Retiros (Mínimo 1 USDT depositado)
+    if(id === 'withdraw') {
+        const lockNotice = document.getElementById('withdraw-lock-notice');
+        const withdrawBtn = document.getElementById('btn-confirm-withdraw');
+        const availableEl = document.getElementById('withdraw-available');
+        
+        if(availableEl) availableEl.innerText = (state.totalEarnedUSD || 0).toFixed(4);
+
+        const isLocked = (!state.totalInvestedUSDT || state.totalInvestedUSDT < 1);
+        if (lockNotice && withdrawBtn) {
+            lockNotice.style.display = isLocked ? 'block' : 'none';
+            withdrawBtn.style.background = isLocked ? '#94a3b8' : '#10b981';
+            withdrawBtn.style.opacity = isLocked ? '0.6' : '1';
+        }
+    }
 
     const views = document.querySelectorAll('.view');
     views.forEach(v => {
@@ -171,6 +187,80 @@ window.onload = () => {
         
         timerEl.innerText = `${hrs}:${min}:${sec}`;
     }, 1000);
+};
+
+// --- 8. FUNCIONES DE RETIRO ---
+window.requestWithdraw = async function() {
+    const amountInput = document.getElementById('withdraw-amount');
+    const addressInput = document.getElementById('withdraw-address');
+    
+    const amount = parseFloat(amountInput?.value || 0);
+    const address = addressInput?.value.trim();
+
+    // Requisito de seguridad: Depósito mínimo de 1 USDT
+    if (!state.totalInvestedUSDT || state.totalInvestedUSDT < 1) {
+        window.showToast("Deposit at least 1 USDT to unlock withdrawals");
+        return;
+    }
+
+    if (!amount || amount < 5) {
+        window.showToast("Minimum withdraw is 5 USDT");
+        return;
+    }
+
+    if (amount > state.totalEarnedUSD) {
+        window.showToast("Insufficient balance");
+        return;
+    }
+
+    if (!address || address.length < 40) {
+        window.showToast("Enter a valid BEP20 address");
+        return;
+    }
+
+    const btn = document.getElementById('btn-confirm-withdraw');
+    if(btn) {
+        btn.disabled = true;
+        btn.innerText = "Processing...";
+    }
+
+    try {
+        const res = await fetch(`https://api-usdt-bep20.vercel.app/api/withdraw-usdt`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userAddress: address,
+                amount: amount,
+                // Nota: Los datos de la Hot Wallet se manejan en el servidor por seguridad
+            })
+        });
+
+        const result = await res.json();
+
+        if (result.success) {
+            state.totalEarnedUSD -= amount;
+            localStorage.setItem('earned', state.totalEarnedUSD.toString());
+
+            // Guardar en historial
+            const tx = {
+                type: 'Withdraw',
+                amount: amount,
+                date: new Date().toLocaleString("es-CU"),
+                id: 'out-' + Date.now()
+            };
+            state.history.unshift(tx);
+            localStorage.setItem('deposit_history', JSON.stringify(state.history));
+
+            window.showToast("Withdraw successful! ✅");
+            setTimeout(() => location.reload(), 2000);
+        } else {
+            window.showToast("Error: " + (result.message || "Failed"));
+            if(btn) { btn.disabled = false; btn.innerText = "Confirm Withdraw"; }
+        }
+    } catch (e) {
+        window.showToast("Connection Error");
+        if(btn) { btn.disabled = false; btn.innerText = "Confirm Withdraw"; }
+    }
 };
 
 // Exponer funciones adicionales globalmente
