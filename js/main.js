@@ -1,6 +1,6 @@
 import { state, saveInvestment, processDailyEarnings } from './state.js';
 
-// --- PUENTE GLOBAL ---
+// --- PUENTE GLOBAL ----
 // Esto permite que las funciones de state.js sean visibles para el HTML
 window.saveInvestment = saveInvestment;
 
