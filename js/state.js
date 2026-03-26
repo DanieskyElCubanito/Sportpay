@@ -1,35 +1,30 @@
 // state.js
 
 export const state = {
-    // Inversión real acumulada
     totalInvestedUSDT: parseFloat(localStorage.getItem('invested')) || 0,
     totalEarnedUSD: parseFloat(localStorage.getItem('earned')) || 0,
-    
-    // Datos de la billetera temporal actual (para que no se pierdan al recargar)
+    // Cargar historial o array vacío
+    history: JSON.parse(localStorage.getItem('deposit_history')) || [],
     currentWallet: JSON.parse(localStorage.getItem('temp_wallet')) || null,
-    
-    // Control del cronómetro del pago
-    paymentTimerInterval: null,
-    
-    // Telegram WebApp
     tg: window.Telegram?.WebApp || null
 };
 
-/**
- * Guarda la inversión exitosa en el almacenamiento local
- * @param {number} amount - Cantidad de USDT a sumar
- */
 export function saveInvestment(amount) {
+    // 1. Actualizar total
     state.totalInvestedUSDT += amount;
     localStorage.setItem('invested', state.totalInvestedUSDT.toString());
+
+    // 2. Registrar en el historial
+    const newTransaction = {
+        amount: amount,
+        date: new Date().toLocaleString(),
+        id: Math.floor(Math.random() * 1000000)
+    };
     
-    // Opcional: Si quieres que el balance empiece a generar desde ya
-    // localStorage.setItem('last_update', Date.now().toString());
+    state.history.unshift(newTransaction); // Añadir al inicio
+    localStorage.setItem('deposit_history', JSON.stringify(state.history));
 }
 
-/**
- * Limpia la billetera temporal después de un pago exitoso
- */
 export function clearTempWallet() {
     state.currentWallet = null;
     localStorage.removeItem('temp_wallet');
