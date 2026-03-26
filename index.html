@@ -169,9 +169,7 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <div id="view-buy" class="view" style="display:none; background: #f8fafc; padding-bottom: 80px;">
+                        <div id="view-buy" class="view" style="display:none; background: #f8fafc; padding-bottom: 80px;">
         <div class="header-ae" style="background: white; padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 10;">
             <i class="fas fa-arrow-left" onclick="switchTab('home')" style="margin-right: 15px; cursor:pointer; font-size: 1.2em;"></i>
             <span style="font-weight: 700; font-size: 1.1em;">Buy AI Energy</span>
@@ -207,7 +205,7 @@
                 <div style="padding: 0 15px; display: flex; align-items: center; gap: 8px; border-right: 1px solid #e2e8f0;">
                     <img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdt.png" style="width: 24px;">
                 </div>
-                <input type="number" id="buy-qty" placeholder="Min $1" oninput="calculateReturns()" 
+                <input type="number" id="buy-qty" placeholder="Min $1" oninput="window.calculateReturns()" 
                        style="width: 100%; padding: 14px; background: transparent; border: none; font-size: 1.1em; font-weight: 700; outline: none;">
             </div>
             
@@ -285,45 +283,51 @@
             <span style="font-weight: 800; font-size: 1.1em;">Account Profile</span>
         </div>
         <div class="main-card" style="text-align: center; padding: 35px 20px; background: white; margin: 0 0 10px 0;">
-            <div id="user-photo" style="width: 85px; height: 85px; background: #3b82f6; border-radius: 50%; margin: 0 auto 18px; display: flex; align-items: center; justify-content: center; border: 4px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.1); color: white;">
-                <i class="fas fa-user" style="font-size: 2.8em;"></i>
+            <div id="user-photo" style="width: 85px; height: 85px; background: #3b82f6; border-radius: 50%; margin: 0 auto 18px; display: flex; align-items: center; justify-content: center; border: 4px solid #f1f5f9;">
+                <i class="fas fa-user" style="color: white; font-size: 2.2em;"></i>
             </div>
-            <div id="user-name" style="font-weight: 800; font-size: 1.3em;">User Name</div>
-            <div style="color: #64748b; font-size: 0.9em;">ID: <span id="me-id">000000</span></div>
+            <div id="user-name" style="font-weight: 800; font-size: 1.2em; color: #1e293b;">User</div>
+            <div style="font-size: 0.8em; color: #64748b;">ID: <span id="me-id">000000</span></div>
         </div>
-
-        <div style="padding: 10px 15px;">
-            <div class="main-card" style="margin:0; padding: 20px; cursor: pointer; display: flex; align-items: center; justify-content: space-between;" onclick="switchTab('referrals')">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <div style="width: 45px; height: 45px; background: #fff7ed; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #f97316;">
-                        <i class="fas fa-users-cog"></i>
+        <div style="padding: 15px;">
+            <div style="background: white; border-radius: 16px; overflow: hidden; border: 1px solid #f1f5f9;">
+                <div style="padding: 15px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between;" onclick="window.showToast('Official News Channel')">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <i class="fab fa-telegram" style="color: #3b82f6;"></i>
+                        <span style="font-weight: 700; font-size: 0.9em;">Official Channel</span>
                     </div>
-                    <div>
-                        <div style="font-weight: 800; font-size: 0.9em;">My Network Panel</div>
-                        <div style="font-size: 0.7em; color: #64748b;">Manage your 5 levels of profit</div>
-                    </div>
+                    <i class="fas fa-chevron-right" style="font-size: 0.7em; color: #cbd5e1;"></i>
                 </div>
-                <i class="fas fa-chevron-right" style="color: #cbd5e1;"></i>
+                <div style="padding: 15px; display: flex; align-items: center; justify-content: space-between;" onclick="window.showToast('Support Center')">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <i class="fas fa-headset" style="color: #10b981;"></i>
+                        <span style="font-weight: 700; font-size: 0.9em;">Live Support</span>
+                    </div>
+                    <i class="fas fa-chevron-right" style="font-size: 0.7em; color: #cbd5e1;"></i>
+                </div>
             </div>
         </div>
     </div>
 
-    <nav class="nav-bar">
+    <div class="nav-bar">
         <div class="nav-item active" onclick="switchTab('home')">
-            <i class="fas fa-home"></i><span>Home</span>
+            <i class="fas fa-home"></i>
+            <span>Home</span>
         </div>
         <div class="nav-item" onclick="switchTab('buy')">
-            <i class="fas fa-bolt"></i><span>Energy</span>
+            <i class="fas fa-bolt"></i>
+            <span>Energy</span>
         </div>
         <div class="nav-item" onclick="switchTab('referrals')">
-            <i class="fas fa-users"></i><span>Team</span>
+            <i class="fas fa-users"></i>
+            <span>Team</span>
         </div>
         <div class="nav-item" onclick="switchTab('me')">
-            <i class="fas fa-user"></i><span>Me</span>
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
         </div>
-    </nav>
+    </div>
 
-    <script type="module" src="./js/main.js"></script>
-    <script type="module" src="./js/payment.js"></script>
+    <script type="module" src="js/main.js"></script>
 </body>
-</html>
+                    </html>                                                                                                                     </div>center; border: 
