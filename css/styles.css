@@ -154,3 +154,20 @@ er; }
     85% { opacity: 1; transform: translate(-50%, 0); }
     100% { opacity: 0; transform: translate(-50%, -20px); }
     }
+/* Esto asegura que si el contenido es largo, puedas bajar con el dedo */
+.modal-content {
+    max-height: 90vh; /* Máximo 90% de la pantalla */
+    overflow-y: auto; /* Permite scroll vertical */
+    padding-bottom: 30px; /* Espacio extra al final */
+}
+
+/* Ajuste para el contenedor de estatus y botón */
+.status-container {
+    margin-top: 15px;
+    padding: 10px;
+    background: #f8fafc;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+                }
