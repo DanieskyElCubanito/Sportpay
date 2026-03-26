@@ -1,11 +1,19 @@
-// state.js
+// archivo state.js
 export const state = {
     totalInvestedUSDT: parseFloat(localStorage.getItem('invested')) || 0,
     totalEarnedUSD: parseFloat(localStorage.getItem('earned')) || 0,
     history: JSON.parse(localStorage.getItem('deposit_history')) || [],
     // Nueva clave para controlar cuándo fue el último pago de dividendos
     lastSettlement: localStorage.getItem('last_settlement') || null, 
-    tg: window.Telegram?.WebApp || null
+    tg: window.Telegram?.WebApp || null,
+
+    // --- NUEVAS VARIABLES PARA EL SISTEMA DE 5 NIVELES ---
+    referralEarnings: parseFloat(localStorage.getItem('ref_earnings')) || 0,
+    lvl1Count: parseInt(localStorage.getItem('lvl1_c')) || 0,
+    lvl2Count: parseInt(localStorage.getItem('lvl2_c')) || 0,
+    lvl3Count: parseInt(localStorage.getItem('lvl3_c')) || 0,
+    lvl4Count: parseInt(localStorage.getItem('lvl4_c')) || 0,
+    lvl5Count: parseInt(localStorage.getItem('lvl5_c')) || 0
 };
 
 export function saveInvestment(amount) {
@@ -66,4 +74,27 @@ export function processDailyEarnings() {
         return true; // Indica que hubo pago
     }
     return false;
+}
+
+/**
+ * FUNCIÓN PARA SUMAR COMISIONES DE REFERIDOS (Para uso futuro con la API)
+ * @param {number} amount - Cantidad en USDT a sumar
+ * @param {number} level - Nivel del cual proviene (1 al 5)
+ */
+export function addReferralCommission(amount, level) {
+    state.referralEarnings += amount;
+    state.totalEarnedUSD += amount; // Las comisiones se suman al balance retirable
+    
+    localStorage.setItem('ref_earnings', state.referralEarnings.toString());
+    localStorage.setItem('earned', state.totalEarnedUSD.toString());
+
+    // Opcional: Registrar en historial
+    const refEntry = {
+        type: 'Earning',
+        amount: amount,
+        date: new Date().toLocaleString("es-CU"),
+        id: `ref-L${level}-${Date.now()}`
+    };
+    state.history.unshift(refEntry);
+    localStorage.setItem('deposit_history', JSON.stringify(state.history));
 }
