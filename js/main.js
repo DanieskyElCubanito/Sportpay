@@ -127,8 +127,17 @@ window.onload = () => {
 
     updateDashboard();
 
-    // Timer hacia la medianoche de Cuba
+// Timer hacia la medianoche de Cuba (Solo si hay inversión activa)
     setInterval(() => {
+        const timerEl = document.getElementById('timer');
+        if(!timerEl) return;
+
+        // Si no hay inversión, el cronómetro se queda en cero
+        if (!state.totalInvestedUSDT || state.totalInvestedUSDT <= 0) {
+            timerEl.innerText = "00:00:00";
+            return;
+        }
+
         const now = new Date();
         // Obtener hora actual en Cuba
         const cubaNow = new Date(now.toLocaleString("en-US", {timeZone: "America/Havana"}));
@@ -137,7 +146,5 @@ window.onload = () => {
         const min = (59 - cubaNow.getMinutes()).toString().padStart(2, '0');
         const sec = (59 - cubaNow.getSeconds()).toString().padStart(2, '0');
         
-        const timerEl = document.getElementById('timer');
-        if(timerEl) timerEl.innerText = `${hrs}:${min}:${sec}`;
+        timerEl.innerText = `${hrs}:${min}:${sec}`;
     }, 1000);
-};
