@@ -172,7 +172,8 @@ export function closePayment() {
     if(state.payTimerInterval) clearInterval(state.payTimerInterval);
 }
 
-// Registro global para el HTML
+// Al final de js/payment.js
 window.showPayment = showPayment;
 window.verifyPayment = verifyPayment;
 window.closePayment = closePayment;
+window.copyAddress = copyAddress;
