@@ -371,3 +371,109 @@ window.requestWithdraw = async function() {
 };
 
 window.updateDashboard = updateDashboard;
+
+// --- 1. FUNCIÓN DEL BOTÓN REFRESCAR (EL DE LA IMAGEN) ---
+window.refreshData = function() {
+    const refreshBtn = document.querySelector('.fa-sync-alt') || document.querySelector('.fa-redo'); 
+    if(refreshBtn) refreshBtn.classList.add('fa-spin'); // Animación de giro
+
+    window.showToast("Updating data from network...");
+    
+    // Recargamos la página para que el script de sincronización que pusimos 
+    // en el onload vuelva a leer los datos de la URL o el storage
+    setTimeout(() => {
+        location.reload();
+    }, 800);
+};
+
+// --- 2. LOGICA DE INVERSIÓN (CORREGIDA) ---
+// Esta función hace que el botón "Activate AI Energy" de la vista Energy funcione
+window.showPayment = function() {
+    const qtyInput = document.getElementById('buy-qty');
+    const qty = parseFloat(qtyInput ? qtyInput.value : 0);
+
+    if (!qty || qty < 1) {
+        window.showToast("Minimum investment is 1 USDT");
+        return;
+    }
+
+    // Aquí simulamos el procesamiento
+    const btn = document.getElementById('btn-continue');
+    if(btn) {
+        btn.disabled = true;
+        btn.innerText = "Processing...";
+    }
+
+    setTimeout(() => {
+        // Guardamos en el state (función de state.js)
+        saveInvestment(qty);
+        
+        window.showToast(`Successfully invested ${qty} USDT! 🚀`);
+        
+        // Actualizamos UI y volvemos al Home
+        updateDashboard();
+        if(btn) {
+            btn.disabled = false;
+            btn.innerText = "Activate AI Energy";
+        }
+        if(qtyInput) qtyInput.value = "";
+        switchTab('home');
+        
+        if(window.Telegram?.WebApp?.HapticFeedback) {
+            window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+        }
+    }, 1500);
+};
+
+// --- 3. FUNCIÓN DE RETIRO (RECUPERADA Y MEJORADA) ---
+window.requestWithdraw = async function() {
+    const amountInput = document.getElementById('withdraw-amount');
+    const addressInput = document.getElementById('withdraw-address');
+    
+    const amount = parseFloat(amountInput?.value || 0);
+    const address = addressInput?.value.trim();
+
+    if (amount < 5) {
+        window.showToast("Minimum withdrawal is 5 USDT");
+        return;
+    }
+
+    if (amount > state.totalEarnedUSD) {
+        window.showToast("Insufficient balance");
+        return;
+    }
+
+    if (!address || address.length < 30) {
+        window.showToast("Enter a valid BEP20/TRC20 address");
+        return;
+    }
+
+    const btn = document.getElementById('btn-confirm-withdraw');
+    btn.disabled = true;
+    btn.innerText = "Sending Request...";
+
+    // Simulamos envío (Aquí conectarás tu API de pagos en el futuro)
+    setTimeout(() => {
+        state.totalEarnedUSD -= amount;
+        localStorage.setItem('earned', state.totalEarnedUSD.toString());
+
+        // Registrar en historial
+        const tx = {
+            type: 'Withdraw',
+            amount: amount,
+            date: new Date().toLocaleString("es-CU"),
+            id: 'out-' + Date.now()
+        };
+        state.history.unshift(tx);
+        localStorage.setItem('deposit_history', JSON.stringify(state.history));
+
+        window.showToast("Withdrawal requested! Check history 🚀");
+        updateDashboard();
+        
+        // Reset campos y cerrar
+        if(amountInput) amountInput.value = "";
+        btn.disabled = false;
+        btn.innerText = "Confirm Withdraw";
+        switchTab('home');
+    }, 2000);
+};
