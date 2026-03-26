@@ -8,8 +8,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="css/styles.css">
     <style>
-        .view { display: none; width: 100%; min-height: 100vh; padding-bottom: 100px; }
-        .view.active { display: block; }
+        /* Estilos críticos para que las pestañas funcionen */
+        .view { 
+            display: none; 
+            width: 100%; 
+            min-height: 100vh; 
+            padding-bottom: 100px; /* Espacio para la nav-bar */
+        }
+        .view.active { 
+            display: block; 
+        }
         
         @keyframes pulse-live {
             0% { transform: scale(0.95); opacity: 0.8; }
@@ -21,62 +29,21 @@
             100% { transform: translateX(-50%); }
         }
         .level-card { 
-            background: white; 
-            padding: 15px; 
-            border-radius: 12px; 
-            border: 1px solid #f1f5f9; 
-            margin-bottom: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+            transition: transform 0.2s; 
+            cursor: pointer;
         }
-        .level-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #f8fafc;
-            padding-bottom: 8px;
+        .level-card:active { 
+            transform: scale(0.98); 
         }
-        .level-stats {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85em;
-        }
-        .stat-box { display: flex; flex-direction: column; }
-        .stat-label { font-size: 0.75em; color: #64748b; text-transform: uppercase; font-weight: 700; }
-        .stat-value { font-weight: 800; color: #1e293b; }
 
-        .tier-row {
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 12px 0; 
-            border-bottom: 1px solid #f1f5f9;
-        }
-        .tier-row:last-child { border-bottom: none; }
-        
-        .nav-item { 
-            text-align: center; 
-            flex: 1; 
-            color: #64748b; 
-            cursor: pointer; 
-            transition: color 0.3s ease;
+        /* Estilo para items de navegación */
+        .nav-item {
+            text-align: center;
+            color: #64748b; /* Gris por defecto */
+            cursor: pointer;
         }
         .nav-item.active {
-            color: #3b82f6 !important;
-        }
-
-        /* Estilos adicionales para el Modal de Pago */
-        #payModal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            z-index: 9999;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            backdrop-filter: blur(5px);
+            color: #3b82f6 !important; /* Azul cuando está activo */
         }
     </style>
 </head>
@@ -88,161 +55,195 @@
             <span style="margin-right: 25px;"><b style="color: white;">BNB/USDT</b> $592.30 <span style="color: #10b981;">+0.8%</span></span>
             <span style="margin-right: 25px;"><b style="color: white;">ETH/USDT</b> $3,450.12 <span style="color: #ef4444;">-0.3%</span></span>
             <span style="margin-right: 25px;"><b style="color: white;">TRX/USDT</b> $0.1182 <span style="color: #10b981;">+2.5%</span></span>
+            <span style="margin-right: 25px;"><b style="color: white;">BTC/USDT</b> $67,241.50 <span style="color: #10b981;">+1.2%</span></span>
         </div>
     </div>
 
-    <div id="view-home" class="view active">
-        <div class="top-header">
-            <div class="id-badge">Sports Pay - ID:<span id="user-id">000000</span> <i class="far fa-copy" style="font-size: 0.8em; color: #3b82f6;"></i></div>
-        </div>
+    <div id="views-container">
 
-        <div class="main-card">
-            <div class="bal-title" style="display: flex; align-items: center; justify-content: space-between;">
-                <span>Total Earned</span>
-                <span class="history-btn" onclick="window.switchTab('history')">
-                    <i class="far fa-clock"></i> History
-                </span>
+        <div id="view-home" class="view active">
+            <div class="top-header">
+                <div class="id-badge">Sports Pay - ID:<span id="user-id">000000</span> <i class="far fa-copy" style="font-size: 0.8em; color: var(--ae-blue);"></i></div>
             </div>
-            <div class="bal-amount">
-                <div>$<span id="main-bal">0.0000</span></div>
-                <button class="btn-withdraw" onclick="window.switchTab('withdraw')"><i class="fas fa-wallet"></i> Withdraw</button>
-            </div>
-        </div>
 
-        <div id="live-feed-container" style="margin: 15px 10px; padding: 12px; background: rgba(59, 130, 246, 0.05); border-radius: 12px; border: 1px solid rgba(59, 130, 246, 0.1); display: flex; align-items: center; gap: 10px;">
-            <div style="position: relative;">
-                <i class="fas fa-circle" style="color: #10b981; font-size: 0.6em; position: absolute; top: -2px; right: -2px; animation: pulse-live 2s infinite;"></i>
-                <div style="width: 35px; height: 35px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                    <i class="fas fa-broadcast-tower" style="color: #3b82f6; font-size: 0.9em;"></i>
+            <div class="main-card">
+                <div class="bal-title" style="display: flex; align-items: center; justify-content: space-between;">
+                    <span>Total Earned</span>
+                    <span class="history-btn" onclick="switchTab('history')">
+                        <i class="far fa-clock"></i> History
+                    </span>
+                </div>
+                <div class="bal-amount">
+                    <div>$<span id="main-bal">0.0000</span></div>
+                    <button class="btn-withdraw" onclick="switchTab('withdraw')"><i class="fas fa-wallet"></i> Withdraw</button>
                 </div>
             </div>
-            <div style="flex: 1; overflow: hidden;">
-                <div style="font-size: 0.65em; font-weight: 800; color: #3b82f6; text-transform: uppercase;">Live Network Activity</div>
-                <div id="live-feed-text" style="font-size: 0.85em; color: #1e293b; white-space: nowrap; font-weight: 600;">Connecting...</div>
-            </div>
-        </div>
 
-        <div class="energy-box">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div><i class="fas fa-bolt"></i> AE (AI ENERGY)</div>
-                <i class="fas fa-sync-alt" onclick="window.refreshData()" style="cursor: pointer;"></i>
-            </div>
-            <div style="font-size: 2.8em; font-weight: 800; margin: 10px 0;"><span id="main-power">0</span></div>
-            <div class="stats-grid">
-                <div class="stat-item"><div class="stat-label">Daily Earn</div><div class="stat-val">$ <span id="stat-daily">0.0000</span></div></div>
-                <div class="stat-item"><div class="stat-label">Return</div><div class="stat-val"><span id="stat-rate">5.5</span>%</div></div>
-                <div class="stat-item"><div class="stat-label">Settlement</div><div class="stat-val" id="timer">00:00:00</div></div>
-            </div>
-        </div>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px;">
-            <div class="main-card" style="margin:0; padding: 15px; cursor: pointer;" onclick="window.switchTab('buy')">
-                <i class="fas fa-coins" style="color: #f97316; font-size: 1.5em; margin-bottom: 8px;"></i>
-                <div style="font-weight: 700; font-size: 0.9em;">Buy AE</div>
-            </div>
-            <div class="main-card" style="margin:0; padding: 15px; cursor: pointer;" onclick="window.switchTab('referrals')">
-                <i class="fas fa-gift" style="color: #ef4444; font-size: 1.5em; margin-bottom: 8px;"></i>
-                <div style="font-weight: 700; font-size: 0.9em;">Refer Friend</div>
-            </div>
-        </div>
-    </div>
-
-    <div id="view-referrals" class="view" style="background: #f8fafc;">
-        <div class="header-ae" style="background: white; padding: 15px; text-align: center; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 10;">
-            <span style="font-weight: 800; font-size: 1.1em; color: #1e293b;">My Global Network</span>
-        </div>
-        <div class="main-card" style="margin: 15px; background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; padding: 20px;">
-            <div style="font-size: 0.8em; opacity: 0.9;">Total Commission Received</div>
-            <div style="font-size: 2.2em; font-weight: 800;">$<span id="total-ref-earnings">0.00</span></div>
-            <div style="margin-top: 10px; font-size: 0.75em; background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 20px; display: inline-block;">
-                <i class="fas fa-users"></i> Team Size: <span id="total-team-size">0</span>
-            </div>
-        </div>
-        <div style="margin: 0 15px 20px; background: white; padding: 15px; border-radius: 16px; border: 1px solid #e2e8f0;">
-            <div style="font-size: 0.7em; font-weight: 800; color: #64748b; margin-bottom: 10px; text-transform: uppercase;">Your Referral Link</div>
-            <div style="display: flex; gap: 8px;">
-                <input type="text" id="referral-link" value="..." readonly style="flex: 1; padding: 10px; border: 1px solid #f1f5f9; background: #f8fafc; border-radius: 8px; font-size: 0.8em; color: #3b82f6; outline: none;">
-                <button onclick="window.copyReferralLink()" style="background: #3b82f6; color: white; border: none; padding: 0 15px; border-radius: 8px; font-weight: 700;">Copy</button>
-            </div>
-        </div>
-        <div style="padding: 0 15px;">
-            <div class="level-card"><div class="level-header"><span style="font-weight: 800; color: #3b82f6;">L1 Direct Friends (7%)</span></div><div class="level-stats"><div class="stat-box"><span class="stat-label">Earned</span><span class="stat-value">$<span id="lvl1-earned">0.000</span></span></div><div class="stat-box" style="text-align: right;"><span class="stat-label">Users</span><span class="stat-value"><span id="lvl1-count">0</span></span></div></div></div>
-            <div class="level-card"><div class="level-header"><span style="font-weight: 800; color: #ef4444;">L2 Sub-Team A (3%)</span></div><div class="level-stats"><div class="stat-box"><span class="stat-label">Earned</span><span class="stat-value">$<span id="lvl2-earned">0.000</span></span></div><div class="stat-box" style="text-align: right;"><span class="stat-label">Users</span><span class="stat-value"><span id="lvl2-count">0</span></span></div></div></div>
-            <div class="level-card"><div class="level-header"><span style="font-weight: 800; color: #f59e0b;">L3 Sub-Team B (2%)</span></div><div class="level-stats"><div class="stat-box"><span class="stat-label">Earned</span><span class="stat-value">$<span id="lvl3-earned">0.000</span></span></div><div class="stat-box" style="text-align: right;"><span class="stat-label">Users</span><span class="stat-value"><span id="lvl3-count">0</span></span></div></div></div>
-            <div class="level-card"><div class="level-header"><span style="font-weight: 800; color: #10b981;">L4 Sub-Team C (2%)</span></div><div class="level-stats"><div class="stat-box"><span class="stat-label">Earned</span><span class="stat-value">$<span id="lvl4-earned">0.000</span></span></div><div class="stat-box" style="text-align: right;"><span class="stat-label">Users</span><span class="stat-value"><span id="lvl4-count">0</span></span></div></div></div>
-            <div class="level-card"><div class="level-header"><span style="font-weight: 800; color: #8b5cf6;">L5 Sub-Team D (1%)</span></div><div class="level-stats"><div class="stat-box"><span class="stat-label">Earned</span><span class="stat-value">$<span id="lvl5-earned">0.000</span></span></div><div class="stat-box" style="text-align: right;"><span class="stat-label">Users</span><span class="stat-value"><span id="lvl5-count">0</span></span></div></div></div>
-        </div>
-    </div>
-
-    <div id="view-buy" class="view" style="background: #f8fafc;">
-        <div class="header-ae" style="background: white; padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #eee;">
-            <i class="fas fa-arrow-left" onclick="window.switchTab('home')" style="margin-right: 15px; cursor:pointer;"></i>
-            <span style="font-weight: 700;">Buy AI Energy</span>
-        </div>
-        <div style="padding: 20px; margin: 12px; background: white; border-radius: 16px; border: 1px solid #f1f5f9;">
-            <div style="margin-bottom: 10px; font-weight: 700; font-size: 0.8em; color: #64748b;">AMOUNT TO INVEST (USDT)</div>
-            <input type="number" id="buy-qty" placeholder="Min $1" oninput="window.calculateReturns()" style="width: 100%; padding: 15px; background: #f1f5f9; border: none; border-radius: 12px; font-size: 1.2em; font-weight: 800; outline: none;">
-            <button onclick="window.showPayment()" style="width: 100%; padding: 18px; background: #3b82f6; color: white; border: none; border-radius: 16px; font-weight: 800; font-size: 1.1em; margin-top: 20px;">ACTIVATE AI ENERGY</button>
-        </div>
-    </div>
-
-    <div id="payModal">
-        <div style="background:white; width:100%; max-width:380px; border-radius:24px; padding:25px; position:relative; text-align:center; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
-            <i class="fas fa-times" onclick="window.closePayment()" style="position:absolute; top:20px; right:20px; color:#64748b; font-size:1.2em; cursor:pointer;"></i>
-            
-            <h3 style="margin-bottom:5px; font-weight: 800;">Secure Payment</h3>
-            <p style="font-size:0.75em; color:#64748b; margin-bottom:20px;">Network: <b style="color:#10b981;">BEP20 (BSC)</b></p>
-
-            <div style="background:#f8fafc; padding:15px; border-radius:18px; margin-bottom:20px; border: 1px solid #f1f5f9;">
-                <div id="pay-amount-display" style="font-size:1.8em; font-weight:900; color:#1e293b;">0.00 USDT</div>
-                <div id="payment-countdown" style="font-family:monospace; color:#ef4444; font-weight:700; font-size: 0.9em;">00:30:00</div>
+            <div id="live-feed-container" style="margin: 15px 10px; padding: 12px; background: rgba(59, 130, 246, 0.05); border-radius: 12px; border: 1px solid rgba(59, 130, 246, 0.1); display: flex; align-items: center; gap: 10px;">
+                <div style="position: relative;">
+                    <i class="fas fa-circle" style="color: #10b981; font-size: 0.6em; position: absolute; top: -2px; right: -2px; animation: pulse-live 2s infinite;"></i>
+                    <div style="width: 35px; height: 35px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                        <i class="fas fa-broadcast-tower" style="color: #3b82f6; font-size: 0.9em;"></i>
+                    </div>
+                </div>
+                <div style="flex: 1; overflow: hidden;">
+                    <div style="font-size: 0.65em; font-weight: 800; color: #3b82f6; text-transform: uppercase;">Live Network Activity</div>
+                    <div id="live-feed-text" style="font-size: 0.85em; color: #1e293b; white-space: nowrap; font-weight: 600;">Connecting...</div>
+                </div>
             </div>
 
-            <div style="background: white; padding: 10px; display: inline-block; border-radius: 15px; border: 1px solid #eee; margin-bottom: 15px;">
-                <img id="qr-image" src="" style="width:140px; height:140px; display: block;">
+            <div class="energy-box">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div><i class="fas fa-bolt"></i> AE (AI ENERGY)</div>
+                    <i class="fas fa-sync-alt" onclick="window.refreshData()" style="cursor: pointer; float: right; opacity: 0.8;"></i>
+                </div>
+                <div style="font-size: 2.8em; font-weight: 800; margin: 10px 0;"><span id="main-power">0</span></div>
+                <div class="stats-grid">
+                    <div class="stat-item"><div class="stat-label">Daily Earn</div><div class="stat-val">$ <span id="stat-daily">0.0000</span></div></div>
+                    <div class="stat-item"><div class="stat-label">Return</div><div class="stat-val"><span id="stat-rate">5.5</span>%</div></div>
+                    <div class="stat-item"><div class="stat-label">Settlement</div><div class="stat-val" id="timer">00:00:00</div></div>
+                </div>
             </div>
             
-            <div style="background:#f1f5f9; padding:12px; border-radius:12px; display:flex; align-items:center; gap:10px; margin-bottom:20px; cursor:pointer;" onclick="window.copyAddress()">
-                <code id="wallet-address-display" style="flex:1; font-size:0.7em; word-break:break-all; color:#3b82f6; font-weight: 700;">Generating...</code>
-                <i class="far fa-copy" style="color:#64748b;"></i>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px;">
+                <div class="main-card" style="margin:0; padding: 15px; cursor: pointer;" onclick="switchTab('buy')">
+                    <i class="fas fa-coins" style="color: #f97316; font-size: 1.5em; margin-bottom: 8px;"></i>
+                    <div style="font-weight: 700; font-size: 0.9em;">Buy AE</div>
+                </div>
+                <div class="main-card" style="margin:0; padding: 15px; cursor: pointer;" onclick="switchTab('referrals')">
+                    <i class="fas fa-gift" style="color: #ef4444; font-size: 1.5em; margin-bottom: 8px;"></i>
+                    <div style="font-weight: 700; font-size: 0.9em;">Refer Friend</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-referrals" class="view" style="background: #f8fafc;">
+            <div class="header-ae" style="background: white; padding: 15px; text-align: center; border-bottom: 1px solid #eee;">
+                <span style="font-weight: 800; font-size: 1.1em; color: #1e293b;">My Global Network</span>
+            </div>
+            <div class="main-card" style="margin: 15px; background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; padding: 20px;">
+                <div style="font-size: 0.8em; opacity: 0.9;">Total Commission</div>
+                <div style="font-size: 2.2em; font-weight: 800;">$<span id="total-ref-earnings">0.00</span></div>
+                <div style="margin-top: 10px; font-size: 0.75em;">Team Size: <span id="total-team-size">0</span></div>
+            </div>
+            <div style="margin: 0 15px; padding: 0 15px; display: flex; flex-direction: column; gap: 10px;">
+                <div class="level-card" style="background:white; padding:15px; border-radius:12px; display:flex; justify-content:space-between; border:1px solid #f1f5f9;">
+                    <span><b>L1</b> Direct Friends (7%)</span>
+                    <span id="lvl1-count" style="font-weight:800;">0</span>
+                </div>
+                <div class="level-card" style="background:white; padding:15px; border-radius:12px; display:flex; justify-content:space-between; border:1px solid #f1f5f9;">
+                    <span><b>L2</b> Sub-Team (3%)</span>
+                    <span id="lvl2-count" style="font-weight:800;">0</span>
+                </div>
+                </div>
+        </div>
+
+        <div id="view-buy" class="view" style="background: #f8fafc;">
+            <div class="header-ae" style="background: white; padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #eee;">
+                <i class="fas fa-arrow-left" onclick="switchTab('home')" style="margin-right: 15px; cursor:pointer;"></i>
+                <span style="font-weight: 700;">Buy AI Energy</span>
             </div>
 
-            <div id="payment-status-text" style="font-size:0.85em; font-weight:800; margin-bottom:20px; color:#64748b; text-transform: uppercase; letter-spacing: 1px;">Not Received ⌛</div>
+            <div style="background: white; padding: 15px; margin: 12px; border-radius: 16px; border: 1px solid #f1f5f9;">
+                <div style="color: #3b82f6; font-weight: 800; font-size: 0.8em; margin-bottom: 10px; text-transform: uppercase;">Daily Return Tiers</div>
+                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9;">
+                    <span>Basic (>= $0)</span><span style="font-weight: 700; color: #3b82f6;">5.5%</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9;">
+                    <span>Pro (>= $20)</span><span style="font-weight: 700; color: #3b82f6;">6.0%</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                    <span>Whale ($300+)</span><span style="font-weight: 700; color: #3b82f6;">6.5%</span>
+                </div>
+            </div>
 
-            <button id="btn-verify-payment" onclick="window.verifyPayment()" style="width:100%; padding:18px; background:#1e293b; color:white; border:none; border-radius:15px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:10px; font-size: 1em;">
-                I HAVE PAID <i id="arrow-icon" class="fas fa-arrow-right"></i>
-            </button>
+            <div style="padding: 20px; margin: 12px; background: white; border-radius: 16px; border: 1px solid #f1f5f9;">
+                <div style="margin-bottom: 10px; font-weight: 700; font-size: 0.8em; color: #64748b;">AMOUNT TO INVEST (USDT)</div>
+                <input type="number" id="buy-qty" placeholder="Min $1" oninput="window.calculateReturns()" style="width: 100%; padding: 15px; background: #f1f5f9; border: none; border-radius: 12px; font-size: 1.2em; font-weight: 800; outline: none;">
+                
+                <div style="margin-top: 15px; text-align: center; border-top: 1px dashed #eee; padding-top: 15px;">
+                    <div id="ae-calc-total" style="font-weight: 800; color: #3b82f6; font-size: 1.3em;">0 AE Power</div>
+                </div>
+            </div>
+
+            <div style="padding: 0 20px;">
+                <button id="btn-continue" onclick="window.saveInvestment()" 
+                    style="width: 100%; padding: 18px; background: #3b82f6; color: white; border: none; border-radius: 16px; font-weight: 800; font-size: 1.1em; cursor: pointer;">
+                    ACTIVATE AI ENERGY
+                </button>
+            </div>
         </div>
-    </div>
 
-    <div class="nav-bar" style="position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #eee; z-index: 1000;">
-        <div id="nav-home" class="nav-item active" onclick="window.switchTab('home')"><i class="fas fa-home" style="display: block; font-size: 1.4em; margin-bottom: 2px;"></i><span style="font-size: 0.7em;">Home</span></div>
-        <div id="nav-buy" class="nav-item" onclick="window.switchTab('buy')"><i class="fas fa-bolt" style="display: block; font-size: 1.4em; margin-bottom: 2px;"></i><span style="font-size: 0.7em;">Energy</span></div>
-        <div id="nav-referrals" class="nav-item" onclick="window.switchTab('referrals')"><i class="fas fa-users" style="display: block; font-size: 1.4em; margin-bottom: 2px;"></i><span style="font-size: 0.7em;">Team</span></div>
-        <div id="nav-me" class="nav-item" onclick="window.switchTab('me')"><i class="fas fa-user" style="display: block; font-size: 1.4em; margin-bottom: 2px;"></i><span style="font-size: 0.7em;">Profile</span></div>
+        <div id="view-withdraw" class="view" style="background: #f8fafc;">
+            <div class="header-ae" style="background: white; padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #eee;">
+                <i class="fas fa-arrow-left" onclick="switchTab('home')" style="margin-right: 15px; cursor:pointer;"></i>
+                <span style="font-weight: 700;">Withdraw</span>
+            </div>
+            <div style="padding: 20px;">
+                <div style="background: white; padding: 20px; border-radius: 16px; margin-bottom: 20px; text-align: center;">
+                    <div style="color: #64748b; font-size: 0.8em;">Available</div>
+                    <div style="font-size: 2.2em; font-weight: 800;">$<span id="withdraw-available">0.0000</span></div>
+                </div>
+                <input type="number" id="withdraw-amount" placeholder="Amount USDT" style="width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 15px; outline: none;">
+                <input type="text" id="withdraw-address" placeholder="BEP20 Address" style="width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 20px; outline: none;">
+                <button onclick="window.requestWithdraw()" style="width: 100%; padding: 18px; background: #1e293b; color: white; border: none; border-radius: 16px; font-weight: 700;">Confirm Withdrawal</button>
+            </div>
+        </div>
+
+        <div id="view-me" class="view" style="background: #f8fafc;">
+            <div style="background: white; padding: 40px 20px; text-align: center; border-bottom: 1px solid #eee;">
+                <div style="width: 80px; height: 80px; background: #3b82f6; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; color: white; font-size: 2em;"><i class="fas fa-user"></i></div>
+                <div id="user-name-me" style="font-weight: 800; font-size: 1.2em;">User</div>
+                <div style="font-size: 0.8em; color: #64748b;">ID: <span id="me-id">000000</span></div>
+            </div>
+            <div style="padding: 15px;">
+                <div style="background:white; border-radius:12px; padding:15px; display:flex; justify-content:space-between; align-items:center;">
+                    <span>Daily Earnings</span><span id="daily-earned-me" style="font-weight:700; color:#10b981;">$0.00</span>
+                </div>
+            </div>
+        </div>
+
+    </div> <div class="nav-bar" style="position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #eee; z-index: 1000;">
+        <div class="nav-item active" onclick="switchTab('home')">
+            <i class="fas fa-home" style="display: block; font-size: 1.4em; margin-bottom: 4px;"></i> Home
+        </div>
+        <div class="nav-item" onclick="switchTab('buy')">
+            <i class="fas fa-bolt" style="display: block; font-size: 1.4em; margin-bottom: 4px;"></i> Energy
+        </div>
+        <div class="nav-item" onclick="switchTab('referrals')">
+            <i class="fas fa-users" style="display: block; font-size: 1.4em; margin-bottom: 4px;"></i> Team
+        </div>
+        <div class="nav-item" onclick="switchTab('me')">
+            <i class="fas fa-user" style="display: block; font-size: 1.4em; margin-bottom: 4px;"></i> Profile
+        </div>
     </div>
 
     <script type="module" src="js/main.js"></script>
     <script>
+        // Función crítica para el cambio de pestañas y colores
         function switchTab(tabId) {
-            // 1. Visibilidad de vistas
+            // 1. Ocultar todas las vistas
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            const target = document.getElementById('view-' + tabId);
-            if(target) target.classList.add('active');
             
-            // 2. Estados de navegación
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            const navBtn = document.getElementById('nav-' + tabId);
-            if(navBtn) {
-                navBtn.classList.add('active');
+            // 2. Mostrar la vista seleccionada
+            const targetView = document.getElementById('view-' + tabId);
+            if (targetView) {
+                targetView.classList.add('active');
             } else {
-                // Si es una subvista como history o withdraw, iluminamos Home
-                if(['history', 'withdraw'].includes(tabId)) {
-                    document.getElementById('nav-home').classList.add('active');
-                }
+                console.error('No se encontró la vista:', 'view-' + tabId);
+            }
+
+            // 3. Actualizar colores de la nav-bar
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active'); // Quitar azul de todos
+            });
+            // Encontrar el item clickeado y ponerlo azul
+            const clickedItem = event.currentTarget;
+            if (clickedItem && clickedItem.classList.contains('nav-item')) {
+                clickedItem.classList.add('active');
             }
         }
         window.switchTab = switchTab;
     </script>
 </body>
-                                                                                       </html>
+</html>
