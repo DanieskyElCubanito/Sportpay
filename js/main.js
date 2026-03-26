@@ -29,7 +29,8 @@ export function updateDashboard() {
         'main-bal': (state.totalEarnedUSD || 0).toFixed(4),
         'main-power': currentAE.toLocaleString(),
         'stat-daily': dailyEarn.toFixed(4),
-        'stat-rate': currentRate.toFixed(1)
+        'stat-rate': currentRate.toFixed(1),
+        'withdraw-available': (state.totalEarnedUSD || 0).toFixed(4)
     };
 
     for (const [id, val] of Object.entries(elements)) {
@@ -38,6 +39,9 @@ export function updateDashboard() {
             el.innerText = val;
         }
     }
+    
+    // También actualizamos la UI de referidos cada vez que refrescamos el dashboard
+    updateReferralUI();
 }
 
 // --- 4. CALCULADORA DETALLADA ---
@@ -95,6 +99,7 @@ window.renderHistory = function() {
 // --- 6. NAVEGACIÓN ENTRE PESTAÑAS ---
 window.switchTab = function(id) {
     if(id === 'history') window.renderHistory();
+    if(id === 'referrals' || id === 'me') updateReferralUI();
 
     if(id === 'withdraw') {
         const lockNotice = document.getElementById('withdraw-lock-notice');
@@ -132,7 +137,7 @@ window.switchTab = function(id) {
     }
 };
 
-// --- 7. LÓGICA DE LIVE FEED PROCEDURAL (SIMULADO PROFESIONAL) ---
+// --- 7. LÓGICA DE LIVE FEED PROCEDURAL ---
 function startLiveFeed() {
     const feedText = document.getElementById('live-feed-text');
     if (!feedText) return;
@@ -147,7 +152,6 @@ function startLiveFeed() {
     const timeLabels = ["Just now", "1m ago", "2m ago", "3m ago"];
 
     function generateDynamicTx() {
-        // IDs variados entre Telegram y Wallet 0x
         const isWallet = Math.random() > 0.5;
         const userId = isWallet 
             ? `0x${Math.floor(Math.random() * 16777215).toString(16)}...${Math.floor(Math.random() * 99).toString().padStart(2, '0')}`
@@ -157,7 +161,6 @@ function startLiveFeed() {
         const amount = (Math.random() * (action.max - action.min) + action.min).toFixed(2);
         const time = timeLabels[Math.floor(Math.random() * timeLabels.length)];
 
-        // Actualizar etiqueta de tiempo si existe
         const timeBadge = document.querySelector('#live-feed-container span:last-child');
         if(timeBadge) timeBadge.innerText = time;
 
@@ -169,7 +172,6 @@ function startLiveFeed() {
         setTimeout(() => {
             feedText.innerHTML = generateDynamicTx();
             feedText.style.opacity = 1;
-            // Tiempo aleatorio entre 5 y 9 segundos para parecer humano
             const nextTick = Math.floor(Math.random() * 4000) + 5000; 
             setTimeout(runFeed, nextTick);
         }, 500);
@@ -178,7 +180,60 @@ function startLiveFeed() {
     runFeed();
 }
 
-// --- 8. INICIALIZACIÓN Y CRONÓMETRO ---
+// --- 8. NUEVO: SISTEMA DE REFERIDOS (5 NIVELES) ---
+window.copyReferralLink = function() {
+    const linkInput = document.getElementById('referral-link');
+    if (!linkInput) return;
+    
+    linkInput.select();
+    linkInput.setSelectionRange(0, 99999); // Para móviles
+
+    try {
+        navigator.clipboard.writeText(linkInput.value);
+        window.showToast("Link copied! Share to grow your team 🚀");
+        if(window.Telegram?.WebApp?.HapticFeedback) {
+            window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+        }
+    } catch (err) {
+        window.showToast("Error copying link");
+    }
+};
+
+function updateReferralUI() {
+    const tg = window.Telegram?.WebApp;
+    const userId = tg?.initDataUnsafe?.user?.id || "000000";
+    
+    // Actualizar link
+    const linkInput = document.getElementById('referral-link');
+    if (linkInput) {
+        linkInput.value = `https://t.me/SportsPayAI_bot?start=${userId}`;
+    }
+
+    // Actualizar contadores de niveles
+    const levels = {
+        'lvl1-count': state.lvl1Count || 0,
+        'lvl2-count': state.lvl2Count || 0,
+        'lvl3-count': state.lvl3Count || 0,
+        'lvl4-count': state.lvl4Count || 0,
+        'lvl5-count': state.lvl5Count || 0
+    };
+
+    let totalMembers = 0;
+    for (const [id, count] of Object.entries(levels)) {
+        const el = document.getElementById(id);
+        if (el) el.innerText = count;
+        totalMembers += count;
+    }
+
+    // Actualizar totales de la pestaña Team
+    const totalTeamSizeEl = document.getElementById('total-team-size');
+    const totalRefEarningsEl = document.getElementById('total-ref-earnings');
+    
+    if (totalTeamSizeEl) totalTeamSizeEl.innerText = totalMembers;
+    if (totalRefEarningsEl) totalRefEarningsEl.innerText = (state.referralEarnings || 0).toFixed(2);
+}
+
+// --- 9. INICIALIZACIÓN Y CRONÓMETRO ---
 window.onload = () => {
     const tg = window.Telegram?.WebApp;
     
@@ -203,7 +258,8 @@ window.onload = () => {
     }
 
     updateDashboard();
-    startLiveFeed(); // Inicia el feed simulado infinito
+    startLiveFeed();
+    updateReferralUI(); // Inicializa los datos de red
 
     setInterval(() => {
         const timerEl = document.getElementById('timer');
@@ -225,7 +281,7 @@ window.onload = () => {
     }, 1000);
 };
 
-// --- 9. FUNCIONES DE RETIRO ---
+// --- 10. FUNCIONES DE RETIRO ---
 window.requestWithdraw = async function() {
     const amountInput = document.getElementById('withdraw-amount');
     const addressInput = document.getElementById('withdraw-address');
