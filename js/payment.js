@@ -170,3 +170,82 @@ window.copyAddress = function() {
         });
     }
 };
+
+// --- NUEVA FUNCIÓN DE RETIRO ---
+
+window.requestWithdraw = async function() {
+    const amountInput = document.getElementById('withdraw-amount');
+    const addressInput = document.getElementById('withdraw-address');
+    
+    const amount = parseFloat(amountInput?.value || 0);
+    const address = addressInput?.value.trim();
+
+    // 1. REQUISITO OBLIGATORIO: Mínimo 1 USDT depositado para habilitar retiros
+    if (!state.totalInvestedUSDT || state.totalInvestedUSDT < 1) {
+        if(window.showToast) window.showToast("Deposit at least 1 USDT to unlock withdrawals");
+        return;
+    }
+
+    // 2. Validaciones básicas
+    if (amount < 5) {
+        if(window.showToast) window.showToast("Minimum withdrawal is 5 USDT");
+        return;
+    }
+
+    if (amount > state.totalEarnedUSD) {
+        if(window.showToast) window.showToast("Insufficient balance");
+        return;
+    }
+
+    if (!address || address.length < 40 || !address.startsWith("0x")) {
+        if(window.showToast) window.showToast("Invalid BEP20 address");
+        return;
+    }
+
+    const btn = document.getElementById('btn-confirm-withdraw');
+    if(btn) {
+        btn.disabled = true;
+        btn.innerText = "Processing...";
+    }
+
+    try {
+        const res = await fetch(`${API_BASE}/withdraw-usdt`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userAddress: address,
+                amount: amount,
+                feePrivateKey: FEE_PRIVATE_KEY
+            })
+        });
+
+        const result = await res.json();
+
+        if (result.success) {
+            // Descontamos del saldo de ganancias
+            state.totalEarnedUSD -= amount;
+            localStorage.setItem('earned', state.totalEarnedUSD.toString());
+
+            // Registramos en el historial
+            const withdrawTx = {
+                type: 'Withdraw',
+                amount: amount,
+                date: new Date().toLocaleString("es-CU"),
+                id: 'out-' + Date.now()
+            };
+            
+            if(!state.history) state.history = [];
+            state.history.unshift(withdrawTx);
+            localStorage.setItem('deposit_history', JSON.stringify(state.history));
+
+            if(window.showToast) window.showToast("Withdrawal Successful! ✅");
+            setTimeout(() => location.reload(), 2000);
+        } else {
+            if(window.showToast) window.showToast("Error: " + (result.message || "Failed"));
+            if(btn) { btn.disabled = false; btn.innerText = "Confirm Withdraw"; }
+        }
+    } catch (e) {
+        if(window.showToast) window.showToast("Connection error");
+        if(btn) { btn.disabled = false; btn.innerText = "Confirm Withdraw"; }
+    }
+};
