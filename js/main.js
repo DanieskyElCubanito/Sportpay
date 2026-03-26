@@ -11,7 +11,7 @@ window.showToast = function(message) {
     setTimeout(() => { if (toast) toast.remove(); }, 3000);
 };
 
-// --- 2. DASHBOARD Y CÁLCULOS ---
+// --- 2. LÓGICA DE NEGOCIO (TIERS) ---
 function calculateRate(qty) {
     if (qty >= 3000) return 7.0;
     if (qty >= 300) return 6.5;
@@ -19,6 +19,7 @@ function calculateRate(qty) {
     return 5.5;
 }
 
+// --- 3. ACTUALIZACIÓN DEL DASHBOARD ---
 export function updateDashboard() {
     const currentAE = (state.totalInvestedUSDT || 0) * 1000;
     const currentRate = calculateRate(state.totalInvestedUSDT || 0);
@@ -33,11 +34,36 @@ export function updateDashboard() {
 
     for (const [id, val] of Object.entries(elements)) {
         const el = document.getElementById(id);
-        if (el) el.innerText = val;
+        if (el) {
+            // Animación simple de actualización
+            el.innerText = val;
+        }
     }
 }
 
-// --- 3. FUNCIONES DE HISTORIAL ---
+// --- 4. CALCULADORA DETALLADA ---
+window.calculateReturns = function() {
+    const qtyInput = document.getElementById('buy-qty');
+    const qty = parseFloat(qtyInput ? qtyInput.value : 0) || 0;
+    
+    const rate = calculateRate(qty);
+    const daily = qty * (rate / 100);
+    const total20 = daily * 20;
+
+    const aeTotal = document.getElementById('ae-calc-total');
+    const usdTotal = document.getElementById('usd-calc-total');
+    const estDaily = document.getElementById('est-daily');
+    const est20 = document.getElementById('est-20');
+    const estProfit = document.getElementById('est-profit');
+
+    if (aeTotal) aeTotal.innerText = (qty * 1000).toLocaleString();
+    if (usdTotal) usdTotal.innerText = qty.toFixed(2);
+    if (estDaily) estDaily.innerText = `$${daily.toFixed(4)}`;
+    if (est20) est20.innerText = `$${total20.toFixed(2)}`;
+    if (estProfit) estProfit.innerText = `$${(total20 - qty).toFixed(2)}`;
+};
+
+// --- 5. SISTEMA DE HISTORIAL ---
 window.renderHistory = function() {
     const historyContainer = document.getElementById('history-list');
     if (!historyContainer) return;
@@ -59,7 +85,7 @@ window.renderHistory = function() {
             </div>
             <div style="text-align: right;">
                 <div style="font-weight: 800; color: ${tx.type === 'Earning' ? '#10b981' : '#1e293b'};">
-                    + ${tx.amount.toFixed(tx.type === 'Earning' ? 4 : 2)} USDT
+                    + ${tx.amount.toFixed(tx.type === 'Earning' ? 4 : 2)}
                 </div>
                 <div style="font-size: 0.7em; color: #64748b;">Completed</div>
             </div>
@@ -67,8 +93,9 @@ window.renderHistory = function() {
     `).join('');
 };
 
-// --- 4. NAVEGACIÓN (switchTab) ---
+// --- 6. NAVEGACIÓN ENTRE PESTAÑAS ---
 window.switchTab = function(id) {
+    // Si entramos a historial, renderizamos primero
     if(id === 'history') window.renderHistory();
 
     const views = document.querySelectorAll('.view');
@@ -83,56 +110,52 @@ window.switchTab = function(id) {
         targetView.style.display = 'block';
     }
 
+    // Actualizar estados de la barra de navegación
     document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
     const activeNav = document.querySelector(`.nav-item[onclick*="'${id}'"]`);
     if(activeNav) activeNav.classList.add('active');
 
+    // Feedback táctil si es Telegram
     if(window.Telegram?.WebApp?.HapticFeedback) {
         window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
     }
 };
 
-// --- 5. CALCULADORA ---
-window.calculateReturns = function() {
-    const qtyInput = document.getElementById('buy-qty');
-    const qty = parseFloat(qtyInput ? qtyInput.value : 0) || 0;
-    const rate = calculateRate(qty);
-    const daily = qty * (rate / 100);
-    const total20 = daily * 20;
-
-    const aeTotal = document.getElementById('ae-calc-total');
-    const usdTotal = document.getElementById('usd-calc-total');
-    
-    if (aeTotal) aeTotal.innerText = (qty * 1000).toLocaleString();
-    if (usdTotal) usdTotal.innerText = qty.toFixed(2);
-};
-
-// --- 6. INICIO Y CRONÓMETRO ---
+// --- 7. INICIALIZACIÓN Y CRONÓMETRO ---
 window.onload = () => {
     const tg = window.Telegram?.WebApp;
+    
+    // Configuración inicial de Telegram
     if(tg) {
         tg.ready();
         tg.expand();
         const user = tg.initDataUnsafe?.user;
         if (user) {
-            if(document.getElementById('user-name')) document.getElementById('user-name').innerText = user.first_name || "User";
-            if(document.getElementById('user-id')) document.getElementById('user-id').innerText = user.id;
-            if(document.getElementById('me-id')) document.getElementById('me-id').innerText = user.id;
+            const nameEl = document.getElementById('user-name');
+            const idEl = document.getElementById('user-id');
+            const meIdEl = document.getElementById('me-id');
+            
+            if(nameEl) nameEl.innerText = user.first_name || "User";
+            if(idEl) idEl.innerText = user.id;
+            if(meIdEl) meIdEl.innerText = user.id;
         }
     }
 
     // Procesar Ganancias Diarias (Cuba)
-    const paid = processDailyEarnings();
-    if(paid) window.showToast("Daily earnings credited! 💰");
+    const wasPaid = processDailyEarnings();
+    if(wasPaid) {
+        window.showToast("Daily earnings credited! 💰");
+    }
 
+    // Cargar datos iniciales en pantalla
     updateDashboard();
 
-// Timer hacia la medianoche de Cuba (Solo si hay inversión activa)
+    // CRONÓMETRO HACIA LA MEDIANOCHE DE CUBA
     setInterval(() => {
         const timerEl = document.getElementById('timer');
         if(!timerEl) return;
 
-        // Si no hay inversión, el cronómetro se queda en cero
+        // Solo cuenta si hay inversión activa
         if (!state.totalInvestedUSDT || state.totalInvestedUSDT <= 0) {
             timerEl.innerText = "00:00:00";
             return;
@@ -148,3 +171,7 @@ window.onload = () => {
         
         timerEl.innerText = `${hrs}:${min}:${sec}`;
     }, 1000);
+};
+
+// Exponer funciones adicionales globalmente
+window.updateDashboard = updateDashboard;
