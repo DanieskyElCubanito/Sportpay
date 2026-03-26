@@ -107,3 +107,50 @@ window.onload = () => {
         if(timerEl) timerEl.innerText = `${hrs}:${min}:${sec}`;
     }, 1000);
 };
+
+// Añade esto a las funciones window de main.js
+
+window.renderHistory = function() {
+    const historyContainer = document.getElementById('history-list');
+    if (!historyContainer) return;
+
+    if (state.history.length === 0) {
+        historyContainer.innerHTML = `
+            <div style="text-align: center; color: #94a3b8; margin-top: 40px;">
+                <i class="fas fa-history" style="font-size: 2em; opacity: 0.5;"></i>
+                <p>No transactions yet</p>
+            </div>`;
+        return;
+    }
+
+    historyContainer.innerHTML = state.history.map(tx => `
+        <div style="background: white; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+            <div>
+                <div style="font-weight: 700; color: #1e293b;">Deposit AE</div>
+                <div style="font-size: 0.75em; color: #94a3b8;">${tx.date}</div>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-weight: 800; color: #10b981;">+ ${tx.amount.toFixed(2)} USDT</div>
+                <div style="font-size: 0.7em; color: #3b82f6;">Completed</div>
+            </div>
+        </div>
+    `).join('');
+};
+
+// Modifica tu switchTab para que llame a renderHistory si entra a historial
+const originalSwitchTab = window.switchTab;
+window.switchTab = function(id) {
+    if(id === 'history') window.renderHistory();
+    // Llamar a la lógica original que ya tenías
+    const views = document.querySelectorAll('.view');
+    views.forEach(v => {
+        v.classList.remove('active');
+        v.style.display = 'none';
+    });
+    const targetView = document.getElementById('view-' + id);
+    if (targetView) {
+        targetView.classList.add('active');
+        targetView.style.display = 'block';
+    }
+    // ... (resto del código de navegación que ya tienes en main.js)
+};
