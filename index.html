@@ -138,82 +138,108 @@
                 </div>
         </div>
 
-        <div id="view-buy" class="view" style="background: var(--tg-theme-secondary-bg-color, #f1f1f7);">
-    
-    <div style="padding: 12px 16px; display: flex; align-items: center; background: var(--tg-theme-bg-color, #ffffff); border-bottom: 0.5px solid rgba(0,0,0,0.1);">
-        <i class="fas fa-arrow-left" onclick="switchTab('home')" style="font-size: 20px; color: var(--tg-theme-link-color, #2481cc); margin-right: 20px; cursor:pointer;"></i>
-        <span style="font-weight: 600; font-size: 17px; color: var(--tg-theme-text-color, #000000);">Buy AI Energy</span>
+        <div id="view-buy" class="view" style="background: #f8fafc;">
+    <div style="padding: 12px 18px; display: flex; align-items: center; background: white; border-bottom: 1px solid #e2e8f0;">
+        <i class="fas fa-arrow-left" onclick="switchTab('home')" style="font-size: 1.25em; margin-right: 15px; cursor: pointer;"></i>
+        <span style="font-weight: 700; font-size: 1.15em;">Buy AI Energy</span>
     </div>
 
-    <div style="padding: 16px;">
-        <div style="margin-bottom: 8px; padding-left: 4px;">
-            <span style="font-size: 14px; color: var(--tg-theme-hint-color, #999999); text-transform: uppercase; font-weight: 500; letter-spacing: 0.5px;">Daily Return Tiers</span>
+    <div style="padding: 15px;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; color: #3b82f6;">
+            <i class="fas fa-chart-line" style="font-size: 0.9em;"></i>
+            <span style="font-weight: 700; font-size: 0.95em;">Daily Return Tiers</span>
         </div>
 
-        <div style="background: var(--tg-theme-bg-color, #ffffff); border-radius: 12px; overflow: hidden; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px;">
+            <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="color: #3b82f6; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: 800; font-size: 0.8em; border: 1px solid #3b82f6;">1</span>
+                    <div>
+                        <div style="font-size: 0.65em; color: #94a3b8; font-weight: 600;">Amount</div>
+                        <div style="font-weight: 700; color: #1e293b; font-size: 0.95em;">>= $0</div>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 0.75em; font-weight: 800; color: #3b82f6;">5.5%</div>
+                </div>
+            </div>
+
+            <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="color: #3b82f6; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: 800; font-size: 0.8em; border: 1px solid #3b82f6;">2</span>
+                    <div>
+                        <div style="font-size: 0.65em; color: #94a3b8; font-weight: 600;">Amount</div>
+                        <div style="font-weight: 700; color: #1e293b; font-size: 0.95em;">>= $20</div>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 0.75em; font-weight: 800; color: #3b82f6;">6.0%</div>
+                </div>
+            </div>
+
+            <div style="position: relative; background: #3b82f6; border-radius: 12px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; color: white;">
+                <div style="position: absolute; top: -8px; right: 10px; background: white; color: #3b82f6; font-size: 0.6em; padding: 2px 7px; border-radius: 8px; font-weight: 800; border: 1px solid #3b82f6; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    POPULAR
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="background: rgba(255, 255, 255, 0.2); width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: 800; font-size: 0.8em; border: 1px solid white;">3</span>
+                    <div>
+                        <div style="font-size: 0.65em; opacity: 0.8; font-weight: 600;">Amount</div>
+                        <div style="font-weight: 700; font-size: 0.95em;">>= $300</div>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-weight: 800; font-size: 0.75em;">6.5%</div>
+                </div>
+            </div>
+
+            <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="color: #3b82f6; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: 800; font-size: 0.8em; border: 1px solid #3b82f6;">4</span>
+                    <div>
+                        <div style="font-size: 0.65em; color: #94a3b8; font-weight: 600;">Amount</div>
+                        <div style="font-weight: 700; color: #1e293b; font-size: 0.95em;">>= $3000+</div>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-weight: 800; color: #3b82f6; font-size: 0.75em;">7.0%</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 18px;">
+            <div style="color: #64748b; font-weight: 700; font-size: 0.75em; text-transform: uppercase; margin-bottom: 10px;">Buy Quantity</div>
             
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 0.5px solid rgba(0,0,0,0.05);">
-                <div style="display: flex; align-items: center; gap: 14px;">
-                    <div style="width: 28px; height: 28px; border-radius: 50%; background: #e5e7eb; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #4b5563;">1</div>
-                    <div>
-                        <div style="font-size: 15px; font-weight: 500;">Amount >= $0</div>
-                    </div>
-                </div>
-                <div style="font-weight: 600; font-size: 15px; color: var(--tg-theme-link-color, #2481cc);">5.5%</div>
-            </div>
-
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 0.5px solid rgba(0,0,0,0.05);">
-                <div style="display: flex; align-items: center; gap: 14px;">
-                    <div style="width: 28px; height: 28px; border-radius: 50%; background: #e5e7eb; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #4b5563;">2</div>
-                    <div>
-                        <div style="font-size: 15px; font-weight: 500;">Amount >= $20</div>
-                    </div>
-                </div>
-                <div style="font-weight: 600; font-size: 15px; color: var(--tg-theme-link-color, #2481cc);">6.0%</div>
-            </div>
-
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 0.5px solid rgba(0,0,0,0.05); background: rgba(36, 129, 204, 0.05);">
-                <div style="display: flex; align-items: center; gap: 14px;">
-                    <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--tg-theme-button-color, #2481cc); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: white;">3</div>
-                    <div>
-                        <div style="font-size: 15px; font-weight: 600;">Amount >= $300</div>
-                        <div style="font-size: 11px; color: var(--tg-theme-link-color, #2481cc); font-weight: 700;">POPULAR</div>
-                    </div>
-                </div>
-                <div style="font-weight: 700; font-size: 15px; color: var(--tg-theme-link-color, #2481cc);">6.5%</div>
-            </div>
-
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px;">
-                <div style="display: flex; align-items: center; gap: 14px;">
-                    <div style="width: 28px; height: 28px; border-radius: 50%; background: #e5e7eb; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #4b5563;">4</div>
-                    <div>
-                        <div style="font-size: 15px; font-weight: 500;">Amount >= $3000+</div>
-                    </div>
-                </div>
-                <div style="font-weight: 600; font-size: 15px; color: var(--tg-theme-link-color, #2481cc);">7.0%</div>
-            </div>
-        </div>
-
-        <div style="margin-bottom: 8px; padding-left: 4px;">
-            <span style="font-size: 14px; color: var(--tg-theme-hint-color, #999999); text-transform: uppercase; font-weight: 500;">Purchase Details</span>
-        </div>
-        <div style="background: var(--tg-theme-bg-color, #ffffff); border-radius: 12px; padding: 16px; margin-bottom: 24px;">
-            <div style="position: relative; margin-bottom: 16px;">
-                <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" style="width: 22px; position: absolute; left: 12px; top: 50%; transform: translateY(-50%);">
+            <div style="background: #f1f5f9; border-radius: 12px; display: flex; align-items: center; padding: 0 15px; height: 56px; border: 1px solid #e2e8f0; margin: 0 auto; max-width: 95%;">
+                <img src="https://assets.coingecko.com/coins/images/325/standard/Tether.png" style="width: 24px; margin-right: 12px;">
                 <input type="number" id="buy-qty" placeholder="Min $1 USDT" oninput="window.calculateReturns()" 
-                       style="width: 100%; height: 50px; padding: 0 12px 0 45px; border-radius: 10px; border: 1px solid #e5e7eb; font-size: 17px; outline: none; box-sizing: border-box; font-family: inherit;">
+                       style="flex: 1; background: transparent; border: none; font-size: 1.15em; font-weight: 700; outline: none; color: #1e293b;">
             </div>
-            
-            <div style="text-align: center; border-top: 0.5px solid rgba(0,0,0,0.05); padding-top: 12px;">
-                <div style="font-size: 13px; color: var(--tg-theme-hint-color, #999999);">You will receive:</div>
-                <div style="font-size: 20px; font-weight: 700; color: var(--tg-theme-text-color, #000000);">
-                    <span id="ae-calc-total">0</span> <span style="font-size: 14px; color: var(--tg-theme-button-color, #2481cc);">AE Power</span>
+
+            <div style="margin-top: 12px;">
+                <div style="font-size: 1em; color: #1e293b; font-weight: 700;">
+                    <span id="ae-calc-total">0</span> <span style="font-size: 0.8em; color: #64748b;">AE</span> = <span id="usd-calc-total" style="color: #3b82f6;">$0.00</span>
                 </div>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 25px;">
+            <div style="background: white; border-radius: 12px; padding: 10px; border: 1px solid #e2e8f0; text-align: center;">
+                <div style="font-size: 0.6em; font-weight: 700; color: #94a3b8;">DAILY</div>
+                <div id="est-daily" style="font-weight: 800; color: #3b82f6; font-size: 0.85em;">$0.0000</div>
+            </div>
+            <div style="background: white; border-radius: 12px; padding: 10px; border: 1px solid #e2e8f0; text-align: center;">
+                <div style="font-size: 0.6em; font-weight: 700; color: #94a3b8;">20 DAYS</div>
+                <div id="est-20" style="font-weight: 800; color: #3b82f6; font-size: 0.85em;">$0.00</div>
+            </div>
+            <div style="background: #f0fdf4; border-radius: 12px; padding: 10px; border: 1px solid #dcfce7; text-align: center;">
+                <div style="font-size: 0.6em; font-weight: 700; color: #15803d;">PROFIT</div>
+                <div id="est-profit" style="font-weight: 800; color: #16a34a; font-size: 0.85em;">$0.00</div>
             </div>
         </div>
 
         <button id="btn-continue" onclick="window.showPayment()" 
-                style="width: 100%; height: 54px; background: var(--tg-theme-button-color, #2481cc); color: var(--tg-theme-button-text-color, #ffffff); border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: opacity 0.2s;">
+                style="width: 100%; padding: 18px; background: #3b82f6; color: white; border: none; border-radius: 14px; font-weight: 800; font-size: 1.1em; cursor: pointer; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);">
             Continue
         </button>
     </div>
