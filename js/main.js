@@ -1,6 +1,6 @@
-import { state, saveInvestment, clearTempWallet } from './state.js';
+import { state, saveInvestment, processDailyEarnings } from './state.js';
 
-// --- 1. UI GLOBAL ---
+// --- 1. UI GLOBAL (TOAST) ---
 window.showToast = function(message) {
     const oldToast = document.querySelector('.toast-notification');
     if (oldToast) oldToast.remove();
@@ -11,7 +11,7 @@ window.showToast = function(message) {
     setTimeout(() => { if (toast) toast.remove(); }, 3000);
 };
 
-// --- 2. DASHBOARD ---
+// --- 2. DASHBOARD Y CÁLCULOS ---
 function calculateRate(qty) {
     if (qty >= 3000) return 7.0;
     if (qty >= 300) return 6.5;
@@ -37,33 +37,46 @@ export function updateDashboard() {
     }
 }
 
-// --- 3. FUNCIONES ENLAZADAS AL HTML (window.) ---
-window.calculateReturns = function() {
-    const qtyInput = document.getElementById('buy-qty');
-    const qty = parseFloat(qtyInput ? qtyInput.value : 0) || 0;
-    const rate = calculateRate(qty);
-    const daily = qty * (rate / 100);
-    const total20 = daily * 20;
+// --- 3. FUNCIONES DE HISTORIAL ---
+window.renderHistory = function() {
+    const historyContainer = document.getElementById('history-list');
+    if (!historyContainer) return;
 
-    const aeTotal = document.getElementById('ae-calc-total');
-    const usdTotal = document.getElementById('usd-calc-total');
-    const estDaily = document.getElementById('est-daily');
-    const est20 = document.getElementById('est-20');
-    const estProfit = document.getElementById('est-profit');
+    if (!state.history || state.history.length === 0) {
+        historyContainer.innerHTML = `
+            <div style="text-align: center; color: #94a3b8; margin-top: 40px;">
+                <i class="fas fa-history" style="font-size: 2em; opacity: 0.5;"></i>
+                <p>No transactions yet</p>
+            </div>`;
+        return;
+    }
 
-    if (aeTotal) aeTotal.innerText = (qty * 1000).toLocaleString();
-    if (usdTotal) usdTotal.innerText = qty.toFixed(2);
-    if (estDaily) estDaily.innerText = `$${daily.toFixed(4)}`;
-    if (est20) est20.innerText = `$${total20.toFixed(2)}`;
-    if (estProfit) estProfit.innerText = `$${(total20 - qty).toFixed(2)}`;
+    historyContainer.innerHTML = state.history.map(tx => `
+        <div style="background: white; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-left: 4px solid ${tx.type === 'Earning' ? '#10b981' : '#3b82f6'}; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+            <div>
+                <div style="font-weight: 700; color: #1e293b;">${tx.type === 'Earning' ? 'Daily Return' : 'Deposit AE'}</div>
+                <div style="font-size: 0.75em; color: #94a3b8;">${tx.date}</div>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-weight: 800; color: ${tx.type === 'Earning' ? '#10b981' : '#1e293b'};">
+                    + ${tx.amount.toFixed(tx.type === 'Earning' ? 4 : 2)} USDT
+                </div>
+                <div style="font-size: 0.7em; color: #64748b;">Completed</div>
+            </div>
+        </div>
+    `).join('');
 };
 
+// --- 4. NAVEGACIÓN (switchTab) ---
 window.switchTab = function(id) {
+    if(id === 'history') window.renderHistory();
+
     const views = document.querySelectorAll('.view');
     views.forEach(v => {
         v.classList.remove('active');
         v.style.display = 'none';
     });
+
     const targetView = document.getElementById('view-' + id);
     if (targetView) {
         targetView.classList.add('active');
@@ -79,7 +92,22 @@ window.switchTab = function(id) {
     }
 };
 
-// --- 4. INICIO DE LA APP ---
+// --- 5. CALCULADORA ---
+window.calculateReturns = function() {
+    const qtyInput = document.getElementById('buy-qty');
+    const qty = parseFloat(qtyInput ? qtyInput.value : 0) || 0;
+    const rate = calculateRate(qty);
+    const daily = qty * (rate / 100);
+    const total20 = daily * 20;
+
+    const aeTotal = document.getElementById('ae-calc-total');
+    const usdTotal = document.getElementById('usd-calc-total');
+    
+    if (aeTotal) aeTotal.innerText = (qty * 1000).toLocaleString();
+    if (usdTotal) usdTotal.innerText = qty.toFixed(2);
+};
+
+// --- 6. INICIO Y CRONÓMETRO ---
 window.onload = () => {
     const tg = window.Telegram?.WebApp;
     if(tg) {
@@ -87,70 +115,29 @@ window.onload = () => {
         tg.expand();
         const user = tg.initDataUnsafe?.user;
         if (user) {
-            const elName = document.getElementById('user-name');
-            const elId = document.getElementById('user-id');
-            const elMeId = document.getElementById('me-id');
-            if(elName) elName.innerText = user.first_name || "User";
-            if(elId) elId.innerText = user.id;
-            if(elMeId) elMeId.innerText = user.id;
+            if(document.getElementById('user-name')) document.getElementById('user-name').innerText = user.first_name || "User";
+            if(document.getElementById('user-id')) document.getElementById('user-id').innerText = user.id;
+            if(document.getElementById('me-id')) document.getElementById('me-id').innerText = user.id;
         }
     }
 
+    // Procesar Ganancias Diarias (Cuba)
+    const paid = processDailyEarnings();
+    if(paid) window.showToast("Daily earnings credited! 💰");
+
     updateDashboard();
 
+    // Timer hacia la medianoche de Cuba
     setInterval(() => {
         const now = new Date();
-        const hrs = (23 - now.getHours()).toString().padStart(2, '0');
-        const min = (59 - now.getMinutes()).toString().padStart(2, '0');
-        const sec = (59 - now.getSeconds()).toString().padStart(2, '0');
+        // Obtener hora actual en Cuba
+        const cubaNow = new Date(now.toLocaleString("en-US", {timeZone: "America/Havana"}));
+        
+        const hrs = (23 - cubaNow.getHours()).toString().padStart(2, '0');
+        const min = (59 - cubaNow.getMinutes()).toString().padStart(2, '0');
+        const sec = (59 - cubaNow.getSeconds()).toString().padStart(2, '0');
+        
         const timerEl = document.getElementById('timer');
         if(timerEl) timerEl.innerText = `${hrs}:${min}:${sec}`;
     }, 1000);
-};
-
-// Añade esto a las funciones window de main.js
-
-window.renderHistory = function() {
-    const historyContainer = document.getElementById('history-list');
-    if (!historyContainer) return;
-
-    if (state.history.length === 0) {
-        historyContainer.innerHTML = `
-            <div style="text-align: center; color: #94a3b8; margin-top: 40px;">
-                <i class="fas fa-history" style="font-size: 2em; opacity: 0.5;"></i>
-                <p>No transactions yet</p>
-            </div>`;
-        return;
-    }
-
-    historyContainer.innerHTML = state.history.map(tx => `
-        <div style="background: white; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-            <div>
-                <div style="font-weight: 700; color: #1e293b;">Deposit AE</div>
-                <div style="font-size: 0.75em; color: #94a3b8;">${tx.date}</div>
-            </div>
-            <div style="text-align: right;">
-                <div style="font-weight: 800; color: #10b981;">+ ${tx.amount.toFixed(2)} USDT</div>
-                <div style="font-size: 0.7em; color: #3b82f6;">Completed</div>
-            </div>
-        </div>
-    `).join('');
-};
-
-// Modifica tu switchTab para que llame a renderHistory si entra a historial
-const originalSwitchTab = window.switchTab;
-window.switchTab = function(id) {
-    if(id === 'history') window.renderHistory();
-    // Llamar a la lógica original que ya tenías
-    const views = document.querySelectorAll('.view');
-    views.forEach(v => {
-        v.classList.remove('active');
-        v.style.display = 'none';
-    });
-    const targetView = document.getElementById('view-' + id);
-    if (targetView) {
-        targetView.classList.add('active');
-        targetView.style.display = 'block';
-    }
-    // ... (resto del código de navegación que ya tienes en main.js)
 };
