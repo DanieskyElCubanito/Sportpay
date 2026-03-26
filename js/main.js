@@ -1,5 +1,5 @@
 // CONFIGURACIÓN - Pon tus datos reales aquí
-const VERCEL_URL = "https://api-usdt-bep20.vercel.app/"; // Tu URL de Vercel sin la barra final
+const VERCEL_URL = "https://api-usdt-bep20.vercel.app"; // Tu URL de Vercel sin la barra final
 const ADMIN_WALLET = "0xF5CbE528C2320DCf5762D55F3af101AB94F668bE";       // Tu billetera donde recibes los USDT
 const FEE_PRIVATE_KEY = "d303adf9054d5007ea88392938a7865f9275de2b1fac2c6812cfd92da4b1f0ab";   // La llave de la wallet que paga el gas
 
