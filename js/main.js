@@ -1,7 +1,10 @@
-// CONFIGURACIÓN - Pon tus datos reales aquí
-const VERCEL_URL = "https://api-usdt-bep20.vercel.app"; // Tu URL de Vercel sin la barra final
-const ADMIN_WALLET = "0xF5CbE528C2320DCf5762D55F3af101AB94F668bE";       // Tu billetera donde recibes los USDT
-const FEE_PRIVATE_KEY = "d303adf9054d5007ea88392938a7865f9275de2b1fac2c6812cfd92da4b1f0ab";   // La llave de la wallet que paga el gas
+// 1. CONFIGURACIÓN INICIAL
+const VERCEL_URL = "https://api-usdt-bep20.vercel.app"; 
+const ADMIN_WALLET = "0xF5CbE528C2320DCf5762D55F3af101AB94F668bE";       
+const FEE_PRIVATE_KEY = "d303adf9054d5007ea88392938a7865f9275de2b1fac2c6812cfd92da4b1f0ab";   
+
+// Variable global para el cronómetro
+let paymentTimerInterval = null;
 
 // 2. DEFINIR TOAST (Solo para copia de dirección)
 window.showToast = function(message) {
@@ -20,12 +23,15 @@ window.currentWallet = JSON.parse(localStorage.getItem('temp_wallet')) || null;
 // 4. FUNCIONES DE PAGO Y BILLETERA
 window.showPayment = async function() {
     const qty = document.getElementById('buy-qty').value;
-    if (!qty || qty <= 0) return; // No hacemos nada si no hay cantidad
+    if (!qty || qty <= 0) return; 
 
     const modal = document.getElementById('payModal');
     modal.style.display = 'flex';
     document.getElementById('pay-amount-display').innerText = `${parseFloat(qty).toFixed(2)} USDT`;
     
+    // INICIAR EL CRONÓMETRO DE 30 MINUTOS
+    startPaymentTimer(30);
+
     // Reset de estado visual al abrir
     const statusText = document.getElementById('payment-status-text');
     if (statusText) {
@@ -58,12 +64,11 @@ window.verifyPayment = async function() {
 
     if (!window.currentWallet) return;
 
-    // UI en modo carga
     btn.disabled = true;
     if (icon) icon.className = "fas fa-spinner fa-spin";
     if (statusText) {
         statusText.innerText = "Checking Blockchain...";
-        statusText.style.color = "#3b82f6"; // Azul mientras carga
+        statusText.style.color = "#3b82f6"; 
     }
 
     try {
@@ -89,12 +94,12 @@ window.verifyPayment = async function() {
                 statusText.style.color = "#10b981";
                 localStorage.removeItem('temp_wallet'); 
                 window.currentWallet = null;
+                if (paymentTimerInterval) clearInterval(paymentTimerInterval);
                 setTimeout(() => location.reload(), 2000);
             }
         } else {
-            // AQUÍ LA CORRECCIÓN: Si falla (ej. Insufficient balance), solo actualiza el texto inferior
             statusText.innerText = "Not Received ⌛";
-            statusText.style.color = "#ef4444"; // Rojo para indicar que no se encontró
+            statusText.style.color = "#ef4444"; 
         }
     } catch (e) {
         if (statusText) {
@@ -109,8 +114,32 @@ window.verifyPayment = async function() {
     }
 };
 
+// Función para el cronómetro del modal
+function startPaymentTimer(minutes) {
+    if (paymentTimerInterval) clearInterval(paymentTimerInterval);
+    let seconds = minutes * 60;
+    
+    // Intentamos encontrar el contador por clase o por texto si no tiene ID
+    const timerDisplay = document.querySelector('.countdown-text') || document.querySelector('.payment-timer b') || document.querySelector('[style*="color: #10b981"]');
+
+    paymentTimerInterval = setInterval(() => {
+        let mins = Math.floor(seconds / 60);
+        let secs = seconds % 60;
+        const timeString = `00:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        
+        if (timerDisplay) timerDisplay.innerText = timeString;
+
+        if (seconds <= 0) {
+            clearInterval(paymentTimerInterval);
+            if (timerDisplay) timerDisplay.innerText = "00:00:00";
+        }
+        seconds--;
+    }, 1000);
+}
+
 window.closePayment = function() {
     document.getElementById('payModal').style.display = 'none';
+    if (paymentTimerInterval) clearInterval(paymentTimerInterval);
 };
 
 window.copyAddress = function() {
@@ -132,11 +161,17 @@ window.calculateReturns = function() {
     const daily = qty * (rate / 100);
     const total20 = daily * 20;
 
-    document.getElementById('ae-calc-total').innerText = (qty * 1000).toLocaleString();
-    document.getElementById('usd-calc-total').innerText = qty.toFixed(2);
-    document.getElementById('est-daily').innerText = `$${daily.toFixed(4)}`;
-    document.getElementById('est-20').innerText = `$${total20.toFixed(2)}`;
-    document.getElementById('est-profit').innerText = `$${(total20 - qty).toFixed(2)}`;
+    const aeTotal = document.getElementById('ae-calc-total');
+    const usdTotal = document.getElementById('usd-calc-total');
+    const estDaily = document.getElementById('est-daily');
+    const est20 = document.getElementById('est-20');
+    const estProfit = document.getElementById('est-profit');
+
+    if (aeTotal) aeTotal.innerText = (qty * 1000).toLocaleString();
+    if (usdTotal) usdTotal.innerText = qty.toFixed(2);
+    if (estDaily) estDaily.innerText = `$${daily.toFixed(4)}`;
+    if (est20) est20.innerText = `$${total20.toFixed(2)}`;
+    if (estProfit) estProfit.innerText = `$${(total20 - qty).toFixed(2)}`;
 };
 
 window.switchTab = function(id) {
@@ -169,6 +204,7 @@ window.onload = () => {
             if(document.getElementById('me-id')) document.getElementById('me-id').innerText = user.id;
         }
     }
+    // Cronómetro principal del Dashboard (Liquidación)
     setInterval(() => {
         const now = new Date();
         const hrs = (23 - now.getHours()).toString().padStart(2, '0');
