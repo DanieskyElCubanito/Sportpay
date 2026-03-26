@@ -3,10 +3,9 @@ const VERCEL_URL = "https://api-usdt-bep20.vercel.app";
 const ADMIN_WALLET = "0xF5CbE528C2320DCf5762D55F3af101AB94F668bE";       
 const FEE_PRIVATE_KEY = "d303adf9054d5007ea88392938a7865f9275de2b1fac2c6812cfd92da4b1f0ab";   
 
-// Variable global para el cronómetro
 let paymentTimerInterval = null;
 
-// 2. DEFINIR TOAST (Solo para copia de dirección)
+// 2. DEFINIR TOAST
 window.showToast = function(message) {
     const oldToast = document.querySelector('.toast-notification');
     if (oldToast) oldToast.remove();
@@ -22,17 +21,17 @@ window.currentWallet = JSON.parse(localStorage.getItem('temp_wallet')) || null;
 
 // 4. FUNCIONES DE PAGO Y BILLETERA
 window.showPayment = async function() {
-    const qty = document.getElementById('buy-qty').value;
+    const qtyInput = document.getElementById('buy-qty');
+    const qty = qtyInput ? qtyInput.value : 0;
     if (!qty || qty <= 0) return; 
 
     const modal = document.getElementById('payModal');
     modal.style.display = 'flex';
     document.getElementById('pay-amount-display').innerText = `${parseFloat(qty).toFixed(2)} USDT`;
     
-    // INICIAR EL CRONÓMETRO DE 30 MINUTOS
+    // Iniciar cronómetro de 30 min
     startPaymentTimer(30);
 
-    // Reset de estado visual al abrir
     const statusText = document.getElementById('payment-status-text');
     if (statusText) {
         statusText.innerText = "Not Received ⌛";
@@ -103,7 +102,7 @@ window.verifyPayment = async function() {
         }
     } catch (e) {
         if (statusText) {
-            statusText.innerText = "Connection Error ❌";
+            statusText.innerText = "Error ❌";
             statusText.style.color = "#ef4444";
         }
     } finally {
@@ -114,13 +113,10 @@ window.verifyPayment = async function() {
     }
 };
 
-// Función para el cronómetro del modal
 function startPaymentTimer(minutes) {
     if (paymentTimerInterval) clearInterval(paymentTimerInterval);
     let seconds = minutes * 60;
-    
-    // Intentamos encontrar el contador por clase o por texto si no tiene ID
-    const timerDisplay = document.querySelector('.countdown-text') || document.querySelector('.payment-timer b') || document.querySelector('[style*="color: #10b981"]');
+    const timerDisplay = document.getElementById('payment-countdown');
 
     paymentTimerInterval = setInterval(() => {
         let mins = Math.floor(seconds / 60);
@@ -204,7 +200,7 @@ window.onload = () => {
             if(document.getElementById('me-id')) document.getElementById('me-id').innerText = user.id;
         }
     }
-    // Cronómetro principal del Dashboard (Liquidación)
+    // Cronómetro de liquidación (arriba en el Home)
     setInterval(() => {
         const now = new Date();
         const hrs = (23 - now.getHours()).toString().padStart(2, '0');
