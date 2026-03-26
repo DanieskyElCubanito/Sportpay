@@ -36,7 +36,7 @@ export async function showPayment() {
     const buyInput = document.getElementById('buy-qty');
     const amount = parseFloat(buyInput?.value || 0);
     
-    if(!amount || amount < 1) {
+    if(!amount || amount < 0.011) {
         if(window.showToast) window.showToast("Minimum investment is 1 USDT");
         return;
     }
