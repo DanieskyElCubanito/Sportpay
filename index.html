@@ -118,113 +118,145 @@
         </div>
         
 <div id="view-referrals" class="view" style="background: #f8fafc; display:none;">
-    <div style="padding: 12px 18px; display: flex; align-items: center; background: white; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 10;">
-        <i class="fas fa-arrow-left" onclick="switchTab('home')" style="font-size: 1.25em; margin-right: 15px; cursor: pointer;"></i>
-        <span style="font-weight: 700; font-size: 1.15em;">My Global Network</span>
+            <div style="padding: 12px 18px; display: flex; align-items: center; background: white; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 10;">
+                <i class="fas fa-arrow-left" onclick="switchTab('home')" style="font-size: 1.25em; margin-right: 15px; cursor: pointer;"></i>
+                <span style="font-weight: 700; font-size: 1.15em;">My Global Network</span>
+            </div>
+
+            <div style="padding: 18px;">
+                <div style="background: linear-gradient(135deg, #3b82f6, #6366f1, #8b5cf6); border-radius: 18px; padding: 25px 20px; color: white; text-align: center; box-shadow: 0 8px 25px rgba(99, 102, 241, 0.35); position: relative; overflow: hidden; margin-bottom: 25px;">
+                    <div style="font-size: 0.85em; opacity: 0.9; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 5px;">Total Commission</div>
+                    <div style="font-size: 2.8em; font-weight: 800; margin: 5px 0;">$<span id="total-ref-earnings">0.00</span></div>
+                    <div style="background: rgba(255, 255, 255, 0.2); display: inline-flex; align-items: center; padding: 8px 18px; border-radius: 20px; font-size: 0.9em; font-weight: 700; backdrop-filter: blur(8px); margin-top: 10px;">
+                        <i class="fas fa-users" style="margin-right: 8px;"></i> Team Size: <span id="total-team-size">0</span>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; color: #1e293b;">
+                        <i class="fas fa-link" style="color: #6366f1;"></i>
+                        <span style="font-weight: 700; font-size: 0.95em;">Your Referral Link</span>
+                    </div>
+                    <div style="display: flex; background: white; border-radius: 14px; border: 1px solid #e2e8f0; overflow: hidden; height: 56px;">
+                        <input type="text" id="referral-link" readonly style="flex: 1; border: none; padding: 0 18px; font-size: 0.95em; font-weight: 600; background: transparent;" value="https://t.me/SportsPayBot?start=000000">
+                        <button onclick="window.copyReferralLink()" style="background: #e0e7ff; color: #4f46e5; border: none; padding: 0 22px; font-weight: 800; cursor: pointer;">COPY</button>
+                    </div>
+                </div>
+
+                <div style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border-bottom: 1px solid #f1f5f9;">
+                        <div style="display: flex; align-items: center; gap: 14px;">
+                            <div style="width: 42px; height: 42px; background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800;">L1</div>
+                            <div>
+                                <div style="font-weight: 700; color: #1e293b;">Direct Friends</div>
+                                <div style="font-size: 0.8em; color: #64748b; font-weight: 600; margin-top: 4px;">
+                                    <span style="color: #10b981; font-weight: 800;">7% Reward</span> • $<span id="lvl1-earned">0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="text-align: right;"><div style="font-weight: 800; font-size: 1.3em;" id="lvl1-count">0</div></div>
+                    </div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border-bottom: 1px solid #f1f5f9;">
+                        <div style="display: flex; align-items: center; gap: 14px;">
+                            <div style="width: 42px; height: 42px; background: #eff6ff; color: #3b82f6; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800;">L2</div>
+                            <div>
+                                <div style="font-weight: 700; color: #1e293b;">Sub-Partners</div>
+                                <div style="font-size: 0.8em; color: #64748b; font-weight: 600; margin-top: 4px;">
+                                    <span style="color: #3b82f6; font-weight: 700;">3% Reward</span> • $<span id="lvl2-earned">0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="text-align: right;"><div style="font-weight: 800; font-size: 1.3em;" id="lvl2-count">0</div></div>
+                    </div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border-bottom: 1px solid #f1f5f9;">
+                        <div style="display: flex; align-items: center; gap: 14px;">
+                            <div style="width: 42px; height: 42px; background: #eff6ff; color: #3b82f6; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800;">L3</div>
+                            <div>
+                                <div style="font-weight: 700; color: #1e293b;">Extended Team</div>
+                                <div style="font-size: 0.8em; color: #64748b; font-weight: 600; margin-top: 4px;">
+                                    <span style="color: #3b82f6; font-weight: 700;">1.5% Reward</span> • $<span id="lvl3-earned">0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="text-align: right;"><div style="font-weight: 800; font-size: 1.3em;" id="lvl3-count">0</div></div>
+                    </div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border-bottom: 1px solid #f1f5f9;">
+                        <div style="display: flex; align-items: center; gap: 14px;">
+                            <div style="width: 42px; height: 42px; background: #f8fafc; color: #64748b; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800;">L4</div>
+                            <div>
+                                <div style="font-weight: 700; color: #1e293b;">Deep Network</div>
+                                <div style="font-size: 0.8em; color: #64748b; font-weight: 600; margin-top: 4px;">
+                                    <span style="color: #94a3b8; font-weight: 700;">1% Reward</span> • $<span id="lvl4-earned">0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="text-align: right;"><div style="font-weight: 800; font-size: 1.3em;" id="lvl4-count">0</div></div>
+                    </div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 18px;">
+                        <div style="display: flex; align-items: center; gap: 14px;">
+                            <div style="width: 42px; height: 42px; background: #f8fafc; color: #64748b; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800;">L5</div>
+                            <div>
+                                <div style="font-weight: 700; color: #1e293b;">Global Reach</div>
+                                <div style="font-size: 0.8em; color: #64748b; font-weight: 600; margin-top: 4px;">
+                                    <span style="color: #94a3b8; font-weight: 700;">0.5% Reward</span> • $<span id="lvl5-earned">0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="text-align: right;"><div style="font-weight: 800; font-size: 1.3em;" id="lvl5-count">0</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-buy" class="view" style="background: #f8fafc; display:none;">
+            <div style="padding: 12px 18px; display: flex; align-items: center; background: white; border-bottom: 1px solid #e2e8f0;">
+                <i class="fas fa-arrow-left" onclick="switchTab('home')" style="font-size: 1.25em; margin-right: 15px; cursor: pointer;"></i>
+                <span style="font-weight: 700; font-size: 1.15em;">Buy AI Energy</span>
+            </div>
+
+            <div style="padding: 18px;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; color: #3b82f6;">
+                    <i class="fas fa-chart-line"></i>
+                    <span style="font-weight: 700; font-size: 0.95em;">Daily Return Tiers</span>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+                    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; display: flex; justify-content: space-between;">
+                        <span>Amount >= $0</span> <span style="color: #3b82f6; font-weight: 800;">5.5%</span>
+                    </div>
+                    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; display: flex; justify-content: space-between;">
+                        <span>Amount >= $20</span> <span style="color: #3b82f6; font-weight: 800;">6.0%</span>
+                    </div>
+                    <div style="background: #3b82f6; color: white; border-radius: 12px; padding: 12px; display: flex; justify-content: space-between;">
+                        <span>Amount >= $300</span> <span style="font-weight: 800;">6.5%</span>
+                    </div>
+                </div>
+
+                <div style="background: white; border-radius: 18px; padding: 20px; border: 1px solid #e2e8f0;">
+                    <div style="font-size: 0.8em; color: #64748b; margin-bottom: 15px; text-align: center; font-weight: 700;">DEPOSIT USDT (TRC20)</div>
+                    <div style="display: flex; align-items: center; background: #f1f5f9; border-radius: 14px; padding: 0 15px; height: 56px;">
+                        <input type="number" id="buy-amount" placeholder="Min $1 USDT" style="flex: 1; border: none; background: transparent; font-size: 1.15em; font-weight: 700; outline: none;">
+                    </div>
+                    <button onclick="window.showPayment()" style="width: 100%; height: 56px; background: #3b82f6; color: white; border: none; border-radius: 14px; margin-top: 20px; font-weight: 800; font-size: 1.1em;">Continue</button>
+                </div>
+            </div>
+        </div>
+
+    </div> <div style="position: fixed; bottom: 0; width: 100%; background: white; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-around; padding: 12px 0; z-index: 100;">
+        <div class="nav-item active" onclick="switchTab('home')">
+            <i class="fas fa-home" style="font-size: 1.4em;"></i>
+            <div style="font-size: 0.7em; margin-top: 4px; font-weight: 700;">Home</div>
+        </div>
+        <div class="nav-item" onclick="switchTab('referrals')">
+            <i class="fas fa-users" style="font-size: 1.4em;"></i>
+            <div style="font-size: 0.7em; margin-top: 4px; font-weight: 700;">Team</div>
+        </div>
+        <div class="nav-item" onclick="switchTab('buy')">
+            <i class="fas fa-plus-circle" style="font-size: 1.4em;"></i>
+            <div style="font-size: 0.7em; margin-top: 4px; font-weight: 700;">Invest</div>
+        </div>
     </div>
 
-    <div style="padding: 18px;">
-        <div style="background: linear-gradient(135deg, #3b82f6, #6366f1, #8b5cf6); border-radius: 18px; padding: 25px 20px; color: white; text-align: center; box-shadow: 0 8px 25px rgba(99, 102, 241, 0.35); position: relative; overflow: hidden; margin-bottom: 25px;">
-            <i class="fas fa-gem" style="position: absolute; right: -20px; top: -10px; font-size: 7em; opacity: 0.1; transform: rotate(15deg);"></i>
-            <div style="font-size: 0.85em; opacity: 0.9; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 5px;">Total Commission</div>
-            <div style="font-size: 2.8em; font-weight: 800; margin: 5px 0;">$<span id="total-ref-earnings">0.00</span></div>
-            <div style="background: rgba(255, 255, 255, 0.2); display: inline-flex; align-items: center; padding: 8px 18px; border-radius: 20px; font-size: 0.9em; font-weight: 700; backdrop-filter: blur(8px); margin-top: 10px; border: 1px solid rgba(255,255,255,0.3);">
-                <i class="fas fa-users" style="margin-right: 8px;"></i> Team Size: <span id="total-team-size" style="margin-left: 5px;">0</span>
-            </div>
-        </div>
-
-        <div style="margin-bottom: 25px;">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; color: #1e293b;">
-                <i class="fas fa-link" style="color: #6366f1;"></i>
-                <span style="font-weight: 700; font-size: 0.95em;">Your Referral Link</span>
-            </div>
-            <div style="display: flex; background: white; border-radius: 14px; border: 1px solid #e2e8f0; overflow: hidden; height: 56px;">
-                <input type="text" id="referral-link" readonly style="flex: 1; border: none; padding: 0 18px; font-size: 0.95em; color: #1e293b; font-weight: 600; outline: none; background: transparent;" value="https://t.me/SportsPayBot?start=000000">
-                <button onclick="window.copyReferralLink()" style="background: #e0e7ff; color: #4f46e5; border: none; padding: 0 22px; font-weight: 800; cursor: pointer;">COPY</button>
-            </div>
-        </div>
-
-        <div style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-            
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border-bottom: 1px solid #f1f5f9;">
-                <div style="display: flex; align-items: center; gap: 14px;">
-                    <div style="width: 42px; height: 42px; background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800;">L1</div>
-                    <div>
-                        <div style="font-weight: 700; font-size: 1em; color: #1e293b;">Direct Friends</div>
-                        <div style="font-size: 0.8em; color: #64748b; font-weight: 600; margin-top: 4px;">
-                            <span style="color: #10b981; font-weight: 800;">7% Reward</span> • $<span id="lvl1-earned">0.00</span>
-                        </div>
-                    </div>
-                </div>
-                <div style="text-align: right;">
-                    <div style="font-weight: 800; font-size: 1.3em; color: #1e293b;" id="lvl1-count">0</div>
-                    <div style="font-size: 0.7em; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Users</div>
-                </div>
-            </div>
-
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border-bottom: 1px solid #f1f5f9;">
-                <div style="display: flex; align-items: center; gap: 14px;">
-                    <div style="width: 42px; height: 42px; background: #eff6ff; color: #3b82f6; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800;">L2</div>
-                    <div>
-                        <div style="font-weight: 700; font-size: 1em; color: #1e293b;">Sub-Partners</div>
-                        <div style="font-size: 0.8em; color: #64748b; font-weight: 600; margin-top: 4px;">
-                            <span style="color: #3b82f6; font-weight: 700;">3% Reward</span> • $<span id="lvl2-earned">0.00</span>
-                        </div>
-                    </div>
-                </div>
-                <div style="text-align: right;">
-                    <div style="font-weight: 800; font-size: 1.3em; color: #1e293b;" id="lvl2-count">0</div>
-                </div>
-            </div>
-
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border-bottom: 1px solid #f1f5f9;">
-                <div style="display: flex; align-items: center; gap: 14px;">
-                    <div style="width: 42px; height: 42px; background: #eff6ff; color: #3b82f6; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800;">L3</div>
-                    <div>
-                        <div style="font-weight: 700; font-size: 1em; color: #1e293b;">Extended Team</div>
-                        <div style="font-size: 0.8em; color: #64748b; font-weight: 600; margin-top: 4px;">
-                            <span style="color: #3b82f6; font-weight: 700;">1.5% Reward</span> • $<span id="lvl3-earned">0.00</span>
-                        </div>
-                    </div>
-                </div>
-                <div style="text-align: right;">
-                    <div style="font-weight: 800; font-size: 1.3em; color: #1e293b;" id="lvl3-count">0</div>
-                </div>
-            </div>
-            
-        </div>
-    </div>
-</div>
-        <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border-bottom: 1px solid #f1f5f9;">
-                <div style="display: flex; align-items: center; gap: 14px;">
-                    <div style="width: 42px; height: 42px; background: #f8fafc; color: #64748b; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1em; border: 1px solid #e2e8f0;">L4</div>
-                    <div>
-                        <div style="font-weight: 700; font-size: 1em; color: #1e293b;">Deep Network</div>
-                        <div style="font-size: 0.8em; color: #64748b; font-weight: 700; margin-top: 2px;">1% Reward</div>
-                    </div>
-                </div>
-                <div style="text-align: right;">
-                    <div style="font-weight: 800; font-size: 1.3em; color: #1e293b;" id="lvl4-count">0</div>
-                    <div style="font-size: 0.7em; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Users</div>
-                </div>
-            </div>
-
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 18px;">
-                <div style="display: flex; align-items: center; gap: 14px;">
-                    <div style="width: 42px; height: 42px; background: #f8fafc; color: #64748b; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1em; border: 1px solid #e2e8f0;">L5</div>
-                    <div>
-                        <div style="font-weight: 700; font-size: 1em; color: #1e293b;">Global Reach</div>
-                        <div style="font-size: 0.8em; color: #64748b; font-weight: 700; margin-top: 2px;">0.5% Reward</div>
-                    </div>
-                </div>
-                <div style="text-align: right;">
-                    <div style="font-weight: 800; font-size: 1.3em; color: #1e293b;" id="lvl5-count">0</div>
-                    <div style="font-size: 0.7em; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Users</div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-        
+    <script src="js/main.js"></script>
+</body>
+</html>
