@@ -64,8 +64,7 @@
         </div>
         <div id="history-list" style="padding: 10px;"></div>
     </div>
-
-    <div id="view-buy" class="view" style="display:none; background: #f8fafc;">
+<div id="view-buy" class="view" style="display:none; background: #f8fafc;">
         <div class="header-ae" style="background: white; padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 10;">
             <i class="fas fa-arrow-left" onclick="window.switchTab('home')" style="margin-right: 15px; cursor:pointer; font-size: 1.2em;"></i>
             <span style="font-weight: 700; font-size: 1.1em;">Buy AI Energy</span>
@@ -75,6 +74,7 @@
             <div style="color: var(--ae-blue); font-weight: 700; font-size: 0.85em; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
                 <i class="fas fa-chart-line"></i> DAILY RETURN TIERS
             </div>
+            
             <div style="display: flex; flex-direction: column; gap: 10px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9;">
                     <div style="display: flex; align-items: center; gap: 12px;">
@@ -90,6 +90,20 @@
                     </div>
                     <div style="text-align: right;"><div style="font-size: 0.7em; color: #94a3b8; font-weight: 600;">Return</div><div style="font-size: 0.9em; font-weight: 700; color: #3b82f6;">6.0%</div></div>
                 </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="background: #eff6ff; color: #3b82f6; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 700; font-size: 0.8em;">3</span>
+                        <div><div style="font-size: 0.7em; color: #94a3b8; font-weight: 600;">Amount</div><div style="font-size: 0.9em; font-weight: 700;">>= $300</div></div>
+                    </div>
+                    <div style="text-align: right;"><div style="font-size: 0.7em; color: #94a3b8; font-weight: 600;">Return</div><div style="font-size: 0.9em; font-weight: 700; color: #3b82f6;">6.5%</div></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 2px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="background: #eff6ff; color: #3b82f6; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: 700; font-size: 0.8em;">4</span>
+                        <div><div style="font-size: 0.7em; color: #94a3b8; font-weight: 600;">Amount</div><div style="font-size: 0.9em; font-weight: 700;">>= $3000+</div></div>
+                    </div>
+                    <div style="text-align: right;"><div style="font-size: 0.7em; color: #94a3b8; font-weight: 600;">Return</div><div style="font-size: 0.9em; font-weight: 700; color: #3b82f6;">7.0%</div></div>
+                </div>
             </div>
         </div>
 
@@ -101,6 +115,28 @@
                 </div>
                 <input type="number" id="buy-qty" placeholder="Min $1" oninput="window.calculateReturns()" 
                        style="width: 100%; padding: 14px; background: transparent; border: none; font-size: 1.1em; font-weight: 700; outline: none;">
+            </div>
+            
+            <div style="margin-top: 15px; text-align: center; border-top: 1px dashed #e2e8f0; padding-top: 15px;">
+                <div style="font-size: 0.85em; color: #64748b;">Your AE total will be:</div>
+                <div style="font-weight: 800; color: #3b82f6; font-size: 1.2em; margin-top: 4px;">
+                    <span id="ae-calc-total">0</span> AE = $<span id="usd-calc-total">0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 0 12px;">
+            <div style="background: white; padding: 12px; border-radius: 12px; text-align: center; border: 1px solid #f1f5f9;">
+                <div style="color:#3b82f6; font-size: 0.65em; font-weight: 800; margin-bottom: 4px;">DAILY</div>
+                <div id="est-daily" style="font-weight: 800; font-size: 0.9em;">$0.0000</div>
+            </div>
+            <div style="background: white; padding: 12px; border-radius: 12px; text-align: center; border: 1px solid #f1f5f9;">
+                <div style="color:#3b82f6; font-size: 0.65em; font-weight: 800; margin-bottom: 4px;">20 DAYS</div>
+                <div id="est-20" style="font-weight: 800; font-size: 0.9em;">$0.000</div>
+            </div>
+            <div style="background: white; padding: 12px; border-radius: 12px; text-align: center; border: 1px solid #f1f5f9;">
+                <div style="color:#3b82f6; font-size: 0.65em; font-weight: 800; margin-bottom: 4px;">PROFIT</div>
+                <div id="est-profit" style="color: #10b981; font-weight: 800; font-size: 0.9em;">$0.000</div>
             </div>
         </div>
 
