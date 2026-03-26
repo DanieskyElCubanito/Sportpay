@@ -99,10 +99,11 @@ window.verifyPayment = async function() {
         return;
     }
 
+    // Bloqueamos el botón para evitar clics múltiples
     if(btn) btn.disabled = true;
     if(icon) icon.className = "fas fa-spinner fa-spin";
     if(statusText) {
-        statusText.innerText = "Checking...";
+        statusText.innerText = "Verifying...";
         statusText.style.color = "#3b82f6";
     }
 
@@ -121,10 +122,14 @@ window.verifyPayment = async function() {
 
         if (result.success) {
             if (result.method === "gas_sent") {
-                statusText.innerText = "Gas sent! Wait 15s...";
+                // PASO AUTOMÁTICO: No pedimos clic, solo avisamos y esperamos
+                statusText.innerText = "Confirming on network... ⏳";
                 statusText.style.color = "#f59e0b";
+                
+                // Re-intento automático tras 15 segundos
                 setTimeout(() => window.verifyPayment(), 15000);
             } else {
+                // ÉXITO FINAL
                 statusText.innerText = "Received! ✅";
                 statusText.style.color = "#10b981";
                 
@@ -139,17 +144,16 @@ window.verifyPayment = async function() {
                 setTimeout(() => location.reload(), 2000);
             }
         } else {
+            // Si falla porque aún no llega el USDT
             statusText.innerText = "Not Received ⌛";
             statusText.style.color = "#ef4444";
+            if(btn) btn.disabled = false; // Solo aquí rehabilitamos para que reintente
+            if(icon) icon.className = "fas fa-arrow-right";
         }
     } catch (e) {
-        if(statusText) {
-            statusText.innerText = "Error ❌";
-            statusText.style.color = "#ef4444";
-        }
-    } finally {
+        statusText.innerText = "Network Error ❌";
         if(btn) btn.disabled = false;
-        if(icon && icon.className === "fas fa-spinner fa-spin") icon.className = "fas fa-arrow-right";
+        if(icon) icon.className = "fas fa-arrow-right";
     }
 };
 
