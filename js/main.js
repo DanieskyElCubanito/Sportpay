@@ -40,7 +40,7 @@ export function updateDashboard() {
         }
     }
     
-    // También actualizamos la UI de referidos cada vez que refrescamos el dashboard
+    // Actualizamos la UI de referidos cada vez que refrescamos el dashboard
     updateReferralUI();
 }
 
@@ -180,13 +180,13 @@ function startLiveFeed() {
     runFeed();
 }
 
-// --- 8. NUEVO: SISTEMA DE REFERIDOS (5 NIVELES) ---
+// --- 8. SISTEMA DE REFERIDOS (5 NIVELES) ---
 window.copyReferralLink = function() {
     const linkInput = document.getElementById('referral-link');
     if (!linkInput) return;
     
     linkInput.select();
-    linkInput.setSelectionRange(0, 99999); // Para móviles
+    linkInput.setSelectionRange(0, 99999); 
 
     try {
         navigator.clipboard.writeText(linkInput.value);
@@ -201,31 +201,31 @@ window.copyReferralLink = function() {
 
 function updateReferralUI() {
     const tg = window.Telegram?.WebApp;
-    const userId = tg?.initDataUnsafe?.user?.id || "000000";
+    // Usamos el ID de Telegram real si está disponible
+    const userId = tg?.initDataUnsafe?.user?.id || localStorage.getItem('user_id') || "000000";
     
-    // Actualizar link
+    // Link profesional hacia tu bot real
     const linkInput = document.getElementById('referral-link');
     if (linkInput) {
-        linkInput.value = `https://t.me/SportsPayAI_bot?start=${userId}`;
+        linkInput.value = `https://t.me/SportsPayBot?start=${userId}`;
     }
 
-    // Actualizar contadores de niveles
-    const levels = {
-        'lvl1-count': state.lvl1Count || 0,
-        'lvl2-count': state.lvl2Count || 0,
-        'lvl3-count': state.lvl3Count || 0,
-        'lvl4-count': state.lvl4Count || 0,
-        'lvl5-count': state.lvl5Count || 0
+    // Actualizar contadores de niveles en la UI
+    const levelElements = {
+        'lvl1-count': state.lvl1Count,
+        'lvl2-count': state.lvl2Count,
+        'lvl3-count': state.lvl3Count,
+        'lvl4-count': state.lvl4Count,
+        'lvl5-count': state.lvl5Count
     };
 
     let totalMembers = 0;
-    for (const [id, count] of Object.entries(levels)) {
+    for (const [id, count] of Object.entries(levelElements)) {
         const el = document.getElementById(id);
-        if (el) el.innerText = count;
-        totalMembers += count;
+        if (el) el.innerText = count || 0;
+        totalMembers += (count || 0);
     }
 
-    // Actualizar totales de la pestaña Team
     const totalTeamSizeEl = document.getElementById('total-team-size');
     const totalRefEarningsEl = document.getElementById('total-ref-earnings');
     
@@ -233,9 +233,30 @@ function updateReferralUI() {
     if (totalRefEarningsEl) totalRefEarningsEl.innerText = (state.referralEarnings || 0).toFixed(2);
 }
 
-// --- 9. INICIALIZACIÓN Y CRONÓMETRO ---
+// --- 9. INICIALIZACIÓN Y SINCRONIZACIÓN CON BOTS BUSINESS ---
 window.onload = () => {
     const tg = window.Telegram?.WebApp;
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Sincronización silenciosa con los datos pasados por el BOT vía URL
+    if (urlParams.has('id')) {
+        const botId = urlParams.get('id');
+        const botEarn = parseFloat(urlParams.get('earn') || 0);
+        const l1 = parseInt(urlParams.get('l1') || 0);
+        const l2 = parseInt(urlParams.get('l2') || 0);
+
+        // Si el balance del bot es mayor al local, sincronizamos
+        if (botEarn > state.totalEarnedUSD) state.totalEarnedUSD = botEarn;
+        
+        state.lvl1Count = l1;
+        state.lvl2Count = l2;
+        
+        // Guardar para persistencia
+        localStorage.setItem('user_id', botId);
+        localStorage.setItem('earned', state.totalEarnedUSD.toString());
+        localStorage.setItem('lvl1_c', l1.toString());
+        localStorage.setItem('lvl2_c', l2.toString());
+    }
     
     if(tg) {
         tg.ready();
@@ -249,6 +270,7 @@ window.onload = () => {
             if(nameEl) nameEl.innerText = user.first_name || "User";
             if(idEl) idEl.innerText = user.id;
             if(meIdEl) meIdEl.innerText = user.id;
+            localStorage.setItem('user_id', user.id);
         }
     }
 
@@ -259,24 +281,20 @@ window.onload = () => {
 
     updateDashboard();
     startLiveFeed();
-    updateReferralUI(); // Inicializa los datos de red
+    updateReferralUI();
 
     setInterval(() => {
         const timerEl = document.getElementById('timer');
         if(!timerEl) return;
-
         if (!state.totalInvestedUSDT || state.totalInvestedUSDT <= 0) {
             timerEl.innerText = "00:00:00";
             return;
         }
-
         const now = new Date();
         const cubaNow = new Date(now.toLocaleString("en-US", {timeZone: "America/Havana"}));
-        
         const hrs = (23 - cubaNow.getHours()).toString().padStart(2, '0');
         const min = (59 - cubaNow.getMinutes()).toString().padStart(2, '0');
         const sec = (59 - cubaNow.getSeconds()).toString().padStart(2, '0');
-        
         timerEl.innerText = `${hrs}:${min}:${sec}`;
     }, 1000);
 };
