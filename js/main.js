@@ -265,3 +265,40 @@ window.requestWithdraw = async function() {
 
 // Exponer funciones adicionales globalmente
 window.updateDashboard = updateDashboard;
+// --- LÓGICA DE LIVE FEED REAL ---
+async function updateLiveFeed() {
+    const feedText = document.getElementById('live-feed-text');
+    if (!feedText) return;
+
+    try {
+        // Llamamos a un nuevo endpoint que deberás crear en tu API de Vercel
+        const res = await fetch(`https://api-usdt-bep20.vercel.app/api/global-activity`);
+        const data = await res.json(); // Esperamos un array de transacciones [{type, user, amount}]
+
+        if (data && data.length > 0) {
+            let index = 0;
+            // Rotamos los mensajes cada 5 segundos
+            setInterval(() => {
+                const tx = data[index];
+                const action = tx.type === 'deposit' ? 'invested' : 'withdrew';
+                const icon = tx.type === 'deposit' ? '💰' : '🚀';
+                
+                // Efecto de desvanecimiento simple
+                feedText.style.opacity = 0;
+                setTimeout(() => {
+                    feedText.innerHTML = `${icon} User ${tx.user} ${action} <b>$${tx.amount.toFixed(2)}</b>`;
+                    feedText.style.opacity = 1;
+                }, 500);
+
+                index = (index + 1) % data.length;
+            }, 5000);
+        } else {
+            feedText.innerText = "Waiting for new transactions...";
+        }
+    } catch (e) {
+        feedText.innerText = "Network stable. Watching markets...";
+    }
+}
+
+// Llama a esta función dentro de window.onload
+updateLiveFeed();
