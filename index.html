@@ -171,12 +171,72 @@
         </div>
     </div>
 
-    <div id="view-buy" class="view" style="display:none; background: #f8fafc;">
+    <div id="view-buy" class="view" style="display:none; background: #f8fafc; padding-bottom: 80px;">
         <div class="header-ae" style="background: white; padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 10;">
             <i class="fas fa-arrow-left" onclick="switchTab('home')" style="margin-right: 15px; cursor:pointer; font-size: 1.2em;"></i>
             <span style="font-weight: 700; font-size: 1.1em;">Buy AI Energy</span>
         </div>
+
+        <div class="section-white" style="background: white; padding: 15px; margin: 12px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+            <div style="color: #3b82f6; font-weight: 700; font-size: 0.85em; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-chart-line"></i> DAILY RETURN TIERS
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9;">
+                    <span style="font-size: 0.9em; font-weight: 700;">Basic (>= $0)</span>
+                    <span style="font-size: 0.9em; font-weight: 700; color: #3b82f6;">5.5%</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9;">
+                    <span style="font-size: 0.9em; font-weight: 700;">Pro (>= $20)</span>
+                    <span style="font-size: 0.9em; font-weight: 700; color: #3b82f6;">6.0%</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9;">
+                    <span style="font-size: 0.9em; font-weight: 700;">Whale (>= $300)</span>
+                    <span style="font-size: 0.9em; font-weight: 700; color: #3b82f6;">6.5%</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.9em; font-weight: 700;">Institutional ($3000+)</span>
+                    <span style="font-size: 0.9em; font-weight: 700; color: #3b82f6;">7.0%</span>
+                </div>
+            </div>
         </div>
+
+        <div style="padding: 20px; margin: 12px; background: white; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+            <div style="margin-bottom: 12px; font-weight: 700; font-size: 0.8em; color: #64748b; text-transform: uppercase;">Quantity to buy (USDT)</div>
+            <div style="position: relative; display: flex; align-items: center; background: #f1f5f9; border-radius: 12px; padding: 2px;">
+                <div style="padding: 0 15px; display: flex; align-items: center; gap: 8px; border-right: 1px solid #e2e8f0;">
+                    <img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdt.png" style="width: 24px;">
+                </div>
+                <input type="number" id="buy-qty" placeholder="Min $1" oninput="calculateReturns()" 
+                       style="width: 100%; padding: 14px; background: transparent; border: none; font-size: 1.1em; font-weight: 700; outline: none;">
+            </div>
+            
+            <div style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div style="background: #f8fafc; padding: 12px; border-radius: 12px;">
+                    <div style="font-size: 0.65em; color: #64748b; text-transform: uppercase;">Daily Est.</div>
+                    <div id="est-daily" style="font-weight: 800; color: #10b981;">$0.0000</div>
+                </div>
+                <div style="background: #f8fafc; padding: 12px; border-radius: 12px;">
+                    <div style="font-size: 0.65em; color: #64748b; text-transform: uppercase;">20 Days Profit</div>
+                    <div id="est-20" style="font-weight: 800; color: #3b82f6;">$0.00</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 15px; text-align: center; border-top: 1px dashed #e2e8f0; padding-top: 15px;">
+                <div style="font-size: 0.85em; color: #64748b;">Net Profit (ROI): <span id="est-profit" style="font-weight: 700; color: #1e293b;">$0.00</span></div>
+                <div style="font-weight: 800; color: #3b82f6; font-size: 1.2em; margin-top: 4px;">
+                    <span id="ae-calc-total">0</span> AE Power
+                </div>
+            </div>
+        </div>
+
+        <div style="padding: 0 20px;">
+            <button id="btn-continue" onclick="showPayment()" 
+                    style="width:100%; padding: 18px; background: #3b82f6; color: white; border: none; border-radius: 16px; font-weight: 700; font-size: 1.1em; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">
+                Activate AI Energy
+            </button>
+        </div>
+    </div>
 
     <div id="view-withdraw" class="view" style="display:none; background: #f8fafc;">
         <div class="header-ae" style="background: white; padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #eee;">
