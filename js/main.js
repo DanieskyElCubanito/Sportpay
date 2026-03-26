@@ -225,3 +225,7 @@ window.onload = () => {
         if(timerEl) timerEl.innerText = `${hrs}:${min}:${sec}`;
     }, 1000);
 };
+
+// Al final de js/main.js
+window.switchTab = switchTab;
+window.calculateReturns = calculateReturns;
