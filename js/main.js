@@ -1,5 +1,9 @@
 import { state, saveInvestment, processDailyEarnings } from './state.js';
 
+// --- PUENTE GLOBAL ---
+// Esto permite que las funciones de state.js sean visibles para el HTML
+window.saveInvestment = saveInvestment;
+
 // --- 1. UI GLOBAL (TOAST) ---
 window.showToast = function(message) {
     const oldToast = document.querySelector('.toast-notification');
@@ -137,7 +141,7 @@ window.switchTab = function(id) {
     }
 };
 
-// --- 7. LÓGICA DE LIVE FEED PROCEDURAL ---
+// --- 7. LÓGICA DE LIVE FEED ---
 function startLiveFeed() {
     const feedText = document.getElementById('live-feed-text');
     if (!feedText) return;
@@ -149,18 +153,10 @@ function startLiveFeed() {
         { text: "received bonus", icon: "🎁", color: "#ef4444", min: 10, max: 10 }
     ];
 
-    const timeLabels = ["Just now", "1m ago", "2m ago", "3m ago"];
-
     function generateDynamicTx() {
-        const isWallet = Math.random() > 0.5;
-        const userId = isWallet 
-            ? `0x${Math.floor(Math.random() * 16777215).toString(16)}...${Math.floor(Math.random() * 99).toString().padStart(2, '0')}`
-            : `${Math.floor(Math.random() * 800 + 100)}***`;
-
+        const userId = `${Math.floor(Math.random() * 800 + 100)}***`;
         const action = actions[Math.floor(Math.random() * actions.length)];
         const amount = (Math.random() * (action.max - action.min) + action.min).toFixed(2);
-        const time = timeLabels[Math.floor(Math.random() * timeLabels.length)];
-
         return `${action.icon} <span style="color: #64748b">User</span> <b>${userId}</b> ${action.text} <b style="color: ${action.color}">$${amount}</b>`;
     }
 
@@ -169,7 +165,7 @@ function startLiveFeed() {
         setTimeout(() => {
             feedText.innerHTML = generateDynamicTx();
             feedText.style.opacity = 1;
-            setTimeout(runFeed, Math.floor(Math.random() * 4000) + 5000);
+            setTimeout(runFeed, 5000);
         }, 500);
     };
     runFeed();
@@ -180,13 +176,9 @@ window.copyReferralLink = function() {
     const linkInput = document.getElementById('referral-link');
     if (!linkInput) return;
     linkInput.select();
-    linkInput.setSelectionRange(0, 99999); 
     try {
         navigator.clipboard.writeText(linkInput.value);
         window.showToast("Link copied! Share to grow your team 🚀");
-        if(window.Telegram?.WebApp?.HapticFeedback) {
-            window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-        }
     } catch (err) {
         window.showToast("Error copying link");
     }
@@ -201,65 +193,45 @@ function updateReferralUI() {
         linkInput.value = `https://t.me/SportsPayBot?start=${userId}`;
     }
 
-    const levelElements = {
-        'lvl1-count': state.lvl1Count,
-        'lvl2-count': state.lvl2Count,
-        'lvl3-count': state.lvl3Count,
-        'lvl4-count': state.lvl4Count,
-        'lvl5-count': state.lvl5Count
-    };
-
+    const levels = ['lvl1-count', 'lvl2-count', 'lvl3-count', 'lvl4-count', 'lvl5-count'];
     let totalMembers = 0;
-    for (const [id, count] of Object.entries(levelElements)) {
+    levels.forEach((id, index) => {
+        const count = state[`lvl${index+1}Count`] || 0;
         const el = document.getElementById(id);
-        if (el) el.innerText = count || 0;
-        totalMembers += (count || 0);
-    }
+        if (el) el.innerText = count;
+        totalMembers += count;
+    });
 
-    const totalTeamSizeEl = document.getElementById('total-team-size');
-    const totalRefEarningsEl = document.getElementById('total-ref-earnings');
-    
-    if (totalTeamSizeEl) totalTeamSizeEl.innerText = totalMembers;
-    if (totalRefEarningsEl) totalRefEarningsEl.innerText = (state.referralEarnings || 0).toFixed(2);
+    if (document.getElementById('total-team-size')) document.getElementById('total-team-size').innerText = totalMembers;
+    if (document.getElementById('total-ref-earnings')) document.getElementById('total-ref-earnings').innerText = (state.referralEarnings || 0).toFixed(2);
 }
 
 // --- 9. INICIALIZACIÓN ---
 window.onload = () => {
-    const tg = window.Telegram?.WebApp;
     const urlParams = new URLSearchParams(window.location.search);
 
     if (urlParams.has('id')) {
         const botId = urlParams.get('id');
         const botEarn = parseFloat(urlParams.get('earn') || 0);
-        const l1 = parseInt(urlParams.get('l1') || 0);
-        const l2 = parseInt(urlParams.get('l2') || 0);
-
         if (botEarn > state.totalEarnedUSD) state.totalEarnedUSD = botEarn;
-        state.lvl1Count = l1;
-        state.lvl2Count = l2;
-        
+        state.lvl1Count = parseInt(urlParams.get('l1') || 0);
+        state.lvl2Count = parseInt(urlParams.get('l2') || 0);
         localStorage.setItem('user_id', botId);
         localStorage.setItem('earned', state.totalEarnedUSD.toString());
-        localStorage.setItem('lvl1_c', l1.toString());
-        localStorage.setItem('lvl2_c', l2.toString());
     }
     
+    const tg = window.Telegram?.WebApp;
     if(tg) {
         tg.ready();
         tg.expand();
-        const user = tg.initDataUnsafe?.user;
-        if (user) {
-            const nameEl = document.getElementById('user-name');
-            const idEl = document.getElementById('user-id');
-            if(nameEl) nameEl.innerText = user.first_name || "User";
-            if(idEl) idEl.innerText = user.id;
+        if (tg.initDataUnsafe?.user) {
+            const user = tg.initDataUnsafe.user;
+            if(document.getElementById('user-name')) document.getElementById('user-name').innerText = user.first_name;
             localStorage.setItem('user_id', user.id);
         }
     }
 
-    const wasPaid = processDailyEarnings();
-    if(wasPaid) window.showToast("Daily earnings credited! 💰");
-
+    processDailyEarnings();
     updateDashboard();
     startLiveFeed();
     updateReferralUI();
@@ -269,98 +241,61 @@ window.onload = () => {
         if(!timerEl || !state.totalInvestedUSDT || state.totalInvestedUSDT <= 0) return;
         const now = new Date();
         const cubaNow = new Date(now.toLocaleString("en-US", {timeZone: "America/Havana"}));
-        const hrs = (23 - cubaNow.getHours()).toString().padStart(2, '0');
-        const min = (59 - cubaNow.getMinutes()).toString().padStart(2, '0');
-        const sec = (59 - cubaNow.getSeconds()).toString().padStart(2, '0');
-        timerEl.innerText = `${hrs}:${min}:${sec}`;
+        timerEl.innerText = `${(23-cubaNow.getHours()).toString().padStart(2,'0')}:${(59-cubaNow.getMinutes()).toString().padStart(2,'0')}:${(59-cubaNow.getSeconds()).toString().padStart(2,'0')}`;
     }, 1000);
 };
 
-// --- 10. FUNCIONES DE ACCIÓN (REFRESCAR, INVERTIR, RETIRAR) ---
+// --- 10. FUNCIONES DE ACCIÓN ---
 
 window.refreshData = function() {
-    const refreshBtn = document.querySelector('.fa-sync-alt') || document.querySelector('.fa-redo'); 
-    if(refreshBtn) refreshBtn.classList.add('fa-spin');
-    window.showToast("Updating data from network...");
+    const icon = document.querySelector('.fa-sync-alt');
+    if(icon) icon.classList.add('fa-spin');
+    window.showToast("Syncing data...");
     setTimeout(() => { location.reload(); }, 800);
 };
 
 window.showPayment = function() {
     const qtyInput = document.getElementById('buy-qty');
-    const qty = parseFloat(qtyInput ? qtyInput.value : 0);
+    const qty = parseFloat(qtyInput?.value || 0);
 
-    if (!qty || qty < 1) {
+    if (qty < 1) {
         window.showToast("Minimum investment is 1 USDT");
         return;
     }
 
     const btn = document.getElementById('btn-continue');
-    if(btn) {
-        btn.disabled = true;
-        btn.innerText = "Processing...";
-    }
+    if(btn) { btn.disabled = true; btn.innerText = "Processing..."; }
 
     setTimeout(() => {
-        saveInvestment(qty);
-        window.showToast(`Successfully invested ${qty} USDT! 🚀`);
+        window.saveInvestment(qty); 
+        window.showToast(`Investment of ${qty} USDT Successful! 🚀`);
         updateDashboard();
-        if(btn) {
-            btn.disabled = false;
-            btn.innerText = "Activate AI Energy";
-        }
+        if(btn) { btn.disabled = false; btn.innerText = "Activate AI Energy"; }
         if(qtyInput) qtyInput.value = "";
         switchTab('home');
-        if(window.Telegram?.WebApp?.HapticFeedback) {
-            window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-        }
     }, 1500);
 };
 
 window.requestWithdraw = function() {
-    const amountInput = document.getElementById('withdraw-amount');
-    const addressInput = document.getElementById('withdraw-address');
-    
-    const amount = parseFloat(amountInput?.value || 0);
-    const address = addressInput?.value.trim();
+    const amount = parseFloat(document.getElementById('withdraw-amount')?.value || 0);
+    const address = document.getElementById('withdraw-address')?.value.trim();
 
-    if (amount < 5) {
-        window.showToast("Minimum withdrawal is 5 USDT");
-        return;
-    }
+    if (amount < 5) { window.showToast("Min withdraw 5 USDT"); return; }
+    if (amount > state.totalEarnedUSD) { window.showToast("Insufficient balance"); return; }
+    if (!address || address.length < 30) { window.showToast("Invalid address"); return; }
 
-    if (amount > state.totalEarnedUSD) {
-        window.showToast("Insufficient balance");
-        return;
-    }
+    state.totalEarnedUSD -= amount;
+    localStorage.setItem('earned', state.totalEarnedUSD.toString());
 
-    if (!address || address.length < 30) {
-        window.showToast("Enter a valid address");
-        return;
-    }
+    state.history.unshift({
+        type: 'Withdraw',
+        amount: amount,
+        date: new Date().toLocaleString("es-CU"),
+        id: 'out-' + Date.now()
+    });
+    localStorage.setItem('deposit_history', JSON.stringify(state.history));
 
-    const btn = document.getElementById('btn-confirm-withdraw');
-    btn.disabled = true;
-    btn.innerText = "Sending Request...";
-
-    setTimeout(() => {
-        state.totalEarnedUSD -= amount;
-        localStorage.setItem('earned', state.totalEarnedUSD.toString());
-
-        const tx = {
-            type: 'Withdraw',
-            amount: amount,
-            date: new Date().toLocaleString("es-CU"),
-            id: 'out-' + Date.now()
-        };
-        state.history.unshift(tx);
-        localStorage.setItem('deposit_history', JSON.stringify(state.history));
-
-        window.showToast("Withdrawal requested! Check history 🚀");
-        updateDashboard();
-        
-        if(amountInput) amountInput.value = "";
-        btn.disabled = false;
-        btn.innerText = "Confirm Withdraw";
-        switchTab('home');
-    }, 2000);
+    window.showToast("Withdrawal Requested! 🚀");
+    updateDashboard();
+    switchTab('home');
 };
