@@ -1,20 +1,44 @@
-// archivo state.js
+// --- ARCHIVO state.js (Versión Sincronizada con Bots Business) ---
+
+// 1. Capturamos los parámetros de la URL enviados por el Bot
+const urlParams = new URLSearchParams(window.location.search);
+
+// 2. Extraemos datos del Bot (si existen en la URL)
+const botId = urlParams.get('id');
+const botEarned = urlParams.get('earn') ? parseFloat(urlParams.get('earn')) : null;
+const botL1 = urlParams.get('l1') ? parseInt(urlParams.get('l1')) : null;
+const botL2 = urlParams.get('l2') ? parseInt(urlParams.get('l2')) : null;
+
+// 3. Inicializamos el estado con prioridad: URL (Bot) > LocalStorage (Teléfono) > 0
 export const state = {
+    // Si el Bot dice que tenemos X saldo, le creemos al Bot (es el servidor)
+    totalEarnedUSD: botEarned !== null ? botEarned : (parseFloat(localStorage.getItem('earned')) || 0),
+    
+    // La inversión la seguimos manejando local por ahora hasta que integres API de pagos
     totalInvestedUSDT: parseFloat(localStorage.getItem('invested')) || 0,
-    totalEarnedUSD: parseFloat(localStorage.getItem('earned')) || 0,
+    
+    // Historial y Liquidación diaria (Local)
     history: JSON.parse(localStorage.getItem('deposit_history')) || [],
-    // Nueva clave para controlar cuándo fue el último pago de dividendos
     lastSettlement: localStorage.getItem('last_settlement') || null, 
     tg: window.Telegram?.WebApp || null,
 
-    // --- NUEVAS VARIABLES PARA EL SISTEMA DE 5 NIVELES ---
-    referralEarnings: parseFloat(localStorage.getItem('ref_earnings')) || 0,
-    lvl1Count: parseInt(localStorage.getItem('lvl1_c')) || 0,
-    lvl2Count: parseInt(localStorage.getItem('lvl2_c')) || 0,
+    // --- SISTEMA DE 5 NIVELES (Prioridad Datos del Bot) ---
+    lvl1Count: botL1 !== null ? botL1 : (parseInt(localStorage.getItem('lvl1_c')) || 0),
+    lvl2Count: botL2 !== null ? botL2 : (parseInt(localStorage.getItem('lvl2_c')) || 0),
+    
+    // Estos niveles se cargan del teléfono (o se pueden añadir a la URL del bot luego)
     lvl3Count: parseInt(localStorage.getItem('lvl3_c')) || 0,
     lvl4Count: parseInt(localStorage.getItem('lvl4_c')) || 0,
-    lvl5Count: parseInt(localStorage.getItem('lvl5_c')) || 0
+    lvl5Count: parseInt(localStorage.getItem('lvl5_c')) || 0,
+    
+    // Ganancias totales por referidos (Sincronizado con Bot)
+    referralEarnings: botEarned !== null ? botEarned : (parseFloat(localStorage.getItem('ref_earnings')) || 0)
 };
+
+// 4. Guardar ID de usuario para el link de referidos
+if (botId) localStorage.setItem('user_id', botId);
+
+// --- FUNCIONES DE PERSISTENCIA ---
 
 export function saveInvestment(amount) {
     state.totalInvestedUSDT += amount;
@@ -24,28 +48,23 @@ export function saveInvestment(amount) {
         type: 'Deposit',
         amount: amount,
         date: new Date().toLocaleString("es-CU"),
-        id: Math.floor(Math.random() * 1000000)
+        id: 'dep-' + Date.now()
     };
     
     state.history.unshift(newTransaction);
     localStorage.setItem('deposit_history', JSON.stringify(state.history));
 }
 
-// FUNCIÓN PARA PROCESAR GANANCIAS DIARIAS
 export function processDailyEarnings() {
-    if (state.totalInvestedUSDT <= 0) return;
+    if (state.totalInvestedUSDT <= 0) return false;
 
     const now = new Date();
-    // Convertimos a hora de Cuba (UTC-5 o UTC-4 según horario de verano)
     const cubaTime = new Intl.DateTimeFormat("en-US", {
         timeZone: "America/Havana",
         year: 'numeric', month: 'numeric', day: 'numeric'
     }).format(now);
 
-    // Si la fecha actual de Cuba es distinta a la última guardada, es un nuevo día
     if (state.lastSettlement !== cubaTime) {
-        
-        // Calculamos el % según la inversión actual
         let rate = 5.5;
         if (state.totalInvestedUSDT >= 3000) rate = 7.0;
         else if (state.totalInvestedUSDT >= 300) rate = 6.5;
@@ -53,11 +72,9 @@ export function processDailyEarnings() {
 
         const dailyProfit = state.totalInvestedUSDT * (rate / 100);
 
-        // 1. Sumar al balance
         state.totalEarnedUSD += dailyProfit;
         localStorage.setItem('earned', state.totalEarnedUSD.toString());
 
-        // 2. Guardar en historial como "Earnings"
         const earningEntry = {
             type: 'Earning',
             amount: dailyProfit,
@@ -67,28 +84,21 @@ export function processDailyEarnings() {
         state.history.unshift(earningEntry);
         localStorage.setItem('deposit_history', JSON.stringify(state.history));
 
-        // 3. Actualizar fecha de última liquidación
         state.lastSettlement = cubaTime;
         localStorage.setItem('last_settlement', cubaTime);
         
-        return true; // Indica que hubo pago
+        return true; 
     }
     return false;
 }
 
-/**
- * FUNCIÓN PARA SUMAR COMISIONES DE REFERIDOS (Para uso futuro con la API)
- * @param {number} amount - Cantidad en USDT a sumar
- * @param {number} level - Nivel del cual proviene (1 al 5)
- */
 export function addReferralCommission(amount, level) {
     state.referralEarnings += amount;
-    state.totalEarnedUSD += amount; // Las comisiones se suman al balance retirable
+    state.totalEarnedUSD += amount; 
     
     localStorage.setItem('ref_earnings', state.referralEarnings.toString());
     localStorage.setItem('earned', state.totalEarnedUSD.toString());
 
-    // Opcional: Registrar en historial
     const refEntry = {
         type: 'Earning',
         amount: amount,
