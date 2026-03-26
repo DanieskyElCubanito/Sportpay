@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="css/styles.css">
     <style>
-        /* Estilos críticos para funcionamiento y visualización */
         .view { display: none; width: 100%; min-height: 100vh; padding-bottom: 100px; }
         .view.active { display: block; }
         
@@ -21,7 +20,7 @@
             0% { transform: translateX(0); }
             100% { transform: translateX(-50%); }
         }
-        .level-card { transition: transform 0.2s; cursor: pointer; }
+        .level-card { transition: transform 0.2s; cursor: pointer; background: white; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f1f5f9; }
         .level-card:active { transform: scale(0.98); }
         
         .tier-row {
@@ -103,29 +102,44 @@
     </div>
 
     <div id="view-referrals" class="view" style="background: #f8fafc;">
-        <div class="header-ae" style="background: white; padding: 15px; text-align: center; border-bottom: 1px solid #eee;">
-            <span style="font-weight: 800; font-size: 1.1em;">My Global Network</span>
+        <div class="header-ae" style="background: white; padding: 15px; text-align: center; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 10;">
+            <span style="font-weight: 800; font-size: 1.1em; color: #1e293b;">My Global Network</span>
         </div>
         <div class="main-card" style="margin: 15px; background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; padding: 20px;">
             <div style="font-size: 0.8em; opacity: 0.9;">Total Commission</div>
             <div style="font-size: 2.2em; font-weight: 800;">$<span id="total-ref-earnings">0.00</span></div>
-            <div style="margin-top: 10px; font-size: 0.75em;">Team Size: <span id="total-team-size">0</span></div>
+            <div style="margin-top: 10px; font-size: 0.75em; background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 20px; display: inline-block;">
+                <i class="fas fa-users"></i> Team Size: <span id="total-team-size">0</span>
+            </div>
         </div>
         <div style="margin: 0 15px 20px; background: white; padding: 15px; border-radius: 16px; border: 1px solid #e2e8f0;">
-            <div style="font-size: 0.75em; font-weight: 800; color: #64748b; margin-bottom: 8px;">REFERRAL LINK</div>
+            <div style="font-size: 0.7em; font-weight: 800; color: #64748b; margin-bottom: 10px; text-transform: uppercase;">Your Referral Link</div>
             <div style="display: flex; gap: 8px;">
-                <input type="text" id="referral-link" value="https://t.me/SportsPayAI_bot?start=000000" readonly style="flex: 1; padding: 10px; border: 1px solid #f1f5f9; background: #f8fafc; border-radius: 8px; font-size: 0.8em; outline: none;">
+                <input type="text" id="referral-link" value="https://t.me/SportsPayAI_bot?start=000000" readonly style="flex: 1; padding: 10px; border: 1px solid #f1f5f9; background: #f8fafc; border-radius: 8px; font-size: 0.8em; color: #3b82f6; outline: none;">
                 <button onclick="window.copyReferralLink()" style="background: #3b82f6; color: white; border: none; padding: 0 15px; border-radius: 8px; font-weight: 700;">Copy</button>
             </div>
         </div>
-        <div style="padding: 0 15px; display: flex; flex-direction: column; gap: 10px;">
-            <div class="level-card" style="background: white; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; border: 1px solid #f1f5f9;">
-                <span><b>L1</b> Direct Friends (7%)</span>
+
+        <div style="padding: 0 15px; display: flex; flex-direction: column; gap: 12px;">
+            <div class="level-card">
+                <div><b style="color: #3b82f6;">L1</b> Direct Friends (7%)</div>
                 <span id="lvl1-count" style="font-weight: 800;">0</span>
             </div>
-            <div class="level-card" style="background: white; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; border: 1px solid #f1f5f9;">
-                <span><b>L2</b> Sub-Team (3%)</span>
+            <div class="level-card">
+                <div><b style="color: #ef4444;">L2</b> Sub-Team A (3%)</div>
                 <span id="lvl2-count" style="font-weight: 800;">0</span>
+            </div>
+            <div class="level-card">
+                <div><b style="color: #f59e0b;">L3</b> Sub-Team B (2%)</div>
+                <span id="lvl3-count" style="font-weight: 800;">0</span>
+            </div>
+            <div class="level-card">
+                <div><b style="color: #10b981;">L4</b> Sub-Team C (2%)</div>
+                <span id="lvl4-count" style="font-weight: 800;">0</span>
+            </div>
+            <div class="level-card">
+                <div><b style="color: #8b5cf6;">L5</b> Sub-Team D (1%)</div>
+                <span id="lvl5-count" style="font-weight: 800;">0</span>
             </div>
         </div>
     </div>
@@ -195,16 +209,16 @@
     <div id="view-me" class="view" style="background: #f8fafc;">
         <div style="background: white; padding: 40px 20px; text-align: center; border-bottom: 1px solid #eee;">
             <div style="width: 80px; height: 80px; background: #3b82f6; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; color: white; font-size: 2em;"><i class="fas fa-user"></i></div>
-            <div id="user-name-me" style="font-weight: 800; font-size: 1.2em;">User</div>
+            <div id="user-name" style="font-weight: 800; font-size: 1.2em;">User</div>
             <div style="font-size: 0.8em; color: #64748b;">ID: <span id="me-id">000000</span></div>
         </div>
     </div>
 
     <div class="nav-bar" style="position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #eee; z-index: 1000;">
-        <div class="nav-item" onclick="window.switchTab('home')" style="text-align: center; flex: 1; color: #3b82f6;"><i class="fas fa-home" style="display: block; font-size: 1.4em;"></i><span style="font-size: 0.7em;">Home</span></div>
-        <div class="nav-item" onclick="window.switchTab('buy')" style="text-align: center; flex: 1; color: #64748b;"><i class="fas fa-bolt" style="display: block; font-size: 1.4em;"></i><span style="font-size: 0.7em;">Energy</span></div>
-        <div class="nav-item" onclick="window.switchTab('referrals')" style="text-align: center; flex: 1; color: #64748b;"><i class="fas fa-users" style="display: block; font-size: 1.4em;"></i><span style="font-size: 0.7em;">Team</span></div>
-        <div class="nav-item" onclick="window.switchTab('me')" style="text-align: center; flex: 1; color: #64748b;"><i class="fas fa-user" style="display: block; font-size: 1.4em;"></i><span style="font-size: 0.7em;">Profile</span></div>
+        <div class="nav-item" onclick="window.switchTab('home')" style="text-align: center; flex: 1; color: #3b82f6; cursor: pointer;"><i class="fas fa-home" style="display: block; font-size: 1.4em;"></i><span style="font-size: 0.7em;">Home</span></div>
+        <div class="nav-item" onclick="window.switchTab('buy')" style="text-align: center; flex: 1; color: #64748b; cursor: pointer;"><i class="fas fa-bolt" style="display: block; font-size: 1.4em;"></i><span style="font-size: 0.7em;">Energy</span></div>
+        <div class="nav-item" onclick="window.switchTab('referrals')" style="text-align: center; flex: 1; color: #64748b; cursor: pointer;"><i class="fas fa-users" style="display: block; font-size: 1.4em;"></i><span style="font-size: 0.7em;">Team</span></div>
+        <div class="nav-item" onclick="window.switchTab('me')" style="text-align: center; flex: 1; color: #64748b; cursor: pointer;"><i class="fas fa-user" style="display: block; font-size: 1.4em;"></i><span style="font-size: 0.7em;">Profile</span></div>
     </div>
 
     <script type="module" src="js/main.js"></script>
@@ -214,8 +228,10 @@
             const target = document.getElementById('view-' + tabId);
             if(target) target.classList.add('active');
             
-            document.querySelectorAll('.nav-item').forEach(item => item.style.color = '#64748b');
-            // Nota: El resaltado de color lo manejará main.js idealmente, pero esto lo hace funcional ya.
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.style.color = '#64748b';
+                if(item.getAttribute('onclick').includes(tabId)) item.style.color = '#3b82f6';
+            });
         }
         window.switchTab = switchTab;
     </script>
