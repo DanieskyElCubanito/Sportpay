@@ -8,46 +8,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="css/styles.css">
     <style>
-        /* Estilos críticos para que las pestañas funcionen */
-        .view { 
-            display: none; 
-            width: 100%; 
-            min-height: 100vh; 
-            padding-bottom: 100px; /* Espacio para la nav-bar */
-        }
-        .view.active { 
-            display: block; 
-        }
-        
-        @keyframes pulse-live {
-            0% { transform: scale(0.95); opacity: 0.8; }
-            70% { transform: scale(1.4); opacity: 0; }
-            100% { transform: scale(0.95); opacity: 0; }
-        }
-        @keyframes ticker {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-        .level-card { 
-            transition: transform 0.2s; 
-            cursor: pointer;
-        }
-        .level-card:active { 
-            transform: scale(0.98); 
-        }
-
-        /* Estilo para items de navegación */
-        .nav-item {
-            text-align: center;
-            color: #64748b; /* Gris por defecto */
-            cursor: pointer;
-        }
-        .nav-item.active {
-            color: #3b82f6 !important; /* Azul cuando está activo */
-        }
+        .view { display: none; width: 100%; min-height: 100vh; padding-bottom: 100px; }
+        .view.active { display: block; }
+        @keyframes pulse-live { 0% { transform: scale(0.95); opacity: 0.8; } 70% { transform: scale(1.4); opacity: 0; } 100% { transform: scale(0.95); opacity: 0; } }
+        @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .nav-item { text-align: center; color: #64748b; cursor: pointer; flex: 1; padding: 10px 0; }
+        .nav-item.active { color: #3b82f6 !important; }
+        .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; border-top: 1px solid #e2e8f0; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
     </style>
 </head>
-<body>
+<body style="margin: 0; font-family: 'Segoe UI', Roboto, sans-serif; background: #f8fafc; color: #1e293b;">
 
     <div style="background: #0f172a; color: #94a3b8; font-size: 0.65em; padding: 6px 0; overflow: hidden; white-space: nowrap; border-bottom: 1px solid #1e293b;">
         <div style="display: inline-block; animation: ticker 25s linear infinite;">
@@ -62,201 +32,207 @@
     <div id="views-container">
 
         <div id="view-home" class="view active">
-            <div class="top-header">
-                <div class="id-badge">Sports Pay - ID:<span id="user-id">000000</span> <i class="far fa-copy" style="font-size: 0.8em; color: var(--ae-blue);"></i></div>
+            <div style="padding: 15px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="background: white; padding: 5px 12px; border-radius: 20px; font-size: 0.8em; font-weight: 700; border: 1px solid #e2e8f0;">
+                    Sports Pay - ID:<span id="user-id">000000</span>
+                </div>
+                <i class="fas fa-bell" style="color: #64748b;"></i>
             </div>
 
-            <div class="main-card">
-                <div class="bal-title" style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="margin: 0 15px; background: linear-gradient(135deg, #1e293b, #0f172a); border-radius: 20px; padding: 25px; color: white; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">
+                <div style="display: flex; justify-content: space-between; opacity: 0.8; font-size: 0.9em;">
                     <span>Total Earned</span>
-                    <span class="history-btn" onclick="switchTab('history')">
-                        <i class="far fa-clock"></i> History
-                    </span>
+                    <span onclick="switchTab('history')" style="cursor:pointer;"><i class="far fa-clock"></i> History</span>
                 </div>
-                <div class="bal-amount">
-                    <div>$<span id="main-bal">0.0000</span></div>
-                    <button class="btn-withdraw" onclick="switchTab('withdraw')"><i class="fas fa-wallet"></i> Withdraw</button>
+                <div style="font-size: 2.5em; font-weight: 800; margin: 15px 0;">$<span id="main-bal">0.0000</span></div>
+                <button onclick="switchTab('withdraw')" style="width: 100%; padding: 14px; border-radius: 12px; border: none; background: #3b82f6; color: white; font-weight: 700; font-size: 1em;">
+                    <i class="fas fa-wallet" style="margin-right: 8px;"></i> Withdraw Funds
+                </button>
+            </div>
+
+            <div style="margin: 15px; padding: 12px; background: rgba(59, 130, 246, 0.05); border-radius: 12px; border: 1px solid rgba(59, 130, 246, 0.1); display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-circle" style="color: #10b981; font-size: 0.6em; animation: pulse-live 2s infinite;"></i>
+                <div id="live-feed-text" style="font-size: 0.85em; color: #1e293b; font-weight: 600;">System active...</div>
+            </div>
+
+            <div style="margin: 15px; background: white; padding: 20px; border-radius: 20px; border: 1px solid #e2e8f0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <span style="font-weight: 700; color: #64748b; font-size: 0.8em;"><i class="fas fa-bolt"></i> AI ENERGY (AE)</span>
+                    <i class="fas fa-sync-alt" onclick="window.refreshData()" style="color: #3b82f6;"></i>
+                </div>
+                <div style="font-size: 2.8em; font-weight: 800; color: #1e293b;"><span id="main-power">0</span></div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px solid #f1f5f9; text-align: center;">
+                    <div><div style="font-size: 0.65em; color: #94a3b8;">Daily</div><div style="font-weight: 700;">$<span id="stat-daily">0.00</span></div></div>
+                    <div><div style="font-size: 0.65em; color: #94a3b8;">Return</div><div style="font-weight: 700;"><span id="stat-rate">5.5</span>%</div></div>
+                    <div><div style="font-size: 0.65em; color: #94a3b8;">Next Pay</div><div style="font-weight: 700;" id="timer">00:00</div></div>
                 </div>
             </div>
 
-            <div id="live-feed-container" style="margin: 15px 10px; padding: 12px; background: rgba(59, 130, 246, 0.05); border-radius: 12px; border: 1px solid rgba(59, 130, 246, 0.1); display: flex; align-items: center; gap: 10px;">
-                <div style="position: relative;">
-                    <i class="fas fa-circle" style="color: #10b981; font-size: 0.6em; position: absolute; top: -2px; right: -2px; animation: pulse-live 2s infinite;"></i>
-                    <div style="width: 35px; height: 35px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                        <i class="fas fa-broadcast-tower" style="color: #3b82f6; font-size: 0.9em;"></i>
-                    </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 15px;">
+                <div onclick="switchTab('buy')" style="background: white; padding: 20px; border-radius: 15px; text-align: center; border: 1px solid #e2e8f0;">
+                    <i class="fas fa-coins" style="color: #f97316; font-size: 1.8em; margin-bottom: 8px;"></i>
+                    <div style="font-weight: 700;">Buy AE</div>
                 </div>
-                <div style="flex: 1; overflow: hidden;">
-                    <div style="font-size: 0.65em; font-weight: 800; color: #3b82f6; text-transform: uppercase;">Live Network Activity</div>
-                    <div id="live-feed-text" style="font-size: 0.85em; color: #1e293b; white-space: nowrap; font-weight: 600;">Connecting...</div>
-                </div>
-            </div>
-
-            <div class="energy-box">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div><i class="fas fa-bolt"></i> AE (AI ENERGY)</div>
-                    <i class="fas fa-sync-alt" onclick="window.refreshData()" style="cursor: pointer; float: right; opacity: 0.8;"></i>
-                </div>
-                <div style="font-size: 2.8em; font-weight: 800; margin: 10px 0;"><span id="main-power">0</span></div>
-                <div class="stats-grid">
-                    <div class="stat-item"><div class="stat-label">Daily Earn</div><div class="stat-val">$ <span id="stat-daily">0.0000</span></div></div>
-                    <div class="stat-item"><div class="stat-label">Return</div><div class="stat-val"><span id="stat-rate">5.5</span>%</div></div>
-                    <div class="stat-item"><div class="stat-label">Settlement</div><div class="stat-val" id="timer">00:00:00</div></div>
-                </div>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px;">
-                <div class="main-card" style="margin:0; padding: 15px; cursor: pointer;" onclick="switchTab('buy')">
-                    <i class="fas fa-coins" style="color: #f97316; font-size: 1.5em; margin-bottom: 8px;"></i>
-                    <div style="font-weight: 700; font-size: 0.9em;">Buy AE</div>
-                </div>
-                <div class="main-card" style="margin:0; padding: 15px; cursor: pointer;" onclick="switchTab('referrals')">
-                    <i class="fas fa-gift" style="color: #ef4444; font-size: 1.5em; margin-bottom: 8px;"></i>
-                    <div style="font-weight: 700; font-size: 0.9em;">Refer Friend</div>
+                <div onclick="switchTab('referrals')" style="background: white; padding: 20px; border-radius: 15px; text-align: center; border: 1px solid #e2e8f0;">
+                    <i class="fas fa-users" style="color: #8b5cf6; font-size: 1.8em; margin-bottom: 8px;"></i>
+                    <div style="font-weight: 700;">My Team</div>
                 </div>
             </div>
         </div>
-        
-<div id="view-referrals" class="view" style="background: #f8fafc; display:none;">
-            <div style="padding: 12px 18px; display: flex; align-items: center; background: white; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 10;">
-                <i class="fas fa-arrow-left" onclick="switchTab('home')" style="font-size: 1.25em; margin-right: 15px; cursor: pointer;"></i>
-                <span style="font-weight: 700; font-size: 1.15em;">My Global Network</span>
+
+        <div id="view-referrals" class="view">
+            <div style="padding: 15px; background: white; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center;">
+                <i class="fas fa-arrow-left" onclick="switchTab('home')" style="margin-right: 15px; font-size: 1.2em;"></i>
+                <span style="font-weight: 700; font-size: 1.1em;">Global Network</span>
             </div>
-
-            <div style="padding: 18px;">
-                <div style="background: linear-gradient(135deg, #3b82f6, #6366f1, #8b5cf6); border-radius: 18px; padding: 25px 20px; color: white; text-align: center; box-shadow: 0 8px 25px rgba(99, 102, 241, 0.35); position: relative; overflow: hidden; margin-bottom: 25px;">
-                    <div style="font-size: 0.85em; opacity: 0.9; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 5px;">Total Commission</div>
-                    <div style="font-size: 2.8em; font-weight: 800; margin: 5px 0;">$<span id="total-ref-earnings">0.00</span></div>
-                    <div style="background: rgba(255, 255, 255, 0.2); display: inline-flex; align-items: center; padding: 8px 18px; border-radius: 20px; font-size: 0.9em; font-weight: 700; backdrop-filter: blur(8px); margin-top: 10px;">
-                        <i class="fas fa-users" style="margin-right: 8px;"></i> Team Size: <span id="total-team-size">0</span>
+            <div style="padding: 15px;">
+                <div style="background: linear-gradient(135deg, #6366f1, #a855f7); border-radius: 20px; padding: 25px; color: white; text-align: center;">
+                    <div style="font-size: 0.85em; opacity: 0.9;">TEAM COMMISSION</div>
+                    <div style="font-size: 2.5em; font-weight: 800; margin: 10px 0;">$<span id="total-ref-earnings">0.00</span></div>
+                    <div style="background: rgba(255,255,255,0.2); padding: 8px 20px; border-radius: 20px; display: inline-flex; align-items: center;">
+                        Team Size: <span id="total-team-size" style="margin-left: 5px; font-weight: 800;">0</span>
                     </div>
                 </div>
 
-                <div style="margin-bottom: 25px;">
-                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; color: #1e293b;">
-                        <i class="fas fa-link" style="color: #6366f1;"></i>
-                        <span style="font-weight: 700; font-size: 0.95em;">Your Referral Link</span>
-                    </div>
-                    <div style="display: flex; background: white; border-radius: 14px; border: 1px solid #e2e8f0; overflow: hidden; height: 56px;">
-                        <input type="text" id="referral-link" readonly style="flex: 1; border: none; padding: 0 18px; font-size: 0.95em; font-weight: 600; background: transparent;" value="https://t.me/SportsPayBot?start=000000">
-                        <button onclick="window.copyReferralLink()" style="background: #e0e7ff; color: #4f46e5; border: none; padding: 0 22px; font-weight: 800; cursor: pointer;">COPY</button>
+                <div style="margin: 20px 0;">
+                    <div style="font-weight: 700; margin-bottom: 10px; font-size: 0.9em; color: #64748b;">YOUR REFERRAL LINK</div>
+                    <div style="display: flex; background: white; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; height: 50px;">
+                        <input type="text" id="referral-link" readonly style="flex: 1; border: none; padding: 0 15px; font-weight: 600; font-size: 0.85em;" value="https://t.me/SportsPayBot?start=000000">
+                        <button onclick="window.copyReferralLink()" style="background: #3b82f6; color: white; border: none; padding: 0 20px; font-weight: 700;">COPY</button>
                     </div>
                 </div>
 
-                <div style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border-bottom: 1px solid #f1f5f9;">
-                        <div style="display: flex; align-items: center; gap: 14px;">
-                            <div style="width: 42px; height: 42px; background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800;">L1</div>
-                            <div>
-                                <div style="font-weight: 700; color: #1e293b;">Direct Friends</div>
-                                <div style="font-size: 0.8em; color: #64748b; font-weight: 600; margin-top: 4px;">
-                                    <span style="color: #10b981; font-weight: 800;">7% Reward</span> • $<span id="lvl1-earned">0.00</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="text-align: right;"><div style="font-weight: 800; font-size: 1.3em;" id="lvl1-count">0</div></div>
+                <div style="background: white; border-radius: 15px; border: 1px solid #e2e8f0; overflow: hidden;">
+                    <div style="padding: 15px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
+                        <div><b style="color: #3b82f6;">L1</b> Direct Friends <div style="font-size: 0.75em; color: #10b981;">7% Reward • $<span id="lvl1-earned">0.00</span></div></div>
+                        <div id="lvl1-count" style="font-weight: 800;">0</div>
                     </div>
-                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border-bottom: 1px solid #f1f5f9;">
-                        <div style="display: flex; align-items: center; gap: 14px;">
-                            <div style="width: 42px; height: 42px; background: #eff6ff; color: #3b82f6; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800;">L2</div>
-                            <div>
-                                <div style="font-weight: 700; color: #1e293b;">Sub-Partners</div>
-                                <div style="font-size: 0.8em; color: #64748b; font-weight: 600; margin-top: 4px;">
-                                    <span style="color: #3b82f6; font-weight: 700;">3% Reward</span> • $<span id="lvl2-earned">0.00</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="text-align: right;"><div style="font-weight: 800; font-size: 1.3em;" id="lvl2-count">0</div></div>
+                    <div style="padding: 15px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
+                        <div><b style="color: #3b82f6;">L2</b> Sub-Partners <div style="font-size: 0.75em; color: #3b82f6;">3% Reward • $<span id="lvl2-earned">0.00</span></div></div>
+                        <div id="lvl2-count" style="font-weight: 800;">0</div>
                     </div>
-                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border-bottom: 1px solid #f1f5f9;">
-                        <div style="display: flex; align-items: center; gap: 14px;">
-                            <div style="width: 42px; height: 42px; background: #eff6ff; color: #3b82f6; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800;">L3</div>
-                            <div>
-                                <div style="font-weight: 700; color: #1e293b;">Extended Team</div>
-                                <div style="font-size: 0.8em; color: #64748b; font-weight: 600; margin-top: 4px;">
-                                    <span style="color: #3b82f6; font-weight: 700;">1.5% Reward</span> • $<span id="lvl3-earned">0.00</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="text-align: right;"><div style="font-weight: 800; font-size: 1.3em;" id="lvl3-count">0</div></div>
+                    <div style="padding: 15px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
+                        <div><b style="color: #3b82f6;">L3</b> Extended <div style="font-size: 0.75em; color: #3b82f6;">1.5% Reward • $<span id="lvl3-earned">0.00</span></div></div>
+                        <div id="lvl3-count" style="font-weight: 800;">0</div>
                     </div>
-                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border-bottom: 1px solid #f1f5f9;">
-                        <div style="display: flex; align-items: center; gap: 14px;">
-                            <div style="width: 42px; height: 42px; background: #f8fafc; color: #64748b; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800;">L4</div>
-                            <div>
-                                <div style="font-weight: 700; color: #1e293b;">Deep Network</div>
-                                <div style="font-size: 0.8em; color: #64748b; font-weight: 600; margin-top: 4px;">
-                                    <span style="color: #94a3b8; font-weight: 700;">1% Reward</span> • $<span id="lvl4-earned">0.00</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="text-align: right;"><div style="font-weight: 800; font-size: 1.3em;" id="lvl4-count">0</div></div>
+                    <div style="padding: 15px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
+                        <div><b style="color: #94a3b8;">L4</b> Deep Network <div style="font-size: 0.75em; color: #94a3b8;">1% Reward • $<span id="lvl4-earned">0.00</span></div></div>
+                        <div id="lvl4-count" style="font-weight: 800;">0</div>
                     </div>
-                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 18px;">
-                        <div style="display: flex; align-items: center; gap: 14px;">
-                            <div style="width: 42px; height: 42px; background: #f8fafc; color: #64748b; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800;">L5</div>
-                            <div>
-                                <div style="font-weight: 700; color: #1e293b;">Global Reach</div>
-                                <div style="font-size: 0.8em; color: #64748b; font-weight: 600; margin-top: 4px;">
-                                    <span style="color: #94a3b8; font-weight: 700;">0.5% Reward</span> • $<span id="lvl5-earned">0.00</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="text-align: right;"><div style="font-weight: 800; font-size: 1.3em;" id="lvl5-count">0</div></div>
+                    <div style="padding: 15px; display: flex; justify-content: space-between; align-items: center;">
+                        <div><b style="color: #94a3b8;">L5</b> Global Reach <div style="font-size: 0.75em; color: #94a3b8;">0.5% Reward • $<span id="lvl5-earned">0.00</span></div></div>
+                        <div id="lvl5-count" style="font-weight: 800;">0</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div id="view-buy" class="view" style="background: #f8fafc; display:none;">
-            <div style="padding: 12px 18px; display: flex; align-items: center; background: white; border-bottom: 1px solid #e2e8f0;">
-                <i class="fas fa-arrow-left" onclick="switchTab('home')" style="font-size: 1.25em; margin-right: 15px; cursor: pointer;"></i>
-                <span style="font-weight: 700; font-size: 1.15em;">Buy AI Energy</span>
+        <div id="view-buy" class="view">
+            <div style="padding: 15px; background: white; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center;">
+                <i class="fas fa-arrow-left" onclick="switchTab('home')" style="margin-right: 15px;"></i>
+                <span style="font-weight: 700;">Buy AI Energy</span>
             </div>
-
-            <div style="padding: 18px;">
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; color: #3b82f6;">
-                    <i class="fas fa-chart-line"></i>
-                    <span style="font-weight: 700; font-size: 0.95em;">Daily Return Tiers</span>
-                </div>
-
-                <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
-                    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; display: flex; justify-content: space-between;">
-                        <span>Amount >= $0</span> <span style="color: #3b82f6; font-weight: 800;">5.5%</span>
+            <div style="padding: 15px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                    <div style="background: white; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; text-align: center;">
+                        <div style="font-size: 0.7em; color: #94a3b8;">Tier 1</div>
+                        <div style="font-weight: 800; color: #3b82f6;">5.5% Daily</div>
                     </div>
-                    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; display: flex; justify-content: space-between;">
-                        <span>Amount >= $20</span> <span style="color: #3b82f6; font-weight: 800;">6.0%</span>
-                    </div>
-                    <div style="background: #3b82f6; color: white; border-radius: 12px; padding: 12px; display: flex; justify-content: space-between;">
-                        <span>Amount >= $300</span> <span style="font-weight: 800;">6.5%</span>
+                    <div style="background: #3b82f6; padding: 15px; border-radius: 12px; text-align: center; color: white;">
+                        <div style="font-size: 0.7em; opacity: 0.8;">Tier 2 ($300+)</div>
+                        <div style="font-weight: 800;">6.5% Daily</div>
                     </div>
                 </div>
 
-                <div style="background: white; border-radius: 18px; padding: 20px; border: 1px solid #e2e8f0;">
-                    <div style="font-size: 0.8em; color: #64748b; margin-bottom: 15px; text-align: center; font-weight: 700;">DEPOSIT USDT (TRC20)</div>
-                    <div style="display: flex; align-items: center; background: #f1f5f9; border-radius: 14px; padding: 0 15px; height: 56px;">
-                        <input type="number" id="buy-amount" placeholder="Min $1 USDT" style="flex: 1; border: none; background: transparent; font-size: 1.15em; font-weight: 700; outline: none;">
+                <div style="background: white; border-radius: 18px; padding: 25px; border: 1px solid #e2e8f0; text-align: center;">
+                    <div style="font-weight: 700; margin-bottom: 20px;">INVESTMENT AMOUNT (USDT)</div>
+                    <div style="display: flex; align-items: center; background: #f1f5f9; padding: 0 15px; border-radius: 12px; height: 60px;">
+                        <input type="number" id="buy-amount" oninput="window.calculateReturns()" placeholder="0.00" style="flex: 1; border: none; background: transparent; font-size: 1.5em; font-weight: 800; outline: none;">
+                        <span style="font-weight: 800; color: #10b981;">USDT</span>
                     </div>
-                    <button onclick="window.showPayment()" style="width: 100%; height: 56px; background: #3b82f6; color: white; border: none; border-radius: 14px; margin-top: 20px; font-weight: 800; font-size: 1.1em;">Continue</button>
+                    <div style="margin: 20px 0; font-size: 0.9em; color: #64748b;">
+                        You will receive approx: <b style="color: #3b82f6;"><span id="ae-calc-total">0</span> AE</b>
+                    </div>
+                    <button onclick="window.showPayment()" style="width: 100%; padding: 16px; border-radius: 12px; border: none; background: #1e293b; color: white; font-weight: 700; font-size: 1.1em;">
+                        Generate Payment Address
+                    </button>
                 </div>
             </div>
         </div>
 
-    </div> <div style="position: fixed; bottom: 0; width: 100%; background: white; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-around; padding: 12px 0; z-index: 100;">
+        <div id="view-withdraw" class="view">
+            <div style="padding: 15px; background: white; border-bottom: 1px solid #e2e8f0;">
+                <i class="fas fa-arrow-left" onclick="switchTab('home')" style="margin-right: 15px;"></i>
+                <span style="font-weight: 700;">Withdraw Funds</span>
+            </div>
+            <div style="padding: 20px; text-align: center;">
+                <div style="font-size: 0.9em; color: #64748b; margin-bottom: 5px;">Available Balance</div>
+                <div style="font-size: 2.2em; font-weight: 800; margin-bottom: 30px;">$<span id="withdraw-bal">0.0000</span></div>
+                
+                <div style="text-align: left; margin-bottom: 15px;">
+                    <label style="font-size: 0.8em; font-weight: 700; color: #64748b; margin-bottom: 5px; display: block;">WALLET ADDRESS (BEP20 / TRC20)</label>
+                    <input type="text" id="withdraw-address" placeholder="Paste your address here" style="width: 100%; box-sizing: border-box; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; outline: none; font-weight: 600;">
+                </div>
+
+                <div style="text-align: left; margin-bottom: 30px;">
+                    <label style="font-size: 0.8em; font-weight: 700; color: #64748b; margin-bottom: 5px; display: block;">AMOUNT TO WITHDRAW</label>
+                    <input type="number" id="withdraw-amount" placeholder="Min $10.00" style="width: 100%; box-sizing: border-box; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; outline: none; font-weight: 800; font-size: 1.2em;">
+                </div>
+
+                <button onclick="window.processWithdraw()" style="width: 100%; padding: 16px; border-radius: 12px; border: none; background: #ef4444; color: white; font-weight: 700; font-size: 1.1em;">
+                    Confirm Withdrawal
+                </button>
+            </div>
+        </div>
+
+        <div id="view-history" class="view">
+            <div style="padding: 15px; background: white; border-bottom: 1px solid #e2e8f0;">
+                <i class="fas fa-arrow-left" onclick="switchTab('home')" style="margin-right: 15px;"></i>
+                <span style="font-weight: 700;">Transaction History</span>
+            </div>
+            <div id="history-list" style="padding: 15px;">
+                <div style="text-align: center; color: #94a3b8; padding: 40px;">No transactions found yet.</div>
+            </div>
+        </div>
+
+    </div> <nav class="nav-bar">
         <div class="nav-item active" onclick="switchTab('home')">
-            <i class="fas fa-home" style="font-size: 1.4em;"></i>
-            <div style="font-size: 0.7em; margin-top: 4px; font-weight: 700;">Home</div>
-        </div>
-        <div class="nav-item" onclick="switchTab('referrals')">
-            <i class="fas fa-users" style="font-size: 1.4em;"></i>
-            <div style="font-size: 0.7em; margin-top: 4px; font-weight: 700;">Team</div>
+            <i class="fas fa-home" style="font-size: 1.4em;"></i><div style="font-size: 0.7em; font-weight: 700;">Home</div>
         </div>
         <div class="nav-item" onclick="switchTab('buy')">
-            <i class="fas fa-plus-circle" style="font-size: 1.4em;"></i>
-            <div style="font-size: 0.7em; margin-top: 4px; font-weight: 700;">Invest</div>
+            <i class="fas fa-plus-circle" style="font-size: 1.4em;"></i><div style="font-size: 0.7em; font-weight: 700;">Invest</div>
         </div>
-    </div>
+        <div class="nav-item" onclick="switchTab('referrals')">
+            <i class="fas fa-users" style="font-size: 1.4em;"></i><div style="font-size: 0.7em; font-weight: 700;">Team</div>
+        </div>
+        <div class="nav-item" onclick="switchTab('history')">
+            <i class="fas fa-list-ul" style="font-size: 1.4em;"></i><div style="font-size: 0.7em; font-weight: 700;">History</div>
+        </div>
+    </nav>
 
     <script src="js/main.js"></script>
+    <script>
+        // Función esencial para navegar sin recargar
+        function switchTab(tabId) {
+            // Ocultar todas las vistas
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            // Quitar active de la barra de navegación
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            
+            // Mostrar la vista seleccionada
+            const targetView = document.getElementById('view-' + tabId);
+            if(targetView) {
+                targetView.classList.add('active');
+                window.scrollTo(0,0);
+            }
+            
+            // Marcar icono activo en la barra inferior (si existe el botón)
+            const navItems = document.querySelectorAll('.nav-item');
+            if(tabId === 'home') navItems[0].classList.add('active');
+            if(tabId === 'buy') navItems[1].classList.add('active');
+            if(tabId === 'referrals') navItems[2].classList.add('active');
+            if(tabId === 'history') navItems[3].classList.add('active');
+        }
+    </script>
 </body>
-</html>
+                    </html>
