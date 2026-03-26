@@ -36,7 +36,6 @@
             <span style="margin-right: 25px;"><b style="color: white;">ETH/USDT</b> $3,450.12 <span style="color: #ef4444;">-0.3%</span></span>
             <span style="margin-right: 25px;"><b style="color: white;">TRX/USDT</b> $0.1182 <span style="color: #10b981;">+2.5%</span></span>
             <span style="margin-right: 25px;"><b style="color: white;">BTC/USDT</b> $67,241.50 <span style="color: #10b981;">+1.2%</span></span>
-            <span style="margin-right: 25px;"><b style="color: white;">BNB/USDT</b> $592.30 <span style="color: #10b981;">+0.8%</span></span>
         </div>
     </div>
 
@@ -177,104 +176,23 @@
             <i class="fas fa-arrow-left" onclick="switchTab('home')" style="margin-right: 15px; cursor:pointer; font-size: 1.2em;"></i>
             <span style="font-weight: 700; font-size: 1.1em;">Buy AI Energy</span>
         </div>
-
-        <div class="section-white" style="background: white; padding: 15px; margin: 12px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
-            <div style="color: #3b82f6; font-weight: 700; font-size: 0.85em; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-                <i class="fas fa-chart-line"></i> DAILY RETURN TIERS
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9;">
-                    <span style="font-size: 0.9em; font-weight: 700;">>= $0</span>
-                    <span style="font-size: 0.9em; font-weight: 700; color: #3b82f6;">5.5%</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9;">
-                    <span style="font-size: 0.9em; font-weight: 700;">>= $20</span>
-                    <span style="font-size: 0.9em; font-weight: 700; color: #3b82f6;">6.0%</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9;">
-                    <span style="font-size: 0.9em; font-weight: 700;">>= $300</span>
-                    <span style="font-size: 0.9em; font-weight: 700; color: #3b82f6;">6.5%</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 0.9em; font-weight: 700;">>= $3000+</span>
-                    <span style="font-size: 0.9em; font-weight: 700; color: #3b82f6;">7.0%</span>
-                </div>
-            </div>
         </div>
 
-        <div style="padding: 20px; margin: 12px; background: white; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
-            <div style="margin-bottom: 12px; font-weight: 700; font-size: 0.8em; color: #64748b; text-transform: uppercase;">Quantity to buy</div>
-            <div style="position: relative; display: flex; align-items: center; background: #f1f5f9; border-radius: 12px; padding: 2px;">
-                <div style="padding: 0 15px; display: flex; align-items: center; gap: 8px; border-right: 1px solid #e2e8f0;">
-                    <img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdt.png" style="width: 24px;">
-                </div>
-                <input type="number" id="buy-qty" placeholder="Min $1" oninput="calculateReturns()" 
-                       style="width: 100%; padding: 14px; background: transparent; border: none; font-size: 1.1em; font-weight: 700; outline: none;">
-            </div>
-            
-            <div style="margin-top: 15px; text-align: center; border-top: 1px dashed #e2e8f0; padding-top: 15px;">
-                <div style="font-size: 0.85em; color: #64748b;">Your AE total will be:</div>
-                <div style="font-weight: 800; color: #3b82f6; font-size: 1.2em; margin-top: 4px;">
-                    <span id="ae-calc-total">0</span> AE = $<span id="usd-calc-total">0.00</span>
-                </div>
-            </div>
-        </div>
-
-        <div style="padding: 0 20px;">
-            <button id="btn-continue" onclick="showPayment()" 
-                    style="width:100%; padding: 18px; background: #3b82f6; color: white; border: none; border-radius: 16px; font-weight: 700; font-size: 1.1em;">
-                Continue
-            </button>
-        </div>
-    </div>
-    
     <div id="view-withdraw" class="view" style="display:none; background: #f8fafc;">
-        <div class="header-ae" style="background: white; padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 10;">
+        <div class="header-ae" style="background: white; padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #eee;">
             <i class="fas fa-arrow-left" onclick="switchTab('home')" style="margin-right: 15px; cursor:pointer; font-size: 1.2em;"></i>
             <span style="font-weight: 700; font-size: 1.1em;">Withdraw USDT</span>
         </div>
-
-        <div style="padding: 20px;">
-            <div class="main-card" style="margin: 0 0 20px 0; background: linear-gradient(135deg, #1e293b, #334155); color: white;">
-                <div style="font-size: 0.8em; opacity: 0.8;">Available for withdraw</div>
-                <div style="font-size: 2em; font-weight: 800;">$<span id="withdraw-available">0.0000</span></div>
-            </div>
-
-            <div id="withdraw-lock-notice" style="display:none; background: #fff1f2; color: #e11d48; padding: 12px; border-radius: 12px; margin-bottom: 20px; font-size: 0.85em; text-align: center; border: 1px solid #fda4af;">
-                <i class="fas fa-lock"></i> Deposit 1 USDT or more to unlock withdrawals.
-            </div>
-
-            <div style="background: white; padding: 20px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
-                <label style="display: block; font-size: 0.75em; font-weight: 700; color: #64748b; margin-bottom: 8px;">WALLET ADDRESS (BEP20)</label>
-                <input type="text" id="withdraw-address" placeholder="0x..." 
-                       style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 20px; font-family: monospace; outline: none;">
-
-                <label style="display: block; font-size: 0.75em; font-weight: 700; color: #64748b; margin-bottom: 8px;">AMOUNT TO WITHDRAW</label>
-                <input type="number" id="withdraw-amount" placeholder="Min 5 USDT" 
-                       style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; font-weight: 700; outline: none;">
-                
-                <button id="btn-confirm-withdraw" onclick="requestWithdraw()" 
-                        style="width: 100%; margin-top: 25px; padding: 18px; background: #10b981; color: white; border: none; border-radius: 16px; font-weight: 700; font-size: 1.1em;">
-                    Confirm Withdraw
-                </button>
-            </div>
         </div>
-    </div>
-    
+
     <div id="view-history" class="view" style="display:none; background: #f8fafc;">
-        <div class="header-ae" style="background: white; padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 10;">
+        <div class="header-ae" style="background: white; padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #eee;">
             <i class="fas fa-arrow-left" onclick="switchTab('home')" style="margin-right: 15px; cursor:pointer; font-size: 1.2em;"></i>
             <span style="font-weight: 700; font-size: 1.1em;">Transaction History</span>
         </div>
-
-        <div id="history-list" style="padding: 15px; display: flex; flex-direction: column; gap: 10px;">
-            <div style="text-align: center; color: #94a3b8; margin-top: 40px;">
-                <i class="fas fa-history" style="font-size: 2em; opacity: 0.5;"></i>
-                <p>No transactions yet</p>
-            </div>
-        </div>
+        <div id="history-list" style="padding: 15px;"></div>
     </div>
-    
+
     <div id="view-me" class="view" style="display:none; background: #f8fafc;">
         <div class="top-header" style="justify-content: center; border: none; background: white; padding: 15px;">
             <span style="font-weight: 800; font-size: 1.1em;">Account Profile</span>
@@ -283,4 +201,42 @@
             <div id="user-photo" style="width: 85px; height: 85px; background: #3b82f6; border-radius: 50%; margin: 0 auto 18px; display: flex; align-items: center; justify-content: center; border: 4px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.1); color: white;">
                 <i class="fas fa-user" style="font-size: 2.8em;"></i>
             </div>
-            <div id="user-name" style="font-weight: 800; f
+            <div id="user-name" style="font-weight: 800; font-size: 1.3em;">User Name</div>
+            <div style="color: #64748b; font-size: 0.9em;">ID: <span id="me-id">000000</span></div>
+        </div>
+
+        <div style="padding: 10px 15px;">
+            <div class="main-card" style="margin:0; padding: 20px; cursor: pointer; display: flex; align-items: center; justify-content: space-between;" onclick="switchTab('referrals')">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="width: 45px; height: 45px; background: #fff7ed; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #f97316;">
+                        <i class="fas fa-users-cog"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight: 800; font-size: 0.9em;">My Network Panel</div>
+                        <div style="font-size: 0.7em; color: #64748b;">Manage your 5 levels of profit</div>
+                    </div>
+                </div>
+                <i class="fas fa-chevron-right" style="color: #cbd5e1;"></i>
+            </div>
+        </div>
+    </div>
+
+    <nav class="nav-bar">
+        <div class="nav-item active" onclick="switchTab('home')">
+            <i class="fas fa-home"></i><span>Home</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('buy')">
+            <i class="fas fa-bolt"></i><span>Energy</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('referrals')">
+            <i class="fas fa-users"></i><span>Team</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('me')">
+            <i class="fas fa-user"></i><span>Me</span>
+        </div>
+    </nav>
+
+    <script type="module" src="./js/main.js"></script>
+    <script type="module" src="./js/payment.js"></script>
+</body>
+</html>
