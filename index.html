@@ -7,8 +7,31 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Estilos para animaciones nuevas */
+        @keyframes pulse-live {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            70% { transform: scale(1.4); opacity: 0; }
+            100% { transform: scale(0.95); opacity: 0; }
+        }
+        @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+    </style>
 </head>
 <body>
+
+    <div style="background: #0f172a; color: #94a3b8; font-size: 0.65em; padding: 6px 0; overflow: hidden; white-space: nowrap; border-bottom: 1px solid #1e293b;">
+        <div style="display: inline-block; animation: ticker 25s linear infinite;">
+            <span style="margin-right: 25px;"><b style="color: white;">BTC/USDT</b> $67,241.50 <span style="color: #10b981;">+1.2%</span></span>
+            <span style="margin-right: 25px;"><b style="color: white;">BNB/USDT</b> $592.30 <span style="color: #10b981;">+0.8%</span></span>
+            <span style="margin-right: 25px;"><b style="color: white;">ETH/USDT</b> $3,450.12 <span style="color: #ef4444;">-0.3%</span></span>
+            <span style="margin-right: 25px;"><b style="color: white;">TRX/USDT</b> $0.1182 <span style="color: #10b981;">+2.5%</span></span>
+            <span style="margin-right: 25px;"><b style="color: white;">BTC/USDT</b> $67,241.50 <span style="color: #10b981;">+1.2%</span></span>
+            <span style="margin-right: 25px;"><b style="color: white;">BNB/USDT</b> $592.30 <span style="color: #10b981;">+0.8%</span></span>
+        </div>
+    </div>
 
     <div id="view-home" class="view active">
         <div class="top-header">
@@ -27,28 +50,25 @@
                 <button class="btn-withdraw" onclick="switchTab('withdraw')"><i class="fas fa-wallet"></i> Withdraw</button>
             </div>
         </div>
-<div id="live-feed-container" style="margin: 15px 10px; padding: 12px; background: rgba(59, 130, 246, 0.05); border-radius: 12px; border: 1px solid rgba(59, 130, 246, 0.1); display: flex; align-items: center; gap: 10px;">
-    <div style="position: relative;">
-        <i class="fas fa-circle" style="color: #10b981; font-size: 0.6em; position: absolute; top: -2px; right: -2px; animation: pulse 2s infinite;"></i>
-        <div style="width: 35px; height: 35px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-            <i class="fas fa-broadcast-tower" style="color: #3b82f6; font-size: 0.9em;"></i>
-        </div>
-    </div>
-    <div style="flex: 1; overflow: hidden;">
-        <div style="font-size: 0.65em; font-weight: 800; color: #3b82f6; text-transform: uppercase; letter-spacing: 0.5px;">Live Network Activity</div>
-        <div id="live-feed-text" style="font-size: 0.85em; color: #1e293b; white-space: nowrap; font-weight: 600;">
-            Connecting to network...
-        </div>
-    </div>
-</div>
 
-<style>
-@keyframes pulse {
-    0% { transform: scale(0.95); opacity: 0.7; }
-    70% { transform: scale(1.2); opacity: 0; }
-    100% { transform: scale(0.95); opacity: 0; }
-}
-</style>
+        <div id="live-feed-container" style="margin: 15px 10px; padding: 12px; background: rgba(59, 130, 246, 0.05); border-radius: 12px; border: 1px solid rgba(59, 130, 246, 0.1); display: flex; align-items: center; gap: 10px;">
+            <div style="position: relative;">
+                <i class="fas fa-circle" style="color: #10b981; font-size: 0.6em; position: absolute; top: -2px; right: -2px; animation: pulse-live 2s infinite;"></i>
+                <div style="width: 35px; height: 35px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                    <i class="fas fa-broadcast-tower" style="color: #3b82f6; font-size: 0.9em;"></i>
+                </div>
+            </div>
+            <div style="flex: 1; overflow: hidden;">
+                <div style="font-size: 0.65em; font-weight: 800; color: #3b82f6; text-transform: uppercase; letter-spacing: 0.5px; display: flex; justify-content: space-between;">
+                    <span>Live Network Activity</span>
+                    <span style="opacity: 0.6; font-weight: 400;">Just now</span>
+                </div>
+                <div id="live-feed-text" style="font-size: 0.85em; color: #1e293b; white-space: nowrap; font-weight: 600; transition: opacity 0.5s ease;">
+                    Connecting to network...
+                </div>
+            </div>
+        </div>
+
         <div class="energy-box">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div><i class="fas fa-bolt"></i> AE (AI ENERGY)</div>
@@ -245,4 +265,4 @@
     <script type="module" src="./js/main.js"></script>
     <script type="module" src="./js/payment.js"></script>
 </body>
-    </html>
+            </html>
