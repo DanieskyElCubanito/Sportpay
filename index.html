@@ -238,13 +238,40 @@
         </div>
     </div>
 
-    <div id="view-withdraw" class="view" style="display:none; background: #f8fafc;">
-        <div class="header-ae" style="background: white; padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #eee;">
-            <i class="fas fa-arrow-left" onclick="switchTab('home')" style="margin-right: 15px; cursor:pointer; font-size: 1.2em;"></i>
-            <span style="font-weight: 700; font-size: 1.1em;">Withdraw USDT</span>
-        </div>
+    <div id="view-withdraw" class="view" style="display:none; background: #f8fafc; padding-bottom: 80px;">
+    <div class="header-ae" style="background: white; padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #eee;">
+        <i class="fas fa-arrow-left" onclick="switchTab('home')" style="margin-right: 15px; cursor:pointer;"></i>
+        <span style="font-weight: 700;">Withdraw USDT</span>
+    </div>
+
+    <div style="padding: 20px;">
+        <div style="background: white; padding: 20px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 20px;">
+            <div style="color: #64748b; font-size: 0.8em; text-transform: uppercase; margin-bottom: 5px;">Available Balance</div>
+            <div style="font-size: 2em; font-weight: 800; color: #1e293b;">$<span id="withdraw-available">0.0000</span></div>
         </div>
 
+        <div style="margin-bottom: 15px;">
+            <label style="display:block; font-size: 0.8em; color: #64748b; margin-bottom: 8px; font-weight: 700;">AMOUNT TO WITHDRAW (USDT)</label>
+            <input type="number" id="withdraw-amount" placeholder="Min 5.00" 
+                   style="width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 1.1em; font-weight: 700; outline: none;">
+        </div>
+
+        <div style="margin-bottom: 25px;">
+            <label style="display:block; font-size: 0.8em; color: #64748b; margin-bottom: 8px; font-weight: 700;">WALLET ADDRESS (BEP20 / TRC20)</label>
+            <input type="text" id="withdraw-address" placeholder="Paste your address here" 
+                   style="width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 0.9em; outline: none;">
+        </div>
+
+        <button id="btn-confirm-withdraw" onclick="window.requestWithdraw()" 
+                style="width: 100%; padding: 18px; background: #3b82f6; color: white; border: none; border-radius: 16px; font-weight: 700; font-size: 1.1em;">
+            Confirm Withdraw
+        </button>
+        
+        <p id="withdraw-lock-notice" style="text-align: center; color: #ef4444; font-size: 0.8em; margin-top: 15px; display: none;">
+            <i class="fas fa-lock"></i> Deposit at least 1 USDT to unlock withdrawals.
+        </p>
+    </div>
+    </div>
     <div id="view-history" class="view" style="display:none; background: #f8fafc;">
         <div class="header-ae" style="background: white; padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #eee;">
             <i class="fas fa-arrow-left" onclick="switchTab('home')" style="margin-right: 15px; cursor:pointer; font-size: 1.2em;"></i>
