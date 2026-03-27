@@ -180,25 +180,25 @@
                 <div style="font-size: 0.6em; opacity: 0.9; margin-top: 4px;">$3,000+</div>
             </div>
         </div>
-
-        <div style="background: white; border-radius: 24px; padding: 25px; border: 1px solid #e2e8f0;">
-            <div style="font-weight: 800; margin-bottom: 20px; text-align: center; color: #475569; font-size: 0.85em; letter-spacing: 0.5px;">CONTRACT AMOUNT (USDT)</div>
-            
-            <div style="display: flex; align-items: center; background: #f8fafc; padding: 0 20px; border-radius: 16px; height: 70px; border: 2px solid #f1f5f9; transition: 0.3s;" id="input-container">
-                <input type="number" id="buy-amount" oninput="window.calculateReturns()" placeholder="0.00" style="flex: 1; border: none; background: transparent; font-size: 2em; font-weight: 800; outline: none; color: #0f172a;">
-                <span style="font-weight: 900; color: #10b981; font-size: 1.1em;">USDT</span>
-            </div>
-            
-            <div style="margin: 25px 0; text-align: center; background: #eff6ff; padding: 20px; border-radius: 18px; border: 1px dashed #3b82f6;">
-                <div style="font-size: 0.75em; color: #1e40af; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px;">Estimated Power</div>
-                <div style="font-size: 2.2em; font-weight: 900; color: #1e3a8a;"><span id="ae-calc-total">0</span> <span style="font-size: 0.4em; color: #3b82f6;">GH/s</span></div>
-            </div>
-            
-            <button onclick="window.showPayment()" style="width: 100%; padding: 20px; border-radius: 16px; border: none; background: #0f172a; color: white; font-weight: 800; font-size: 1.1em; cursor: pointer; box-shadow: 0 10px 20px rgba(15, 23, 42, 0.2);">
-                ACTIVATE MINING NODE
-            </button>
+        
+    <div style="background: white; border-radius: 24px; padding: 25px; border: 1px solid #e2e8f0;">
+    <div style="font-weight: 800; margin-bottom: 20px; text-align: center; color: #475569; font-size: 0.85em;">CONTRACT AMOUNT (USDT)</div>
+    
+    <div id="input-box-container" style="display: flex; align-items: center; background: #f8fafc; padding: 0 20px; border-radius: 16px; height: 70px; border: 2px solid #f1f5f9;">
+        <input type="number" id="buy-amount" oninput="window.calculateReturns()" placeholder="0.00" style="flex: 1; border: none; background: transparent; font-size: 2em; font-weight: 800; outline: none; color: #0f172a;">
+        <span style="font-weight: 900; color: #10b981; font-size: 1.1em;">USDT</span>
+    </div>
+    
+    <div style="margin: 25px 0; text-align: center; background: #eff6ff; padding: 20px; border-radius: 18px; border: 1px dashed #3b82f6;">
+        <div style="font-size: 0.75em; color: #1e40af; font-weight: 800; text-transform: uppercase; margin-bottom: 5px;">Estimated Power</div>
+        <div style="font-size: 2.2em; font-weight: 900; color: #1e3a8a;">
+            <span id="ae-calc-total">0</span> <span style="font-size: 0.4em; color: #3b82f6;">GH/s</span>
         </div>
     </div>
+    
+    <button onclick="window.showPayment()" style="width: 100%; padding: 20px; border-radius: 16px; border: none; background: #0f172a; color: white; font-weight: 800; font-size: 1.1em; box-shadow: 0 10px 20px rgba(15,23,42,0.1);">
+        ACTIVATE MINING NODE
+    </button>
 </div>
 
         <div id="view-withdraw" class="view">
