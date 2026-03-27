@@ -63,20 +63,29 @@ export function updateDashboard() {
 window.updateDashboard = updateDashboard;
 
 // --- 4. CALCULADORA DE RENDIMIENTOS ---
+// Asegúrate de que esta función esté así en tu js/main.js
 window.calculateReturns = function() {
-    // Corregido el ID para que coincida con el nuevo HTML
+    // 1. Buscamos el input por su ID correcto
     const qtyInput = document.getElementById('buy-amount');
+    const displayOutput = document.getElementById('ae-calc-total');
+    
+    // 2. Obtenemos el valor
     const qty = parseFloat(qtyInput ? qtyInput.value : 0) || 0;
     
-    // Cálculo de GH/s (1 USDT = 1000 GH/s)
+    // 3. Calculamos GH/s (1 USDT = 1000 GH/s)
     const ghsPower = qty * 1000;
 
-    const aeTotal = document.getElementById('ae-calc-total');
-
-    // Solo insertamos el número porque el HTML ya dice " GH/s" al lado
-    if (aeTotal) aeTotal.innerText = ghsPower.toLocaleString();
+    // 4. Mostramos el resultado con formato de miles
+    if (displayOutput) {
+        displayOutput.innerText = ghsPower.toLocaleString();
+    }
+    
+    // Estetica opcional: Cambiar color del borde del input al escribir
+    const container = document.getElementById('input-container');
+    if (container) {
+        container.style.borderColor = qty > 0 ? '#3b82f6' : '#f1f5f9';
+    }
 };
-
 // --- 5. SISTEMA DE HISTORIAL ---
 window.renderHistory = function() {
     const historyContainer = document.getElementById('history-list');
