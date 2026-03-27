@@ -65,25 +65,37 @@ window.updateDashboard = updateDashboard;
 // --- 4. CALCULADORA DE RENDIMIENTOS ---
 // Asegúrate de que esta función esté así en tu js/main.js
 window.calculateReturns = function() {
-    // 1. Buscamos el input por su ID correcto
-    const qtyInput = document.getElementById('buy-amount');
-    const displayOutput = document.getElementById('ae-calc-total');
-    
-    // 2. Obtenemos el valor
-    const qty = parseFloat(qtyInput ? qtyInput.value : 0) || 0;
-    
-    // 3. Calculamos GH/s (1 USDT = 1000 GH/s)
-    const ghsPower = qty * 1000;
+    // Intentar obtener el input por ID
+    const inputEl = document.getElementById('buy-amount');
+    const outputEl = document.getElementById('ae-calc-total');
+    const container = document.getElementById('input-box-container');
 
-    // 4. Mostramos el resultado con formato de miles
-    if (displayOutput) {
-        displayOutput.innerText = ghsPower.toLocaleString();
+    if (!inputEl || !outputEl) {
+        console.error("No se encontraron los elementos ID: buy-amount o ae-calc-total");
+        return;
     }
+
+    // Obtener valor y convertir a número
+    const val = parseFloat(inputEl.value);
     
-    // Estetica opcional: Cambiar color del borde del input al escribir
-    const container = document.getElementById('input-container');
-    if (container) {
-        container.style.borderColor = qty > 0 ? '#3b82f6' : '#f1f5f9';
+    if (isNaN(val) || val <= 0) {
+        outputEl.innerText = "0";
+        if(container) container.style.borderColor = "#f1f5f9";
+        return;
+    }
+
+    // 1 USDT = 1000 GH/s
+    const totalGHS = val * 1000;
+
+    // Formatear con comas para que se vea profesional (ej: 1,500)
+    outputEl.innerText = totalGHS.toLocaleString('en-US');
+
+    // Efecto visual: iluminar el borde cuando hay un monto válido
+    if(container) container.style.borderColor = "#3b82f6";
+    
+    // Opcional: Vibración en móviles al escribir
+    if (window.Telegram?.WebApp?.HapticFeedback) {
+        window.Telegram.WebApp.HapticFeedback.selectionChanged();
     }
 };
 // --- 5. SISTEMA DE HISTORIAL ---
