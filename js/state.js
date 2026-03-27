@@ -1,110 +1,100 @@
-// --- ARCHIVO state.js (Versión Sincronizada con Bots Business) ---
+import { state, saveInvestment, processDailyEarnings } from './state.js';
 
-// 1. Capturamos los parámetros de la URL enviados por el Bot
-const urlParams = new URLSearchParams(window.location.search);
+// --- CALCULADORA INDEPENDIENTE (Prioridad #1) ---
+// La ponemos aquí arriba para que cargue primero que nada
+window.calculateReturns = function() {
+    const inputEl = document.getElementById('buy-amount');
+    const outputEl = document.getElementById('ae-calc-total');
+    const container = document.getElementById('input-box-container');
 
-// 2. Extraemos datos del Bot (si existen en la URL)
-const botId = urlParams.get('id');
-const botEarned = urlParams.get('earn') ? parseFloat(urlParams.get('earn')) : null;
-const botL1 = urlParams.get('l1') ? parseInt(urlParams.get('l1')) : null;
-const botL2 = urlParams.get('l2') ? parseInt(urlParams.get('l2')) : null;
+    if (!inputEl || !outputEl) return;
 
-// 3. Inicializamos el estado con prioridad: URL (Bot) > LocalStorage (Teléfono) > 0
-export const state = {
-    // Si el Bot dice que tenemos X saldo, le creemos al Bot (es el servidor)
-    totalEarnedUSD: botEarned !== null ? botEarned : (parseFloat(localStorage.getItem('earned')) || 0),
-    
-    // La inversión la seguimos manejando local por ahora hasta que integres API de pagos
-    totalInvestedUSDT: parseFloat(localStorage.getItem('invested')) || 0,
-    
-    // Historial y Liquidación diaria (Local)
-    history: JSON.parse(localStorage.getItem('deposit_history')) || [],
-    lastSettlement: localStorage.getItem('last_settlement') || null, 
-    tg: window.Telegram?.WebApp || null,
+    const val = parseFloat(inputEl.value) || 0;
+    const totalGHS = val * 1000;
 
-    // --- SISTEMA DE 5 NIVELES (Prioridad Datos del Bot) ---
-    lvl1Count: botL1 !== null ? botL1 : (parseInt(localStorage.getItem('lvl1_c')) || 0),
-    lvl2Count: botL2 !== null ? botL2 : (parseInt(localStorage.getItem('lvl2_c')) || 0),
-    
-    // Estos niveles se cargan del teléfono (o se pueden añadir a la URL del bot luego)
-    lvl3Count: parseInt(localStorage.getItem('lvl3_c')) || 0,
-    lvl4Count: parseInt(localStorage.getItem('lvl4_c')) || 0,
-    lvl5Count: parseInt(localStorage.getItem('lvl5_c')) || 0,
-    
-    // Ganancias totales por referidos (Sincronizado con Bot)
-    referralEarnings: botEarned !== null ? botEarned : (parseFloat(localStorage.getItem('ref_earnings')) || 0)
+    // Actualizar número en pantalla
+    outputEl.innerText = totalGHS.toLocaleString('en-US');
+
+    // Color del borde
+    if(container) {
+        container.style.borderColor = val > 0 ? "#3b82f6" : "#f1f5f9";
+    }
+
+    // Vibración Telegram
+    if (window.Telegram?.WebApp?.HapticFeedback && val > 0) {
+        window.Telegram.WebApp.HapticFeedback.selectionChanged();
+    }
 };
 
-// 4. Guardar ID de usuario para el link de referidos
-if (botId) localStorage.setItem('user_id', botId);
+// --- UI Y DASHBOARD ---
+window.showToast = function(msj) {
+    const t = document.createElement('div');
+    t.innerText = msj;
+    t.style.cssText = "position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:#1e293b; color:white; padding:12px 25px; border-radius:30px; font-weight:700; z-index:10000; font-size:0.9em;";
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+};
 
-// --- FUNCIONES DE PERSISTENCIA ---
-
-export function saveInvestment(amount) {
-    state.totalInvestedUSDT += amount;
-    localStorage.setItem('invested', state.totalInvestedUSDT.toString());
-
-    const newTransaction = {
-        type: 'Deposit',
-        amount: amount,
-        date: new Date().toLocaleString("es-CU"),
-        id: 'dep-' + Date.now()
-    };
+export function updateDashboard() {
+    if(!state) return;
+    const ghs = (state.totalInvestedUSDT || 0) * 1000;
+    const rate = state.totalInvestedUSDT >= 3000 ? 7.0 : (state.totalInvestedUSDT >= 300 ? 6.5 : (state.totalInvestedUSDT >= 20 ? 6.0 : 5.5));
     
-    state.history.unshift(newTransaction);
-    localStorage.setItem('deposit_history', JSON.stringify(state.history));
-}
+    const fields = {
+        'main-bal': state.totalEarnedUSD.toFixed(4),
+        'main-power': ghs.toLocaleString(),
+        'stat-daily': (state.totalInvestedUSDT * (rate/100)).toFixed(4),
+        'stat-rate': rate.toFixed(1),
+        'withdraw-bal': state.totalEarnedUSD.toFixed(4)
+    };
 
-export function processDailyEarnings() {
-    if (state.totalInvestedUSDT <= 0) return false;
-
-    const now = new Date();
-    const cubaTime = new Intl.DateTimeFormat("en-US", {
-        timeZone: "America/Havana",
-        year: 'numeric', month: 'numeric', day: 'numeric'
-    }).format(now);
-
-    if (state.lastSettlement !== cubaTime) {
-        let rate = 5.5;
-        if (state.totalInvestedUSDT >= 3000) rate = 7.0;
-        else if (state.totalInvestedUSDT >= 300) rate = 6.5;
-        else if (state.totalInvestedUSDT >= 20) rate = 6.0;
-
-        const dailyProfit = state.totalInvestedUSDT * (rate / 100);
-
-        state.totalEarnedUSD += dailyProfit;
-        localStorage.setItem('earned', state.totalEarnedUSD.toString());
-
-        const earningEntry = {
-            type: 'Earning',
-            amount: dailyProfit,
-            date: new Date().toLocaleString("es-CU"),
-            id: 'earn-' + Date.now()
-        };
-        state.history.unshift(earningEntry);
-        localStorage.setItem('deposit_history', JSON.stringify(state.history));
-
-        state.lastSettlement = cubaTime;
-        localStorage.setItem('last_settlement', cubaTime);
-        
-        return true; 
+    for (const [id, val] of Object.entries(fields)) {
+        const el = document.getElementById(id);
+        if (el) el.innerText = val;
     }
-    return false;
-}
+}// --- ACCIONES Y BOTONES ---
+window.showPayment = function() {
+    const amt = document.getElementById('buy-amount')?.value;
+    if (!amt || amt < 1) return window.showToast("Minimum investment $1");
+    window.showToast("Redirecting to payment...");
+};
 
-export function addReferralCommission(amount, level) {
-    state.referralEarnings += amount;
-    state.totalEarnedUSD += amount; 
-    
-    localStorage.setItem('ref_earnings', state.referralEarnings.toString());
-    localStorage.setItem('earned', state.totalEarnedUSD.toString());
+window.copyReferralLink = function() {
+    const link = document.getElementById('referral-link');
+    if (link) {
+        navigator.clipboard.writeText(link.value);
+        window.showToast("Link copied! 🚀");
+    }
+};
 
-    const refEntry = {
-        type: 'Earning',
-        amount: amount,
-        date: new Date().toLocaleString("es-CU"),
-        id: `ref-L${level}-${Date.now()}`
-    };
-    state.history.unshift(refEntry);
-    localStorage.setItem('deposit_history', JSON.stringify(state.history));
-}
+// --- INICIALIZACIÓN ---
+window.onload = () => {
+    // 1. Telegram Setup
+    const tg = window.Telegram?.WebApp;
+    if(tg) { tg.ready(); tg.expand(); }
+
+    // 2. Forzar link de referido
+    const uid = localStorage.getItem('user_id') || "000000";
+    const refInput = document.getElementById('referral-link');
+    if(refInput) refInput.value = `https://t.me/SportsPayBot?start=${uid}`;
+
+    // 3. Procesar ganancias y dashboard
+    try {
+        processDailyEarnings();
+        updateDashboard();
+    } catch(e) { console.error("Error en state:", e); }
+
+    // 4. EL FIX MAESTRO: Escuchar el input manualmente
+    const inputMain = document.getElementById('buy-amount');
+    if(inputMain) {
+        inputMain.addEventListener('input', window.calculateReturns);
+    }
+
+    // 5. Timer
+    setInterval(() => {
+        const t = document.getElementById('timer');
+        if(!t) return;
+        const d = new Date();
+        t.innerText = `${(23-d.getHours()).toString().padStart(2,'0')}:${(59-d.getMinutes()).toString().padStart(2,'0')}:${(59-d.getSeconds()).toString().padStart(2,'0')}`;
+    }, 1000);
+};
