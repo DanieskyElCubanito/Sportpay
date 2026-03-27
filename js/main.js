@@ -10,30 +10,45 @@ window.showToast = function(message) {
     const toast = document.createElement('div');
     toast.className = 'toast-notification';
     toast.innerText = message;
+    
+    // Estilos dinámicos para el toast por si no los tienes en el CSS
+    toast.style.position = 'fixed';
+    toast.style.bottom = '80px';
+    toast.style.left = '50%';
+    toast.style.transform = 'translateX(-50%)';
+    toast.style.background = '#1e293b';
+    toast.style.color = 'white';
+    toast.style.padding = '12px 24px';
+    toast.style.borderRadius = '30px';
+    toast.style.fontWeight = '700';
+    toast.style.zIndex = '9999';
+    toast.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+    
     document.body.appendChild(toast);
     setTimeout(() => { if (toast) toast.remove(); }, 3000);
 };
 
-// --- 2. LÓGICA DE NEGOCIO (TIERS) ---
+// --- 2. LÓGICA DE NEGOCIO (TIERS - NIVELES DE MINERÍA) ---
 function calculateRate(qty) {
-    if (qty >= 3000) return 7.0;
-    if (qty >= 300) return 6.5;
-    if (qty >= 20) return 6.0;
-    return 5.5;
+    if (qty >= 3000) return 7.0; // Giga Farm
+    if (qty >= 300) return 6.5;  // Hash Master
+    if (qty >= 20) return 6.0;   // Node Runner
+    return 5.5;                  // Micro Miner
 }
 
 // --- 3. ACTUALIZACIÓN DEL DASHBOARD ---
 export function updateDashboard() {
-    const currentAE = (state.totalInvestedUSDT || 0) * 1000;
+    // 1 USDT = 1000 GH/s de poder
+    const currentGHS = (state.totalInvestedUSDT || 0) * 1000;
     const currentRate = calculateRate(state.totalInvestedUSDT || 0);
     const dailyEarn = (state.totalInvestedUSDT || 0) * (currentRate / 100);
 
     const elements = {
         'main-bal': (state.totalEarnedUSD || 0).toFixed(4),
-        'main-power': currentAE.toLocaleString(),
+        'main-power': currentGHS.toLocaleString(),
         'stat-daily': dailyEarn.toFixed(4),
         'stat-rate': currentRate.toFixed(1),
-        'withdraw-available': (state.totalEarnedUSD || 0).toFixed(4),
+        'withdraw-bal': (state.totalEarnedUSD || 0).toFixed(4), // Actualizado al ID del nuevo HTML
         'me-id': localStorage.getItem('user_id') || '000000',
         'user-id': localStorage.getItem('user_id') || '000000'
     };
@@ -49,20 +64,17 @@ window.updateDashboard = updateDashboard;
 
 // --- 4. CALCULADORA DE RENDIMIENTOS ---
 window.calculateReturns = function() {
-    const qtyInput = document.getElementById('buy-qty');
+    // Corregido el ID para que coincida con el nuevo HTML
+    const qtyInput = document.getElementById('buy-amount');
     const qty = parseFloat(qtyInput ? qtyInput.value : 0) || 0;
     
-    const rate = calculateRate(qty);
-    const daily = qty * (rate / 100);
-    const total20 = daily * 20;
+    // Cálculo de GH/s (1 USDT = 1000 GH/s)
+    const ghsPower = qty * 1000;
 
     const aeTotal = document.getElementById('ae-calc-total');
-    const estDaily = document.getElementById('est-daily');
-    const est20 = document.getElementById('est-20');
 
-    if (aeTotal) aeTotal.innerText = `${(qty * 1000).toLocaleString()} AE Power`;
-    if (estDaily) estDaily.innerText = `$${daily.toFixed(4)}`;
-    if (est20) est20.innerText = `$${total20.toFixed(2)}`;
+    // Solo insertamos el número porque el HTML ya dice " GH/s" al lado
+    if (aeTotal) aeTotal.innerText = ghsPower.toLocaleString();
 };
 
 // --- 5. SISTEMA DE HISTORIAL ---
@@ -72,9 +84,9 @@ window.renderHistory = function() {
 
     if (!state.history || state.history.length === 0) {
         historyContainer.innerHTML = `
-            <div style="text-align: center; color: #94a3b8; margin-top: 40px;">
-                <i class="fas fa-history" style="font-size: 2em; opacity: 0.5;"></i>
-                <p>No transactions yet</p>
+            <div style="text-align: center; color: #94a3b8; padding: 60px 20px;">
+                <i class="fas fa-history" style="font-size: 3.5em; margin-bottom: 15px; opacity: 0.2;"></i>
+                <div style="font-weight: 600; font-size: 0.9em;">No transactions recorded yet.</div>
             </div>`;
         return;
     }
@@ -82,7 +94,7 @@ window.renderHistory = function() {
     historyContainer.innerHTML = state.history.map(tx => `
         <div class="history-item" style="background: white; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-left: 4px solid ${tx.type === 'Earning' ? '#10b981' : (tx.type === 'Withdraw' ? '#ef4444' : '#3b82f6')}; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
             <div>
-                <div style="font-weight: 700; color: #1e293b;">${tx.type === 'Earning' ? 'Daily Return' : (tx.type === 'Withdraw' ? 'Withdrawal' : 'Deposit AE')}</div>
+                <div style="font-weight: 700; color: #1e293b;">${tx.type === 'Earning' ? 'Mining Yield' : (tx.type === 'Withdraw' ? 'Withdrawal' : 'Hash Purchase')}</div>
                 <div style="font-size: 0.75em; color: #94a3b8;">${tx.date}</div>
             </div>
             <div style="text-align: right;">
@@ -95,30 +107,37 @@ window.renderHistory = function() {
     `).join('');
 };
 
-// --- 6. NAVEGACIÓN ---
-window.switchTab = function(id) {
-    if(id === 'history') window.renderHistory();
-    if(id === 'referrals' || id === 'me') updateReferralUI();
-
-    const views = document.querySelectorAll('.view');
-    views.forEach(v => {
-        v.classList.remove('active');
-        v.style.display = 'none';
-    });
-
-    const targetView = document.getElementById('view-' + id);
-    if (targetView) {
-        targetView.classList.add('active');
-        targetView.style.display = 'block';
+// --- 6. FUNCIONES DE BOTONES FALTANTES ---
+window.showPayment = function() {
+    const amount = document.getElementById('buy-amount')?.value;
+    if (!amount || amount < 1) {
+        window.showToast("Minimum investment is $1");
+        return;
     }
+    window.showToast("Generating secure deposit address...");
+    // Aquí puedes enlazar tu lógica para mostrar la wallet o abrir el bot
+};
 
-    document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-    const activeNav = document.getElementById('nav-' + id) || document.querySelector(`.nav-item[onclick*="'${id}'"]`);
-    if(activeNav) activeNav.classList.add('active');
-
-    if(window.Telegram?.WebApp?.HapticFeedback) {
-        window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+window.processWithdraw = function() {
+    const address = document.getElementById('withdraw-address')?.value;
+    const amount = parseFloat(document.getElementById('withdraw-amount')?.value);
+    const balance = state.totalEarnedUSD || 0;
+    
+    if (!address || address.length < 10) {
+        window.showToast("Please enter a valid wallet address");
+        return;
     }
+    if (!amount || amount < 10) {
+        window.showToast("Minimum withdrawal is $10.00");
+        return;
+    }
+    if (amount > balance) {
+        window.showToast("Insufficient available balance");
+        return;
+    }
+    
+    window.showToast("Withdrawal request submitted! ⏳");
+    // Aquí enlazas con tu base de datos para descontar el saldo
 };
 
 // --- 7. LÓGICA DE LIVE FEED ---
@@ -127,9 +146,9 @@ function startLiveFeed() {
     if (!feedText) return;
 
     const actions = [
-        { text: "invested", icon: "💰", color: "#3b82f6", min: 10, max: 1000 },
-        { text: "withdrew", icon: "🚀", color: "#10b981", min: 5, max: 200 },
-        { text: "reinvested", icon: "♻️", color: "#f59e0b", min: 1, max: 50 }
+        { text: "purchased hash", icon: "⚡", color: "#3b82f6", min: 10, max: 1000 },
+        { text: "withdrew", icon: "💸", color: "#10b981", min: 10, max: 200 },
+        { text: "upgraded node", icon: "🔌", color: "#f59e0b", min: 50, max: 500 }
     ];
 
     const runFeed = () => {
@@ -141,7 +160,7 @@ function startLiveFeed() {
         setTimeout(() => {
             feedText.innerHTML = `${action.icon} User <b>${userId}</b> ${action.text} <b style="color: ${action.color}">$${amount}</b>`;
             feedText.style.opacity = 1;
-            setTimeout(runFeed, 5000);
+            setTimeout(runFeed, 4000); // Lo bajé a 4s para que se vea más activo
         }, 500);
     };
     runFeed();
@@ -152,7 +171,7 @@ window.copyReferralLink = function() {
     const linkInput = document.getElementById('referral-link');
     if (!linkInput) return;
     navigator.clipboard.writeText(linkInput.value).then(() => {
-        window.showToast("Link copied! 🚀");
+        window.showToast("Link copied to clipboard! 🚀");
     });
 };
 
@@ -191,9 +210,12 @@ window.onload = () => {
     updateDashboard();
     startLiveFeed();
 
+    // Temporizador de pago (Settlement)
     setInterval(() => {
         const timerEl = document.getElementById('timer');
-        if(!timerEl || !state.totalInvestedUSDT || state.totalInvestedUSDT <= 0) return;
+        if(!timerEl) return;
+        
+        // El reloj sigue corriendo aunque no tenga inversión para incitar a comprar
         const now = new Date();
         const cubaNow = new Date(now.toLocaleString("en-US", {timeZone: "America/Havana"}));
         timerEl.innerText = `${(23-cubaNow.getHours()).toString().padStart(2,'0')}:${(59-cubaNow.getMinutes()).toString().padStart(2,'0')}:${(59-cubaNow.getSeconds()).toString().padStart(2,'0')}`;
@@ -201,5 +223,6 @@ window.onload = () => {
 };
 
 window.refreshData = function() {
-    location.reload();
+    window.showToast("Syncing with blockchain...");
+    setTimeout(() => { location.reload(); }, 800);
 };
