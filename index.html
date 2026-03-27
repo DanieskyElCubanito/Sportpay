@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sports Pay</title>
+    <title>Sports Pay - Hash Mining</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="css/styles.css">
@@ -42,7 +42,7 @@
 
             <div style="margin: 0 15px; background: linear-gradient(135deg, #1e293b, #334155); border-radius: 24px; padding: 25px; color: white; box-shadow: 0 10px 25px rgba(0,0,0,0.15);">
                 <div style="display: flex; justify-content: space-between; opacity: 0.8; font-size: 0.85em; font-weight: 600;">
-                    <span>TOTAL EARNED BALANCE</span>
+                    <span>TOTAL EARNED USDT</span>
                     <span onclick="switchTab('history')" style="cursor:pointer; color: #60a5fa;"><i class="far fa-clock"></i> History</span>
                 </div>
                 <div style="font-size: 2.8em; font-weight: 800; margin: 15px 0;">$<span id="main-bal">0.0000</span></div>
@@ -53,29 +53,37 @@
 
             <div style="margin: 15px; padding: 12px; background: white; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px;">
                 <i class="fas fa-circle" style="color: #10b981; font-size: 0.6em; animation: pulse-live 2s infinite;"></i>
-                <div id="live-feed-text" style="font-size: 0.8em; color: #475569; font-weight: 600;">Connecting to secure server...</div>
+                <div id="live-feed-text" style="font-size: 0.8em; color: #475569; font-weight: 600;">Node connected securely...</div>
             </div>
 
-            <div style="margin: 15px; background: white; padding: 20px; border-radius: 20px; border: 1px solid #e2e8f0;">
+            <div style="margin: 15px; background: #ffffff; padding: 20px; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <span style="font-weight: 800; color: #64748b; font-size: 0.75em; letter-spacing: 0.5px;"><i class="fas fa-bolt" style="color: #f59e0b;"></i> AI ENERGY (AE)</span>
-                    <i class="fas fa-sync-alt" onclick="window.refreshData()" style="color: #3b82f6; cursor: pointer;"></i>
+                    <span style="font-weight: 800; color: #475569; font-size: 0.75em; letter-spacing: 1px;">
+                        <i class="fas fa-microchip" style="color: #3b82f6;"></i> ACTIVE MINING POWER
+                    </span>
+                    <span style="background: #10b981; color: white; padding: 2px 8px; border-radius: 6px; font-size: 0.6em; font-weight: 800; display: flex; align-items: center; gap: 4px;">
+                        <i class="fas fa-bolt" style="font-size: 0.8em;"></i> LIVE
+                    </span>
                 </div>
-                <div style="font-size: 3em; font-weight: 800; color: #0f172a;"><span id="main-power">0</span></div>
+                
+                <div style="font-size: 3em; font-weight: 800; color: #0f172a; display: flex; align-items: baseline; gap: 5px;">
+                    <span id="main-power">0</span> <span style="font-size: 0.4em; color: #94a3b8;">GH/s</span>
+                </div>
+                
                 <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 18px; padding-top: 18px; border-top: 1px solid #f1f5f9; text-align: center;">
-                    <div><div style="font-size: 0.65em; color: #94a3b8; font-weight: 700;">Daily</div><div style="font-weight: 800; color: #10b981;">$<span id="stat-daily">0.00</span></div></div>
-                    <div><div style="font-size: 0.65em; color: #94a3b8; font-weight: 700;">Rate</div><div style="font-weight: 800; color: #3b82f6;"><span id="stat-rate">5.5</span>%</div></div>
-                    <div><div style="font-size: 0.65em; color: #94a3b8; font-weight: 700;">Settlement</div><div style="font-weight: 800;" id="timer">00:00:00</div></div>
+                    <div><div style="font-size: 0.6em; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Daily Yield</div><div style="font-weight: 800; color: #10b981;">$<span id="stat-daily">0.00</span></div></div>
+                    <div><div style="font-size: 0.6em; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Hash Rate</div><div style="font-weight: 800; color: #3b82f6;"><span id="stat-rate">5.5</span>%</div></div>
+                    <div><div style="font-size: 0.6em; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Auto-Pay</div><div style="font-weight: 800;" id="timer">00:00:00</div></div>
                 </div>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 15px;">
                 <div onclick="switchTab('buy')" style="background: white; padding: 20px; border-radius: 18px; text-align: center; border: 1px solid #e2e8f0;">
-                    <i class="fas fa-chart-line" style="color: #3b82f6; font-size: 1.8em; margin-bottom: 8px;"></i>
-                    <div style="font-weight: 700; font-size: 0.9em;">Invest AE</div>
+                    <i class="fas fa-server" style="color: #3b82f6; font-size: 1.8em; margin-bottom: 8px;"></i>
+                    <div style="font-weight: 700; font-size: 0.9em;">Purchase Hash</div>
                 </div>
                 <div onclick="switchTab('referrals')" style="background: white; padding: 20px; border-radius: 18px; text-align: center; border: 1px solid #e2e8f0;">
-                    <i class="fas fa-users" style="color: #8b5cf6; font-size: 1.8em; margin-bottom: 8px;"></i>
+                    <i class="fas fa-network-wired" style="color: #8b5cf6; font-size: 1.8em; margin-bottom: 8px;"></i>
                     <div style="font-weight: 700; font-size: 0.9em;">My Network</div>
                 </div>
             </div>
@@ -146,40 +154,42 @@
         <div id="view-buy" class="view">
             <div style="padding: 15px; background: white; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center;">
                 <i class="fas fa-arrow-left" onclick="switchTab('home')" style="margin-right: 15px;"></i>
-                <span style="font-weight: 800;">Invest in AI Energy</span>
+                <span style="font-weight: 800;">Purchase Hash Power</span>
             </div>
             <div style="padding: 15px;">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
                     <div style="background: white; padding: 12px; border-radius: 14px; border: 1px solid #e2e8f0; text-align: center;">
-                        <div style="font-size: 0.65em; font-weight: 700; color: #94a3b8;">TIER 1 (Min $1)</div>
+                        <div style="font-size: 0.65em; font-weight: 700; color: #94a3b8;">MICRO MINER ($1-$19)</div>
                         <div style="font-weight: 800; color: #3b82f6;">5.5% <span style="font-size: 0.7em;">Daily</span></div>
                     </div>
                     <div style="background: white; padding: 12px; border-radius: 14px; border: 1px solid #e2e8f0; text-align: center;">
-                        <div style="font-size: 0.65em; font-weight: 700; color: #94a3b8;">TIER 2 ($20+)</div>
+                        <div style="font-size: 0.65em; font-weight: 700; color: #94a3b8;">NODE RUNNER ($20-$299)</div>
                         <div style="font-weight: 800; color: #3b82f6;">6.0% <span style="font-size: 0.7em;">Daily</span></div>
                     </div>
                     <div style="background: #3b82f6; padding: 12px; border-radius: 14px; text-align: center; color: white; grid-column: span 2;">
-                        <div style="font-size: 0.65em; font-weight: 700; opacity: 0.9;">TIER 3 ($300+) POPULAR</div>
+                        <div style="font-size: 0.65em; font-weight: 700; opacity: 0.9;">HASH MASTER ($300-$2,999)</div>
                         <div style="font-weight: 800; font-size: 1.2em;">6.5% Daily</div>
                     </div>
                     <div style="background: #1e293b; padding: 12px; border-radius: 14px; text-align: center; color: #fbbf24; grid-column: span 2;">
-                        <div style="font-size: 0.65em; font-weight: 700; opacity: 0.9;">TIER 4 ($3,000+) VIP</div>
+                        <div style="font-size: 0.65em; font-weight: 700; opacity: 0.9;">GIGA FARM ($3,000+)</div>
                         <div style="font-weight: 800; font-size: 1.2em;">7.0% Daily</div>
                     </div>
                 </div>
 
                 <div style="background: white; border-radius: 20px; padding: 25px; border: 1px solid #e2e8f0;">
-                    <div style="font-weight: 800; margin-bottom: 20px; text-align: center; color: #475569; font-size: 0.9em;">AMOUNT TO INVEST (USDT)</div>
-                    <div style="display: flex; align-items: center; background: #f8fafc; padding: 0 18px; border-radius: 14px; height: 64px; border: 1px solid #e2e8f0;">
+                    <div style="font-weight: 800; margin-bottom: 20px; text-align: center; color: #475569; font-size: 0.85em;">CONTRACT AMOUNT (USDT)</div>
+                    <div style="display: flex; align-items: center; background: #f8fafc; padding: 0 18px; border-radius: 14px; height: 64px; border: 1px solid #3b82f6;">
                         <input type="number" id="buy-amount" oninput="window.calculateReturns()" placeholder="0.00" style="flex: 1; border: none; background: transparent; font-size: 1.8em; font-weight: 800; outline: none; color: #0f172a;">
-                        <span style="font-weight: 800; color: #10b981;">USDT</span>
+                        <span style="font-weight: 800; color: #3b82f6;">USDT</span>
                     </div>
-                    <div style="margin: 20px 0; text-align: center; background: #f1f5f9; padding: 12px; border-radius: 10px;">
-                        <div style="font-size: 0.8em; color: #64748b; font-weight: 600;">You will receive:</div>
-                        <div style="font-size: 1.4em; font-weight: 800; color: #3b82f6;"><span id="ae-calc-total">0</span> AE</div>
+                    
+                    <div style="margin: 20px 0; text-align: center; background: #eff6ff; padding: 15px; border-radius: 12px; border: 1px dashed #3b82f6;">
+                        <div style="font-size: 0.8em; color: #1e40af; font-weight: 700;">Hardware Power to Receive:</div>
+                        <div style="font-size: 1.6em; font-weight: 900; color: #1e3a8a;"><span id="ae-calc-total">0</span> GH/s</div>
                     </div>
-                    <button onclick="window.showPayment()" style="width: 100%; padding: 18px; border-radius: 14px; border: none; background: #3b82f6; color: white; font-weight: 800; font-size: 1.1em; cursor: pointer; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">
-                        Get Deposit Address
+                    
+                    <button onclick="window.showPayment()" style="width: 100%; padding: 18px; border-radius: 14px; border: none; background: #0f172a; color: white; font-weight: 800; font-size: 1.1em; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                        ACTIVATE MINING NODE
                     </button>
                 </div>
             </div>
@@ -234,12 +244,12 @@
             <div style="font-size: 0.65em; font-weight: 800;">Home</div>
         </div>
         <div class="nav-item" onclick="switchTab('buy')">
-            <i class="fas fa-bolt" style="font-size: 1.3em; margin-bottom: 3px;"></i>
+            <i class="fas fa-microchip" style="font-size: 1.3em; margin-bottom: 3px;"></i>
             <div style="font-size: 0.65em; font-weight: 800;">Invest</div>
         </div>
         <div class="nav-item" onclick="switchTab('referrals')">
-            <i class="fas fa-users" style="font-size: 1.3em; margin-bottom: 3px;"></i>
-            <div style="font-size: 0.65em; font-weight: 800;">Team</div>
+            <i class="fas fa-network-wired" style="font-size: 1.3em; margin-bottom: 3px;"></i>
+            <div style="font-size: 0.65em; font-weight: 800;">Network</div>
         </div>
         <div class="nav-item" onclick="switchTab('history')">
             <i class="fas fa-receipt" style="font-size: 1.3em; margin-bottom: 3px;"></i>
@@ -249,39 +259,32 @@
 
     <script src="js/main.js"></script>
     <script>
-        // Función para cambiar entre pestañas/vistas
         function switchTab(tabId) {
-            // 1. Ocultar todas las vistas
             document.querySelectorAll('.view').forEach(v => {
                 v.classList.remove('active');
             });
             
-            // 2. Quitar el estado activo de todos los botones de la nav-bar
             document.querySelectorAll('.nav-item').forEach(i => {
                 i.classList.remove('active');
             });
             
-            // 3. Mostrar la vista seleccionada
             const targetView = document.getElementById('view-' + tabId);
             if(targetView) {
                 targetView.classList.add('active');
-                window.scrollTo(0,0); // Volver arriba al cambiar de vista
+                window.scrollTo(0,0);
             }
             
-            // 4. Marcar el botón correspondiente como activo
             const navItems = document.querySelectorAll('.nav-item');
             if(tabId === 'home') navItems[0].classList.add('active');
             if(tabId === 'buy') navItems[1].classList.add('active');
             if(tabId === 'referrals') navItems[2].classList.add('active');
             if(tabId === 'history') navItems[3].classList.add('active');
             
-            // Opcional: Feedback táctil de Telegram
             if (window.Telegram && window.Telegram.WebApp) {
                 window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
             }
         }
 
-        // Prevenir scroll elástico en iOS para que se sienta como una App
         document.addEventListener('touchmove', function (e) {
             if (e.scale !== 1) { e.preventDefault(); }
         }, { passive: false });
