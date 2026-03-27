@@ -210,3 +210,23 @@
     </script>
 </body>
                                                                                                 </html>
+<script>
+  // Este script es el "puente" directo para que nunca falle la calculadora
+  const buyInput = document.getElementById('buy-amount');
+  const calcDisplay = document.getElementById('ae-calc-total');
+  const inputContainer = document.getElementById('input-box-container');
+
+  if (buyInput && calcDisplay) {
+    buyInput.addEventListener('input', function() {
+      const val = parseFloat(this.value) || 0;
+      
+      // Actualiza los GH/s con formato de comas (ej: 1,000)
+      calcDisplay.innerText = (val * 1000).toLocaleString('en-US');
+      
+      // Feedback visual: si hay número, ponemos el borde azul
+      if (inputContainer) {
+          inputContainer.style.borderColor = val > 0 ? "#3b82f6" : "#e2e8f0";
+      }
+    });
+  }
+</script>
