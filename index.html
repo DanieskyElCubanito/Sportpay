@@ -150,50 +150,56 @@
                 </div>
             </div>
         </div>
-
-        <div id="view-buy" class="view">
-            <div style="padding: 15px; background: white; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center;">
-                <i class="fas fa-arrow-left" onclick="switchTab('home')" style="margin-right: 15px;"></i>
-                <span style="font-weight: 800;">Purchase Hash Power</span>
+        
+       <div id="view-buy" class="view">
+    <div style="padding: 15px; background: white; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center;">
+        <i class="fas fa-arrow-left" onclick="switchTab('home')" style="margin-right: 15px;"></i>
+        <span style="font-weight: 800;">Purchase Hash Power</span>
+    </div>
+    <div style="padding: 15px;">
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+            <div style="background: white; padding: 15px; border-radius: 16px; border: 1px solid #e2e8f0; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                <div style="font-size: 0.6em; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 5px;">Micro Miner</div>
+                <div style="font-weight: 800; color: #3b82f6; font-size: 1.2em;">5.5% <span style="font-size: 0.6em; color: #64748b;">Daily</span></div>
+                <div style="font-size: 0.6em; color: #64748b; margin-top: 4px;">$1 - $19</div>
             </div>
-            <div style="padding: 15px;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
-                    <div style="background: white; padding: 12px; border-radius: 14px; border: 1px solid #e2e8f0; text-align: center;">
-                        <div style="font-size: 0.65em; font-weight: 700; color: #94a3b8;">MICRO MINER ($1-$19)</div>
-                        <div style="font-weight: 800; color: #3b82f6;">5.5% <span style="font-size: 0.7em;">Daily</span></div>
-                    </div>
-                    <div style="background: white; padding: 12px; border-radius: 14px; border: 1px solid #e2e8f0; text-align: center;">
-                        <div style="font-size: 0.65em; font-weight: 700; color: #94a3b8;">NODE RUNNER ($20-$299)</div>
-                        <div style="font-weight: 800; color: #3b82f6;">6.0% <span style="font-size: 0.7em;">Daily</span></div>
-                    </div>
-                    <div style="background: #3b82f6; padding: 12px; border-radius: 14px; text-align: center; color: white; grid-column: span 2;">
-                        <div style="font-size: 0.65em; font-weight: 700; opacity: 0.9;">HASH MASTER ($300-$2,999)</div>
-                        <div style="font-weight: 800; font-size: 1.2em;">6.5% Daily</div>
-                    </div>
-                    <div style="background: #1e293b; padding: 12px; border-radius: 14px; text-align: center; color: #fbbf24; grid-column: span 2;">
-                        <div style="font-size: 0.65em; font-weight: 700; opacity: 0.9;">GIGA FARM ($3,000+)</div>
-                        <div style="font-weight: 800; font-size: 1.2em;">7.0% Daily</div>
-                    </div>
-                </div>
-
-                <div style="background: white; border-radius: 20px; padding: 25px; border: 1px solid #e2e8f0;">
-                    <div style="font-weight: 800; margin-bottom: 20px; text-align: center; color: #475569; font-size: 0.85em;">CONTRACT AMOUNT (USDT)</div>
-                    <div style="display: flex; align-items: center; background: #f8fafc; padding: 0 18px; border-radius: 14px; height: 64px; border: 1px solid #3b82f6;">
-                        <input type="number" id="buy-amount" oninput="window.calculateReturns()" placeholder="0.00" style="flex: 1; border: none; background: transparent; font-size: 1.8em; font-weight: 800; outline: none; color: #0f172a;">
-                        <span style="font-weight: 800; color: #3b82f6;">USDT</span>
-                    </div>
-                    
-                    <div style="margin: 20px 0; text-align: center; background: #eff6ff; padding: 15px; border-radius: 12px; border: 1px dashed #3b82f6;">
-                        <div style="font-size: 0.8em; color: #1e40af; font-weight: 700;">Hardware Power to Receive:</div>
-                        <div style="font-size: 1.6em; font-weight: 900; color: #1e3a8a;"><span id="ae-calc-total">0</span> GH/s</div>
-                    </div>
-                    
-                    <button onclick="window.showPayment()" style="width: 100%; padding: 18px; border-radius: 14px; border: none; background: #0f172a; color: white; font-weight: 800; font-size: 1.1em; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-                        ACTIVATE MINING NODE
-                    </button>
-                </div>
+            <div style="background: white; padding: 15px; border-radius: 16px; border: 1px solid #e2e8f0; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                <div style="font-size: 0.6em; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 5px;">Node Runner</div>
+                <div style="font-weight: 800; color: #3b82f6; font-size: 1.2em;">6.0% <span style="font-size: 0.6em; color: #64748b;">Daily</span></div>
+                <div style="font-size: 0.6em; color: #64748b; margin-top: 4px;">$20 - $299</div>
+            </div>
+            <div style="background: #3b82f6; padding: 15px; border-radius: 16px; text-align: center; color: white; grid-column: span 1; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);">
+                <div style="font-size: 0.6em; font-weight: 800; opacity: 0.9; text-transform: uppercase; margin-bottom: 5px;">Hash Master</div>
+                <div style="font-weight: 800; font-size: 1.2em;">6.5% Daily</div>
+                <div style="font-size: 0.6em; opacity: 0.9; margin-top: 4px;">$300 - $2,999</div>
+            </div>
+            <div style="background: #0f172a; padding: 15px; border-radius: 16px; text-align: center; color: #fbbf24; grid-column: span 1; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);">
+                <div style="font-size: 0.6em; font-weight: 800; opacity: 0.9; text-transform: uppercase; margin-bottom: 5px;">Giga Farm</div>
+                <div style="font-weight: 800; font-size: 1.2em;">7.0% Daily</div>
+                <div style="font-size: 0.6em; opacity: 0.9; margin-top: 4px;">$3,000+</div>
             </div>
         </div>
+
+        <div style="background: white; border-radius: 24px; padding: 25px; border: 1px solid #e2e8f0;">
+            <div style="font-weight: 800; margin-bottom: 20px; text-align: center; color: #475569; font-size: 0.85em; letter-spacing: 0.5px;">CONTRACT AMOUNT (USDT)</div>
+            
+            <div style="display: flex; align-items: center; background: #f8fafc; padding: 0 20px; border-radius: 16px; height: 70px; border: 2px solid #f1f5f9; transition: 0.3s;" id="input-container">
+                <input type="number" id="buy-amount" oninput="window.calculateReturns()" placeholder="0.00" style="flex: 1; border: none; background: transparent; font-size: 2em; font-weight: 800; outline: none; color: #0f172a;">
+                <span style="font-weight: 900; color: #10b981; font-size: 1.1em;">USDT</span>
+            </div>
+            
+            <div style="margin: 25px 0; text-align: center; background: #eff6ff; padding: 20px; border-radius: 18px; border: 1px dashed #3b82f6;">
+                <div style="font-size: 0.75em; color: #1e40af; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px;">Estimated Power</div>
+                <div style="font-size: 2.2em; font-weight: 900; color: #1e3a8a;"><span id="ae-calc-total">0</span> <span style="font-size: 0.4em; color: #3b82f6;">GH/s</span></div>
+            </div>
+            
+            <button onclick="window.showPayment()" style="width: 100%; padding: 20px; border-radius: 16px; border: none; background: #0f172a; color: white; font-weight: 800; font-size: 1.1em; cursor: pointer; box-shadow: 0 10px 20px rgba(15, 23, 42, 0.2);">
+                ACTIVATE MINING NODE
+            </button>
+        </div>
+    </div>
+</div>
 
         <div id="view-withdraw" class="view">
             <div style="padding: 15px; background: white; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center;">
