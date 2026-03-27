@@ -1,232 +1,318 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sports Pay - Hash Mining</title>
+    <title>Sports Pay - Premium Mining</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: #f8fafc; color: #1e293b; overflow-x: hidden; }
-        .view { display: none; width: 100%; min-height: 100vh; padding-bottom: 100px; box-sizing: border-box; }
-        .view.active { display: block; }
-        @keyframes pulse-live { 0% { transform: scale(0.95); opacity: 0.8; } 70% { transform: scale(1.4); opacity: 0; } 100% { transform: scale(0.95); opacity: 0; } }
-        @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-        .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; border-top: 1px solid #e2e8f0; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-item { text-align: center; color: #64748b; cursor: pointer; flex: 1; padding: 12px 0; transition: 0.2s; }
-        .nav-item.active { color: #3b82f6 !important; }
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        /* --- NUEVA PALETA DE COLORES PREMIUM --- */
+        :root {
+            --bg-deep: #0f172a;          /* Fondo Medianoche Profundo */
+            --card-deep: #1e293b;        /* Fondo de Tarjeta Intenso */
+            --text-light: #f1f5f9;       /* Texto casi blanco */
+            --text-gray: #94a3b8;        /* Texto descriptivo gris */
+            
+            /* Degradado de Acción (Azul Eléctrico a Cian) */
+            --gradient-action: linear-gradient(135deg, #0070f3, #00c6ff);
+            --gradient-action-active: linear-gradient(135deg, #0056b3, #0099cc);
+            
+            --success: #10b981;          /* Verde Esmeralda Vibrante */
+            --danger: #ef4444;           /* Rojo Suave */
+            
+            /* Sombra Neuromórfica Suave */
+            --neu-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+        }
+
+        /* --- BASE --- */
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif; /* Fuente FinTech por excelencia */
+            background-color: var(--bg-deep);
+            color: var(--text-light);
+            overflow-x: hidden;
+            padding-bottom: 90px;
+        }
+
+        /* --- COMPONENTES DE INTERFAZ --- */
+        
+        /* Cabecera Ticker */
+        .ticker-wrap {
+            background: #000;
+            color: #ccc;
+            font-size: 0.65em;
+            padding: 5px 0;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        /* Balance Box (La principal) */
+        .premium-balance-box {
+            background: var(--card-deep);
+            margin: 15px;
+            padding: 30px 20px;
+            border-radius: 24px;
+            box-shadow: var(--neu-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        /* Efecto de luz suave en la esquina */
+        .premium-balance-box::after {
+            content: '';
+            position: absolute;
+            top: -50px; right: -50px;
+            width: 150px; height: 150px;
+            background: radial-gradient(circle, rgba(0, 112, 243, 0.2) 0%, rgba(0, 0, 0, 0) 70%);
+            border-radius: 50%;
+        }
+
+        .bal-title {
+            color: var(--text-gray);
+            font-size: 0.8em;
+            font-weight: 600;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .bal-amount {
+            font-size: 3.2em; /* Mucho más grande */
+            font-weight: 800; /* Extra-negrita */
+            margin: 20px 0;
+            letter-spacing: -2px;
+        }
+
+        /* EL BOTÓN AHORA PARECE BOTÓN */
+        .btn-withdraw-premium {
+            width: 100%;
+            background: var(--gradient-action);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 16px;
+            font-weight: 800;
+            font-size: 1.1em;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(0, 112, 243, 0.5);
+            transition: 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .btn-withdraw-premium:active {
+            transform: translateY(2px) scale(0.98);
+            background: var(--gradient-action-active);
+            box-shadow: 0 2px 7px rgba(0, 112, 243, 0.3);
+        }
+
+        /* Status Bar (Conectado) */
+        .premium-status-bar {
+            background: rgba(30, 41, 59, 0.5);
+            margin: 0 15px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            color: var(--text-gray);
+            font-size: 0.8em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .live-dot {
+            height: 8px; width: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--success);
+            animation: pulse-live 1.5s infinite;
+        }
+
+        @keyframes pulse-live {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            70% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+
+        /* Active Power Box */
+        .premium-power-box {
+            background: var(--card-deep);
+            margin: 15px;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: var(--neu-shadow);
+        }
+
+        .power-title {
+            color: var(--text-gray);
+            font-size: 0.75em;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            display: flex; height: 25px;
+            align-items: center; justify-content: space-between;
+        }
+
+        .power-amount {
+            font-size: 3.5em; /* Gigante */
+            font-weight: 800;
+            margin: 10px 0;
+            color: var(--text-light);
+            display: flex; align-items: baseline; gap: 5px;
+        }
+        .power-unit {
+            font-size: 0.35em;
+            color: var(--text-gray);
+            font-weight: 600;
+        }
+
+        .live-badge {
+            background: #000; color: #10b981;
+            font-size: 0.6em; font-weight: 800;
+            padding: 3px 8px; border-radius: 5px;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        /* Navegación Inferior Corregida */
+        .nav-bar-premium {
+            position: fixed;
+            bottom: 0; left: 0; width: 100%;
+            background: rgba(15, 23, 42, 0.95); /* Semi-transparente */
+            backdrop-filter: blur(10px); /* Efecto cristal */
+            display: flex;
+            padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
+            border-top: 1px solid #1e293b;
+            z-index: 1000;
+        }
+        .nav-item {
+            flex: 1; text-align: center;
+            color: var(--text-gray);
+            font-size: 0.7em; font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .nav-item.active {
+            color: #00c6ff !important;
+        }
+        .nav-item i {
+            display: block; font-size: 1.6em;
+            margin-bottom: 4px;
+        }
     </style>
 </head>
 <body>
 
-    <div style="background: #0f172a; color: #94a3b8; font-size: 0.65em; padding: 6px 0; overflow: hidden; white-space: nowrap; border-bottom: 1px solid #1e293b;">
-        <div style="display: inline-block; animation: ticker 25s linear infinite;">
-            <span style="margin-right: 25px;"><b style="color: white;">BTC/USDT</b> $67,241.50 <span style="color: #10b981;">+1.2%</span></span>
-            <span style="margin-right: 25px;"><b style="color: white;">BNB/USDT</b> $592.30 <span style="color: #10b981;">+0.8%</span></span>
-            <span style="margin-right: 25px;"><b style="color: white;">ETH/USDT</b> $3,450.12 <span style="color: #ef4444;">-0.3%</span></span>
-            <span style="margin-right: 25px;"><b style="color: white;">TRX/USDT</b> $0.1182 <span style="color: #10b981;">+2.5%</span></span>
-            <span style="margin-right: 25px;"><b style="color: white;">BTC/USDT</b> $67,241.50 <span style="color: #10b981;">+1.2%</span></span>
+    <div class="ticker-wrap">
+        <div style="display:inline-block; animation: ticker-kf 25s linear infinite; white-space: nowrap;">
+            <span style="margin-right:25px;">BTC/USDT <span class="text-success">$67,241.50</span></span>
+            <span style="margin-right:25px;">BNB/USDT <span class="text-success">$592.30</span></span>
+            <span style="margin-right:25px;">ETH/USDT <span class="text-danger">$3,450.12</span></span>
+            <span style="margin-right:25px;">BTC/USDT <span class="text-success">$67,241.50</span></span>
         </div>
     </div>
+    <style> @keyframes ticker-kf { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } } </style>
 
     <div id="views-container">
 
-        <div id="view-home" class="view active">
-            <div style="padding: 15px; display: flex; justify-content: space-between; align-items: center;">
-                <div style="background: white; padding: 6px 14px; border-radius: 20px; font-size: 0.8em; font-weight: 700; border: 1px solid #e2e8f0; color: #3b82f6;">
+        <div id="view-home" class="view active" style="display:block;">
+            
+                <div style="padding: 15px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="background: rgba(30,41,59,0.5); padding: 6px 14px; border-radius: 20px; font-size: 0.75em; font-weight: 600; color: #00c6ff; border: 1px solid rgba(0, 198, 255, 0.2);">
                     Sports Pay - ID:<span id="user-id">000000</span>
                 </div>
-                <i class="fas fa-user-circle" style="font-size: 1.5em; color: #64748b;"></i>
+                <i class="fas fa-user-circle" style="font-size: 1.5em; color: var(--text-gray);"></i>
             </div>
 
-            <div style="margin: 0 15px; background: linear-gradient(135deg, #1e293b, #334155); border-radius: 24px; padding: 25px; color: white; box-shadow: 0 10px 25px rgba(0,0,0,0.15);">
-                <div style="display: flex; justify-content: space-between; opacity: 0.8; font-size: 0.85em; font-weight: 600;">
+            <div class="premium-balance-box">
+                <div class="bal-title">
                     <span>TOTAL EARNED USDT</span>
-                    <span onclick="switchTab('history')" style="cursor:pointer; color: #60a5fa;"><i class="far fa-clock"></i> History</span>
+                    <span onclick="switchTab('history')" style="cursor:pointer; color: #00c6ff; font-weight: 700;"><i class="far fa-clock"></i> History</span>
                 </div>
-                <div style="font-size: 2.8em; font-weight: 800; margin: 15px 0;">$<span id="main-bal">0.0000</span></div>
-                <button onclick="switchTab('withdraw')" style="width: 100%; padding: 15px; border-radius: 14px; border: none; background: #3b82f6; color: white; font-weight: 700; font-size: 1em;">
-                    <i class="fas fa-wallet" style="margin-right: 8px;"></i> Withdraw Funds
+                <div class="bal-amount">$<span id="main-bal">0.0000</span></div>
+                <button class="btn-withdraw-premium" onclick="switchTab('withdraw')">
+                    <i class="fas fa-wallet"></i> Withdraw Funds
                 </button>
             </div>
 
-            <div style="margin: 15px; padding: 12px; background: white; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px;">
-                <i class="fas fa-circle" style="color: #10b981; font-size: 0.6em; animation: pulse-live 2s infinite;"></i>
-                <div id="live-feed-text" style="font-size: 0.8em; color: #475569; font-weight: 600;">Node connected securely...</div>
+            <div class="premium-status-bar">
+                <div class="live-dot"></div>
+                <span>Node connected securely...</span>
             </div>
 
-            <div style="margin: 15px; background: #ffffff; padding: 20px; border-radius: 20px; border: 1px solid #e2e8f0;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <span style="font-weight: 800; color: #475569; font-size: 0.75em; letter-spacing: 1px;"><i class="fas fa-microchip" style="color: #3b82f6;"></i> ACTIVE POWER</span>
-                    <span style="background: #10b981; color: white; padding: 2px 8px; border-radius: 6px; font-size: 0.6em; font-weight: 800;">LIVE</span>
+            <div class="premium-power-box">
+                <div class="power-title">
+                    <span><i class="fas fa-microchip" style="margin-right:5px;color:#00c6ff;"></i> ACTIVE MINING POWER</span>
+                    <span class="live-badge">LIVE</span>
                 </div>
-                <div style="font-size: 3em; font-weight: 800; color: #0f172a;"><span id="main-power">0</span> <span style="font-size: 0.4em; color: #94a3b8;">GH/s</span></div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 18px; padding-top: 18px; border-top: 1px solid #f1f5f9; text-align: center;">
-                    <div><div style="font-size: 0.6em; color: #94a3b8; font-weight: 700;">DAILY</div><div style="font-weight: 800; color: #10b981;">$<span id="stat-daily">0.00</span></div></div>
-                    <div><div style="font-size: 0.6em; color: #94a3b8; font-weight: 700;">RATE</div><div style="font-weight: 800; color: #3b82f6;"><span id="stat-rate">5.5</span>%</div></div>
-                    <div><div style="font-size: 0.6em; color: #94a3b8; font-weight: 700;">SETTLE</div><div style="font-weight: 800;" id="timer">00:00:00</div></div>
+                <div class="power-amount">
+                    <span id="main-power">0</span> <span class="power-unit">GH/s</span>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px; text-align: center; border-top: 1px solid #334155; padding-top: 15px;">
+                    <div><div style="font-size: 0.6em; color: var(--text-gray); font-weight: 700; text-transform:uppercase;">DAILY</div><div style="font-weight: 800; color: var(--success); font-size: 1.1em;">$<span id="stat-daily">0.00</span></div></div>
+                    <div><div style="font-size: 0.6em; color: var(--text-gray); font-weight: 700; text-transform:uppercase;">RATE</div><div style="font-weight: 800; color: #00c6ff; font-size: 1.1em;"><span id="stat-rate">5.5</span>%</div></div>
+                    <div><div style="font-size: 0.6em; color: var(--text-gray); font-weight: 700; text-transform:uppercase;">SETTLE</div><div style="font-weight: 800; color: var(--text-light); font-size: 1.1em;" id="timer">00:00:00</div></div>
                 </div>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 15px;">
-                <div onclick="switchTab('buy')" style="background: white; padding: 20px; border-radius: 18px; text-align: center; border: 1px solid #e2e8f0;">
-                    <i class="fas fa-server" style="color: #3b82f6; font-size: 1.8em; margin-bottom: 8px;"></i>
-                    <div style="font-weight: 700; font-size: 0.9em;">Purchase Hash</div>
-                </div>
-                <div onclick="switchTab('referrals')" style="background: white; padding: 20px; border-radius: 18px; text-align: center; border: 1px solid #e2e8f0;">
-                    <i class="fas fa-network-wired" style="color: #8b5cf6; font-size: 1.8em; margin-bottom: 8px;"></i>
-                    <div style="font-weight: 700; font-size: 0.9em;">My Network</div>
-                </div>
+                <button class="btn-withdraw-premium" onclick="switchTab('buy')" style="height: 100px; flex-direction: column;">
+                    <i class="fas fa-chart-line" style="font-size: 1.8em; margin-bottom: 8px;"></i>
+                    Purchase Hash
+                </button>
+                <button class="btn-withdraw-premium" onclick="switchTab('referrals')" style="height: 100px; flex-direction: column; background: var(--card-deep); color: #00c6ff; box-shadow: 0 4px 14px rgba(0,0,0,0.3);">
+                    <i class="fas fa-users" style="font-size: 1.8em; margin-bottom: 8px;"></i>
+                    My Network
+                </button>
             </div>
         </div>
-
-        <div id="view-referrals" class="view">
-            <div style="padding: 15px; background: white; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; position: sticky; top: 0; z-index: 10;">
-                <i class="fas fa-arrow-left" onclick="switchTab('home')" style="margin-right: 15px;"></i>
-                <span style="font-weight: 800;">Global Network</span>
-            </div>
-            <div style="padding: 15px;">
-                <div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 20px; padding: 25px; color: white; text-align: center;">
-                    <div style="font-size: 0.8em; font-weight: 600; opacity: 0.9;">TOTAL COMMISSIONS</div>
-                    <div style="font-size: 2.8em; font-weight: 800; margin: 10px 0;">$<span id="total-ref-earnings">0.00</span></div>
-                    <div style="background: rgba(255,255,255,0.2); padding: 8px 20px; border-radius: 20px; display: inline-flex; font-weight: 700;">Team: <span id="total-team-size" style="margin-left: 5px;">0</span></div>
-                </div>
-                <div style="margin: 20px 0;">
-                    <div style="font-weight: 700; margin-bottom: 10px; font-size: 0.85em; color: #64748b;">YOUR LINK</div>
-                    <div style="display: flex; background: white; border-radius: 14px; border: 1px solid #e2e8f0; overflow: hidden; height: 50px;">
-                        <input type="text" id="referral-link" readonly style="flex: 1; border: none; padding: 0 15px; font-weight: 600; font-size: 0.8em; background: transparent;">
-                        <button onclick="window.copyReferralLink()" style="background: #3b82f6; color: white; border: none; padding: 0 15px; font-weight: 800;">COPY</button>
-                    </div>
-                </div>
-                <div id="lvl-list" style="background: white; border-radius: 18px; border: 1px solid #e2e8f0; overflow: hidden;">
-                    <div style="padding: 16px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between;">
-                        <span>Direct (L1) - 7%</span><span id="lvl1-count" style="font-weight: 800;">0</span>
-                    </div>
-                    <div style="padding: 16px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between;">
-                        <span>Partner (L2) - 3%</span><span id="lvl2-count" style="font-weight: 800;">0</span>
-                    </div>
-                    <div style="padding: 16px; display: flex; justify-content: space-between;">
-                        <span>Network (L3-L5)</span><span style="font-weight: 800;">Check Details</span>
-                    </div>
-                </div>
-            </div>
-                                                                                                                                   </div>
-                                                                                                                                   <div id="view-buy" class="view">
-            <div style="padding: 15px; background: white; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center;">
-                <i class="fas fa-arrow-left" onclick="switchTab('home')" style="margin-right: 15px;"></i>
-                <span style="font-weight: 800;">Purchase Hash Power</span>
-            </div>
-            <div style="padding: 15px;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
-                    <div style="background: white; padding: 15px; border-radius: 16px; border: 1px solid #e2e8f0; text-align: center;">
-                        <div style="font-size: 0.6em; font-weight: 800; color: #94a3b8;">MICRO</div>
-                        <div style="font-weight: 800; color: #3b82f6; font-size: 1.2em;">5.5%</div>
-                    </div>
-                    <div style="background: white; padding: 15px; border-radius: 16px; border: 1px solid #e2e8f0; text-align: center;">
-                        <div style="font-size: 0.6em; font-weight: 800; color: #94a3b8;">NODE</div>
-                        <div style="font-weight: 800; color: #3b82f6; font-size: 1.2em;">6.0%</div>
-                    </div>
-                    <div style="background: #3b82f6; padding: 15px; border-radius: 16px; text-align: center; color: white;">
-                        <div style="font-size: 0.6em; font-weight: 800;">MASTER</div>
-                        <div style="font-weight: 800; font-size: 1.2em;">6.5%</div>
-                    </div>
-                    <div style="background: #0f172a; padding: 15px; border-radius: 16px; text-align: center; color: #fbbf24;">
-                        <div style="font-size: 0.6em; font-weight: 800;">GIGA</div>
-                        <div style="font-weight: 800; font-size: 1.2em;">7.0%</div>
-                    </div>
-                </div>
-
-                <div style="background: white; border-radius: 24px; padding: 25px; border: 1px solid #e2e8f0;">
-                    <div style="font-weight: 800; margin-bottom: 15px; text-align: center; font-size: 0.8em; color: #64748b;">AMOUNT (USDT)</div>
-                    <div id="input-box-container" style="display: flex; align-items: center; background: #f8fafc; padding: 0 20px; border-radius: 16px; height: 65px; border: 2px solid #f1f5f9;">
-                        <input type="number" id="buy-amount" oninput="window.calculateReturns()" placeholder="0.00" style="flex: 1; border: none; background: transparent; font-size: 1.8em; font-weight: 800; outline: none;">
-                        <span style="font-weight: 900; color: #10b981;">USDT</span>
-                    </div>
-                    <div style="margin: 20px 0; text-align: center; background: #eff6ff; padding: 15px; border-radius: 15px;">
-                        <div style="font-size: 0.7em; color: #1e40af; font-weight: 800;">ESTIMATED POWER</div>
-                        <div style="font-size: 1.8em; font-weight: 900; color: #1e3a8a;"><span id="ae-calc-total">0</span> GH/s</div>
-                    </div>
-                    <button onclick="window.showPayment()" style="width: 100%; padding: 18px; border-radius: 16px; border: none; background: #0f172a; color: white; font-weight: 800;">ACTIVATE NODE</button>
-                </div>
-            </div>
+        
+    </div> <nav class="nav-bar-premium">
+        <div class="nav-item active" onclick="switchTab('home')">
+            <i class="fas fa-home"></i>
+            Home
         </div>
-
-        <div id="view-withdraw" class="view">
-            <div style="padding: 15px; background: white; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center;">
-                <i class="fas fa-arrow-left" onclick="switchTab('home')" style="margin-right: 15px;"></i>
-                <span style="font-weight: 800;">Withdraw</span>
-            </div>
-            <div style="padding: 20px;">
-                <div style="text-align: center; margin-bottom: 25px;">
-                    <div style="font-size: 0.8em; color: #64748b;">Available</div>
-                    <div style="font-size: 2.2em; font-weight: 800;">$<span id="withdraw-bal">0.0000</span></div>
-                </div>
-                <input type="text" id="withdraw-address" placeholder="Network Address" style="width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 15px; box-sizing: border-box;">
-                <input type="number" id="withdraw-amount" placeholder="Amount (Min $10)" style="width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 25px; box-sizing: border-box;">
-                <button onclick="window.processWithdraw()" style="width: 100%; padding: 18px; border-radius: 14px; border: none; background: #ef4444; color: white; font-weight: 800;">Confirm Withdrawal</button>
-            </div>
+        <div class="nav-item" onclick="switchTab('buy')">
+            <i class="fas fa-microchip"></i>
+            Invest
         </div>
-
-        <div id="view-history" class="view">
-            <div style="padding: 15px; background: white; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center;">
-                <i class="fas fa-arrow-left" onclick="switchTab('home')" style="margin-right: 15px;"></i>
-                <span style="font-weight: 800;">History</span>
-            </div>
-            <div id="history-list" style="padding: 15px;"></div>
+        <div class="nav-item" onclick="switchTab('referrals')">
+            <i class="fas fa-network-wired"></i>
+            Network
         </div>
-
-    </div> <nav class="nav-bar">
-        <div class="nav-item active" onclick="switchTab('home')"><i class="fas fa-home"></i><div style="font-size: 0.6em;">Home</div></div>
-        <div class="nav-item" onclick="switchTab('buy')"><i class="fas fa-microchip"></i><div style="font-size: 0.6em;">Invest</div></div>
-        <div class="nav-item" onclick="switchTab('referrals')"><i class="fas fa-network-wired"></i><div style="font-size: 0.6em;">Network</div></div>
-        <div class="nav-item" onclick="switchTab('history')"><i class="fas fa-receipt"></i><div style="font-size: 0.6em;">History</div></div>
+        <div class="nav-item" onclick="switchTab('history')">
+            <i class="fas fa-receipt"></i>
+            History
+        </div>
     </nav>
 
-   <script src="js/main.js"></script>
     <script>
-  document.getElementById('buy-amount').addEventListener('input', function() {
-    const val = parseFloat(this.value) || 0;
-    document.getElementById('ae-calc-total').innerText = (val * 1000).toLocaleString();
-    console.log("Calculando GH/s para:", val);
-  });
-    </script>
-    <script>
-        function switchTab(id) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        function switchTab(tabId) {
+            document.querySelectorAll('.view').forEach(v => {
+                v.style.display = 'none';
+                v.classList.remove('active');
+            });
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            const target = document.getElementById('view-' + id);
-            if(target) target.classList.add('active');
             
-            // Activar icono nav
-            const navs = document.querySelectorAll('.nav-item');
-            if(id === 'home') navs[0].classList.add('active');
-            if(id === 'buy') navs[1].classList.add('active');
-            if(id === 'referrals') navs[2].classList.add('active');
-            if(id === 'history') navs[3].classList.add('active');
+            const target = document.getElementById('view-' + tabId);
+            if(target) {
+                target.style.display = 'block';
+                setTimeout(() => target.classList.add('active'), 10);
+            }
             
-            if (window.Telegram?.WebApp) window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+            // Actualizar Nav activo
+            const navItems = document.querySelectorAll('.nav-item');
+            if(tabId === 'home') navItems[0].classList.add('active');
+            if(tabId === 'buy') navItems[1].classList.add('active');
+            if(tabId === 'referrals') navItems[2].classList.add('active');
+            if(tabId === 'history') navItems[ navItems.length - 1 ].classList.add('active');
+            
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+            }
         }
+        window.switchTab = switchTab;
     </script>
 </body>
-                                                                                                </html>
-<script>
-  // Este script es el "puente" directo para que nunca falle la calculadora
-  const buyInput = document.getElementById('buy-amount');
-  const calcDisplay = document.getElementById('ae-calc-total');
-  const inputContainer = document.getElementById('input-box-container');
-
-  if (buyInput && calcDisplay) {
-    buyInput.addEventListener('input', function() {
-      const val = parseFloat(this.value) || 0;
-      
-      // Actualiza los GH/s con formato de comas (ej: 1,000)
-      calcDisplay.innerText = (val * 1000).toLocaleString('en-US');
-      
-      // Feedback visual: si hay número, ponemos el borde azul
-      if (inputContainer) {
-          inputContainer.style.borderColor = val > 0 ? "#3b82f6" : "#e2e8f0";
-      }
-    });
-  }
-</script>
+</html>
