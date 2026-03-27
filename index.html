@@ -185,6 +185,13 @@
 
    <script src="js/main.js"></script>
     <script>
+  document.getElementById('buy-amount').addEventListener('input', function() {
+    const val = parseFloat(this.value) || 0;
+    document.getElementById('ae-calc-total').innerText = (val * 1000).toLocaleString();
+    console.log("Calculando GH/s para:", val);
+  });
+    </script>
+    <script>
         function switchTab(id) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
