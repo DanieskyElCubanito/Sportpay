@@ -3,444 +3,279 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sports Pay - Pro Dashboard</title>
+    <title>Sports Pay - Premium</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root {
-            --bg-main: #0b0f1a;
-            --bg-card: #161c2d;
-            --accent: #0070f3;
-            --accent-glow: rgba(0, 112, 243, 0.3);
-            --gradient: linear-gradient(135deg, #0070f3 0%, #00c6ff 100%);
-            --text-primary: #ffffff;
-            --text-secondary: #94a3b8;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --nav-bg: rgba(22, 28, 45, 0.8);
-        }
-
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
+            --bg-dark: #05070a;
+            --card-glass: rgba(23, 28, 41, 0.8);
+            --accent-blue: #0088cc;
+            --accent-gradient: linear-gradient(135deg, #0088cc 0%, #00c6ff 100%);
+            --text-main: #ffffff;
+            --text-dim: #848da0;
+            --glass-border: rgba(255, 255, 255, 0.08);
         }
 
         body {
             margin: 0;
-            padding: 0;
-            background-color: var(--bg-main);
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-            line-height: 1.5;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-user-select: none;
         }
 
-        /* --- Animaciones --- */
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        @keyframes pulse-glow {
-            0% { box-shadow: 0 0 0 0 rgba(0, 112, 243, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(0, 112, 243, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(0, 112, 243, 0); }
-        }
-
-        /* --- Contenedor de Vistas --- */
-        .app-container {
-            padding: 16px;
-            padding-bottom: 100px; /* Espacio para la nav bar */
-        }
-
-        .view {
-            display: none;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        .view.active {
-            display: block;
-        }
-
-        /* --- Tarjetas Estilo Pro --- */
-        .card {
-            background: var(--bg-card);
-            border-radius: 24px;
+        .app-shell {
             padding: 20px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding-bottom: 110px;
         }
 
-        .balance-label {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .balance-amount {
-            font-size: 2.8rem;
-            font-weight: 900;
-            margin: 10px 0;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* --- Botones --- */
-        .btn {
-            width: 100%;
-            padding: 16px;
-            border-radius: 16px;
-            border: none;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
+        /* --- NUEVO ENCABEZADO PROFESIONAL --- */
+        .header-profile {
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 10px;
+            justify-content: space-between;
+            margin-bottom: 30px;
         }
 
-        .btn-primary {
-            background: var(--gradient);
-            color: white;
-            box-shadow: 0 4px 15px var(--accent-glow);
-        }
-
-        .btn-primary:active {
-            transform: scale(0.97);
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 2px solid #334155;
-            color: var(--text-primary);
-            margin-top: 10px;
-        }
-
-        /* --- Inputs --- */
-        .input-wrapper {
-            position: relative;
-            margin-bottom: 15px;
-        }
-
-        .input-wrapper i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-secondary);
-        }
-
-        input {
-            width: 100%;
-            background: #0f172a;
-            border: 2px solid #334155;
-            border-radius: 14px;
-            padding: 14px 14px 14px 45px;
-            color: white;
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        input:focus {
-            border-color: var(--accent);
-        }
-
-        /* --- Navigation Bar --- */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--nav-bg);
-            backdrop-filter: blur(20px);
-            display: flex;
-            justify-content: space-around;
-            padding: 12px 5px calc(12px + env(safe-area-inset-bottom));
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            z-index: 1000;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.7rem;
-            font-weight: 600;
-            transition: 0.3s;
-            flex: 1;
-        }
-
-        .nav-item i {
-            font-size: 1.4rem;
-            margin-bottom: 4px;
-        }
-
-        .nav-item.active {
-            color: var(--accent);
-        }
-
-        /* --- Header de Usuario --- */
-        .user-header {
+        .user-info {
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 25px;
         }
 
-        .avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: var(--gradient);
+        .user-photo {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            background: var(--accent-gradient);
+            border: 2px solid var(--glass-border);
+            object-fit: cover;
+        }
+
+        .user-details h2 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 800;
+        }
+
+        .user-details span {
+            font-size: 0.8rem;
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        /* BOTÓN HISTORIAL (Flecha derecha) */
+        .btn-history-top {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: var(--card-glass);
+            border: 1px solid var(--glass-border);
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 900;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        /* --- DASHBOARD CARDS --- */
+        .main-card {
+            background: var(--card-glass);
+            backdrop-filter: blur(15px);
+            border-radius: 28px;
+            padding: 25px;
+            border: 1px solid var(--glass-border);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .balance-label {
+            color: var(--text-dim);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        .balance-val {
+            font-size: 3rem;
+            font-weight: 800;
+            margin: 10px 0;
+            display: flex;
+            align-items: baseline;
+        }
+
+        /* --- BOTONES PREMIUM DE NAVEGACIÓN INFERIOR --- */
+        .nav-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            height: 72px;
+            background: rgba(13, 17, 28, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 10px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            z-index: 9999;
+        }
+
+        .nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            width: 60px;
+        }
+
+        .nav-btn i {
+            font-size: 1.4rem;
+            color: var(--text-dim);
+            transition: 0.3s;
+        }
+
+        .nav-btn span {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--text-dim);
+        }
+
+        /* Estado Activo con Color y Brillo */
+        .nav-btn.active i {
+            color: var(--accent-blue);
+            text-shadow: 0 0 15px rgba(0, 136, 204, 0.8);
+            transform: translateY(-5px);
+        }
+
+        .nav-btn.active span {
+            color: white;
+        }
+
+        .nav-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            width: 6px;
+            height: 6px;
+            background: var(--accent-blue);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-blue);
+        }
+
+        /* Estilo para los botones de acción Invertir/Retirar */
+        .action-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn-action {
+            padding: 14px;
+            border-radius: 18px;
+            border: none;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .btn-blue {
+            background: var(--accent-gradient);
+            color: white;
+            box-shadow: 0 8px 20px rgba(0, 136, 204, 0.3);
+        }
+
+        .btn-dark {
+            background: #1c2333;
+            color: white;
+            border: 1px solid var(--glass-border);
         }
     </style>
 </head>
 <body>
 
-<div class="app-container">
+<div class="app-shell">
     
-    <div class="user-header">
-        <div class="avatar" id="user-initial">U</div>
-        <div>
-            <div style="font-size: 0.9rem; font-weight: 800;" id="user-name">Usuario</div>
-            <div style="font-size: 0.7rem; color: var(--text-secondary);" id="user-status">Cuenta Verificada</div>
+    <div class="header-profile">
+        <div class="user-info">
+            <img id="user-pic" class="user-photo" src="https://via.placeholder.com/100" alt="Profile">
+            <div class="user-details">
+                <h2 id="user-full-name">Cargando...</h2>
+                <span id="user-id">ID: 000000</span>
+            </div>
+        </div>
+        <div class="btn-history-top" onclick="switchTab('history')">
+            <i class="fa-solid fa-clock-rotate-left"></i>
         </div>
     </div>
 
-    <section id="home" class="view active">
-        <div class="card">
-            <span class="balance-label">Balance Disponible</span>
-            <div class="balance-amount">$<span id="bal-val">0.00</span></div>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn btn-primary" style="flex: 1;" onclick="switchTab('invest')">
-                    <i class="fas fa-plus-circle"></i> Invertir
+    <section id="dashboard" class="view active">
+        <div class="main-card">
+            <div class="balance-label">Balance Disponible</div>
+            <div class="balance-val">$<span id="main-balance">0.00</span></div>
+            <div class="action-group">
+                <button class="btn-action btn-blue" onclick="switchTab('planes')">
+                    <i class="fa-solid fa-circle-plus"></i> Invertir
                 </button>
-                <button class="btn btn-outline" style="flex: 1;" onclick="switchTab('withdraw')">
-                    <i class="fas fa-wallet"></i> Retirar
+                <button class="btn-action btn-dark" onclick="switchTab('withdraw')">
+                    <i class="fa-solid fa-wallet"></i> Retirar
                 </button>
             </div>
         </div>
 
-        <div class="card" style="border-left: 4px solid var(--accent);">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div class="main-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
                     <div class="balance-label">Minería en curso</div>
-                    <div style="font-size: 1.5rem; font-weight: 800; margin-top: 5px;"><span id="power-val">0.0</span> GH/s</div>
+                    <div style="font-size: 1.6rem; font-weight: 800; margin-top: 5px;">0.0 GH/s</div>
                 </div>
-                <div class="avatar" style="width: 40px; height: 40px; background: rgba(0, 112, 243, 0.1); color: var(--accent);"><i class="fas fa-microchip"></i></div>
-            </div>
-            <div style="margin-top: 15px; background: #0b0f1a; height: 6px; border-radius: 10px; overflow: hidden;">
-                <div id="progress-bar" style="width: 65%; height: 100%; background: var(--gradient);"></div>
+                <div style="background: rgba(0,136,204,0.1); padding: 12px; border-radius: 15px;">
+                    <i class="fa-solid fa-microchip" style="color: var(--accent-blue); font-size: 1.5rem;"></i>
+                </div>
             </div>
         </div>
     </section>
 
-    <section id="invest" class="view">
-        </section>
+    </div>
 
-</div>
-
-<nav class="bottom-nav">
-    <a href="#" class="nav-item active" onclick="switchTab('home')"><i class="fas fa-th-large"></i><span>Dashboard</span></a>
-    <a href="#" class="nav-item" onclick="switchTab('invest')"><i class="fas fa-bolt"></i><span>Planes</span></a>
-    <a href="#" class="nav-item" onclick="switchTab('network')"><i class="fas fa-share-nodes"></i><span>Red</span></a>
-    <a href="#" class="nav-item" onclick="switchTab('history')"><i class="fas fa-list-ul"></i><span>Historial</span></a>
+<nav class="nav-bar">
+    <a href="#" class="nav-btn active" onclick="switchTab('dashboard')">
+        <i class="fa-solid fa-house-chimney"></i>
+        <span>Home</span>
+    </a>
+    <a href="#" class="nav-btn" onclick="switchTab('planes')">
+        <i class="fa-solid fa-bolt-lightning"></i>
+        <span>Planes</span>
+    </a>
+    <a href="#" class="nav-btn" onclick="switchTab('red')">
+        <i class="fa-solid fa-users-viewfinder"></i>
+        <span>Red</span>
+    </a>
+    <a href="#" class="nav-btn" onclick="switchTab('misiones')">
+        <i class="fa-solid fa-gift"></i>
+        <span>Misiones</span>
+    </a>
 </nav>
 
 <script>
-    // La lógica de JavaScript y el resto de secciones HTML van en la Parte 2
-    <section id="invest" class="view">
-        <h2 style="font-weight: 800; margin-bottom: 20px;">Planes de Inversión</h2>
-        <div class="card" onclick="selectPlan('Starter', 10)">
-            <div style="display: flex; justify-content: space-between;">
-                <span style="font-weight: 700; color: var(--accent);">PLAN STARTER</span>
-                <span style="background: var(--success); font-size: 0.7rem; padding: 2px 8px; border-radius: 20px;">ACTIVO</span>
-            </div>
-            <div style="font-size: 1.8rem; font-weight: 900; margin: 10px 0;">10.00 USDT</div>
-            <p style="color: var(--text-secondary); font-size: 0.85rem;">Retorno diario: 2.5%<br>Duración: 30 días</p>
-            <button class="btn btn-primary" onclick="processPayment(10)">Mejorar Plan</button>
-        </div>
-
-        <div class="card" onclick="selectPlan('Premium', 50)">
-            <span style="font-weight: 700; color: #a855f7;">PLAN PREMIUM</span>
-            <div style="font-size: 1.8rem; font-weight: 900; margin: 10px 0;">50.00 USDT</div>
-            <p style="color: var(--text-secondary); font-size: 0.85rem;">Retorno diario: 4.0%<br>Duración: 30 días</p>
-            <button class="btn btn-outline">Adquirir Ahora</button>
-        </div>
-    </section>
-
-    <section id="network" class="view">
-        <h2 style="font-weight: 800; margin-bottom: 20px;">Sistema de Referidos</h2>
-        <div class="card" style="text-align: center;">
-            <div class="avatar" style="width: 60px; height: 60px; margin: 0 auto 15px auto; font-size: 1.5rem;">
-                <i class="fas fa-users"></i>
-            </div>
-            <div class="balance-amount" style="font-size: 2rem;" id="ref-count">0</div>
-            <div class="balance-label">Amigos Invitados</div>
-        </div>
-
-        <div class="card">
-            <div class="balance-label" style="margin-bottom: 10px;">Tu Enlace de Invitación</div>
-            <div class="input-wrapper">
-                <i class="fas fa-link"></i>
-                <input type="text" id="referral-link" readonly value="https://t.me/TuBot?start=user123">
-            </div>
-            <button class="btn btn-primary" onclick="copyLink()">
-                <i class="fas fa-copy"></i> Copiar Enlace
-            </button>
-        </div>
-    </section>
-
-    <section id="withdraw" class="view">
-        <h2 style="font-weight: 800; margin-bottom: 20px;">Retirar Fondos</h2>
-        <div class="card">
-            <div class="input-wrapper">
-                <i class="fas fa-wallet"></i>
-                <input type="number" id="withdraw-amount" placeholder="Monto (Min. 5 USDT)">
-            </div>
-            <div class="input-wrapper">
-                <i class="fab fa-ethereum"></i>
-                <input type="text" id="wallet-address" placeholder="Dirección de Red TON / USDT">
-            </div>
-            <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 15px;">
-                * Los retiros pueden tardar hasta 24 horas en procesarse.
-            </p>
-            <button class="btn btn-primary" onclick="handleWithdraw()">Confirmar Retiro</button>
-        </div>
-    </section>
-
-    <section id="history" class="view">
-        <h2 style="font-weight: 800; margin-bottom: 20px;">Actividad Reciente</h2>
-        <div id="history-list">
-            <div class="card" style="padding: 15px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <div style="background: rgba(16, 185, 129, 0.1); color: var(--success); padding: 10px; border-radius: 12px;">
-                        <i class="fas fa-arrow-down"></i>
-                    </div>
-                    <div>
-                        <div style="font-size: 0.9rem; font-weight: 700;">Depósito</div>
-                        <div style="font-size: 0.7rem; color: var(--text-secondary);">24 Mar, 2026</div>
-                    </div>
-                </div>
-                <div style="font-weight: 800; color: var(--success);">+10.00</div>
-            </div>
-        </div>
-    </section>
-
-</div> <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-    tg.ready();
-
-    // Colores de Telegram
-    document.documentElement.style.setProperty('--accent', tg.themeParams.button_color || '#0070f3');
-
-    // Inicializar datos de usuario
-    const user = tg.initDataUnsafe?.user;
-    if (user) {
-        document.getElementById('user-name').innerText = (user.first_name + " " + (user.last_name || "")).trim();
-        document.getElementById('user-initial').innerText = user.first_name.charAt(0).toUpperCase();
-        document.getElementById('referral-link').value = `https://t.me/SportsPay_Bot?start=${user.id}`;
-    }
-
-    // Sistema de Navegación
-    function switchTab(tabId) {
-        // Remover clases activas
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-
-        // Activar seleccionada
-        document.getElementById(tabId).classList.add('active');
-        const activeNav = Array.from(document.querySelectorAll('.nav-item')).find(n => n.getAttribute('onclick').includes(tabId));
-        if (activeNav) activeNav.classList.add('active');
-
-        // Feedback háptico
-        if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-    }
-
-    // Función Copiar
-    function copyLink() {
-        const linkInput = document.getElementById('referral-link');
-        linkInput.select();
-        document.execCommand('copy');
-        tg.showAlert("¡Enlace copiado correctamente!");
-    }
-
-    // Lógica de Retiro
-    function handleWithdraw() {
-        const amount = document.getElementById('withdraw-amount').value;
-        const wallet = document.getElementById('wallet-address').value;
-
-        if (!amount || amount < 5) {
-            tg.showAlert("El monto mínimo es de 5 USDT");
-            return;
-        }
-        if (wallet.length < 10) {
-            tg.showAlert("Por favor ingresa una dirección de billetera válida");
-            return;
-        }
-
-        tg.showConfirm(`¿Confirmas el retiro de ${amount} USDT a la wallet ${wallet.substring(0,6)}...?`, (ok) => {
-            if (ok) {
-                tg.showProgress();
-                // Simulación de envío al bot
-                setTimeout(() => {
-                    tg.close(); // O enviar datos vía tg.sendData
-                }, 2000);
-            }
-        });
-    }
-
-    // Selección de Planes
-    function selectPlan(name, price) {
-        tg.showConfirm(`¿Deseas activar el plan ${name} por ${price} USDT?`, (ok) => {
-            if (ok) {
-                // Lógica para procesar el pago con el bot
-                const orderData = {
-                    action: 'buy_plan',
-                    plan: name,
-                    amount: price
-                };
-                tg.sendData(JSON.stringify(orderData));
-            }
-        });
-    }
-
-    // Animación de contador de balance (opcional)
-    function animateBalance(target) {
-        let current = 0;
-        const interval = setInterval(() => {
-            if (current >= target) {
-                clearInterval(interval);
-            } else {
-                current += (target / 20);
-                document.getElementById('bal-val').innerText = current.toFixed(2);
-            }
-        }, 50);
-    }
-
-    // Carga inicial
-    window.onload = () => {
-        animateBalance(124.50); // Ejemplo de carga de datos
-    };
+    // La lógica de la Parte 2 conectará la foto y el ID de Telegram
 </script>
-</script>
+
 </body>
 </html>
