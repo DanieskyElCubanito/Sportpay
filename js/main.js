@@ -66,3 +66,40 @@ export function updateDashboard() {
         if (el) el.innerText = val;
     }
 }
+function claimMining() {
+    if (state.accumulatedMining > 0) {
+        // 1. Sumamos al balance local de la pantalla
+        state.totalEarnedUSD += state.accumulatedMining;
+        state.accumulatedMining = 0;
+        updateDashboard();
+
+        // 2. Preparamos el paquete para el Bot
+        const dataToBot = {
+            type: "save_balance",
+            balance: state.totalEarnedUSD,
+            invested: state.totalInvestedUSDT
+        };
+
+        // 3. ENVIAR A BJS (Esto cierra la App y activa 'on_serialized_data')
+        if (window.Telegram.WebApp) {
+            window.Telegram.WebApp.sendData(JSON.stringify(dataToBot));
+        }
+    }
+}
+function syncInitialData() {
+    const params = new URLSearchParams(window.location.search);
+    
+    // Si la URL trae balance, lo cargamos sobre el valor por defecto
+    if (params.has('balance')) {
+        state.totalEarnedUSD = parseFloat(params.get('balance')) || 0;
+    }
+    if (params.has('invested')) {
+        state.totalInvestedUSDT = parseFloat(params.get('invested')) || 0;
+    }
+    
+    // Refrescamos la interfaz
+    updateDashboard();
+}
+
+// Ejecutar al cargar
+window.addEventListener('load', syncInitialData);
