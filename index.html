@@ -219,16 +219,19 @@
         </div>
 
         <div class="main-card">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <div class="balance-label">Minería en curso</div>
-                    <div id="mining-speed" style="font-size: 1.6rem; font-weight: 800; margin-top: 5px;">0.0 GH/s</div>
-                </div>
-                <div style="position: relative;">
-                    <i class="fa-solid fa-microchip" style="color: var(--accent-blue); font-size: 1.8rem; opacity: 0.5;"></i>
-                    <i class="fa-solid fa-gear fa-spin" style="position: absolute; top: -5px; right: -5px; color: var(--accent-blue); font-size: 0.8rem;"></i>
-                </div>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <div class="balance-label">Minería en curso</div>
+            <div style="font-size: 1.6rem; font-weight: 800; margin-top: 5px;">
+                $<span id="mining-balance">0.0000</span>
             </div>
+            <div id="mining-speed" style="font-size: 0.7rem; color: var(--accent-blue); font-weight: 600;">0.0 GH/s activos</div>
+        </div>
+        
+        <button onclick="claimMining()" class="btn-action btn-blue" style="padding: 10px 15px; font-size: 0.8rem; border-radius: 12px; height: auto;">
+            <i class="fa-solid fa-hand-holding-dollar"></i> Reclamar
+        </button>
+    </div>
         </div>
     </section>
 
