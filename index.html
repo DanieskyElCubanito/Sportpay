@@ -233,9 +233,12 @@
         Mínimo de inversión: <span style="color: var(--accent-blue);">1.00 USDT</span>
     </div>
     
-    <div style="width: 90%; max-width: 280px; position: relative; margin-bottom: 25px; display: flex; align-items: center; border-bottom: 2px solid var(--accent-blue); padding-bottom: 5px;">
+    <div style="width: 90%; max-width: 280px; position: relative; margin-bottom: 25px; display: flex; align-items: center; border-bottom: 2px solid var(--accent-blue); padding-bottom: 8px;">
+        
         <div style="margin-right: 12px; display: flex; align-items: center;">
-            <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT" style="width: 28px; height: 28px;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Tether_Logo.svg" 
+                 onerror="this.src='https://cryptologos.cc/logos/tether-usdt-logo.png?v=025'"
+                 alt="USDT" style="width: 28px; height: 28px;">
         </div>
         
         <input type="number" id="invest-amount" placeholder="0.00" oninput="calculateROI()" 
@@ -259,7 +262,7 @@
         </div>
     </div>
 
-    <button class="btn-action btn-blue" style="width: 100%; margin-top: 25px; height: 62px; font-size: 1.1rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;" onclick="processInvestment()">
+    <button class="btn-action btn-blue" style="width: 100%; margin-top: 25px; height: 62px; font-size: 1.1rem; border-radius: 20px;" onclick="processInvestment()">
         Activar Nodo
     </button>
 </div>
