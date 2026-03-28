@@ -321,11 +321,13 @@
     tg.expand();
     tg.ready();
 
+    // --- 1. INICIALIZAR USUARIO ---
     function initUser() {
         const user = tg.initDataUnsafe?.user;
         if (user) {
             document.getElementById('user-full-name').innerText = (user.first_name + " " + (user.last_name || "")).trim();
             document.getElementById('user-id').innerText = `ID: ${user.id}`;
+            
             if (user.photo_url) {
                 document.getElementById('user-pic').src = user.photo_url;
             } else {
@@ -333,19 +335,19 @@
             }
             document.getElementById('ref-link').value = `https://t.me/SportsPay_Bot?start=${user.id}`;
         }
+        
+        // Iniciar la animación de minería al cargar
+        startMiningAnimation();
     }
 
+    // --- 2. NAVEGACIÓN (TABS) ---
     function switchTab(tabId) {
-        // Ocultar todas las vistas
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        // Quitar estado activo de botones
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
 
-        // Activar la vista y el botón correspondiente
         const targetView = document.getElementById(tabId);
         if (targetView) targetView.classList.add('active');
 
-        // Buscar el botón por el texto o el atributo onclick
         const btns = document.querySelectorAll('.nav-btn');
         btns.forEach(btn => {
             if(btn.getAttribute('onclick').includes(tabId)) {
@@ -356,11 +358,72 @@
         if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
     }
 
+    // --- 3. LÓGICA DE LA CALCULADORA DE INVERSIÓN ---
+    function calculateROI() {
+        const amount = parseFloat(document.getElementById('invest-amount').value) || 0;
+        let rate = 0;
+        let tier = "None";
+        let color = "#848da0";
+
+        // Rangos oficiales que pediste
+        if (amount >= 5 && amount <= 20) {
+            rate = 0.045; tier = "MICRO"; color = "#3b82f6";
+        } else if (amount >= 25 && amount <= 80) {
+            rate = 0.055; tier = "NODE"; color = "#10b981";
+        } else if (amount >= 100 && amount <= 450) {
+            rate = 0.065; tier = "MASTER"; color = "#a855f7";
+        } else if (amount >= 500 && amount <= 2000) {
+            rate = 0.075; tier = "GIGA"; color = "#f59e0b";
+        }
+
+        const power = amount * 10; // 1 USDT = 10 GH/s
+        const dailyHash = (amount * rate) * 1000; // 1000 Hash = 1 USDT de ganancia
+
+        document.getElementById('calc-power').innerText = `${power.toFixed(1)} GH/s`;
+        document.getElementById('calc-hash').innerText = `${dailyHash.toFixed(0)} HASH`;
+        document.getElementById('calc-tier').innerText = tier;
+        document.getElementById('calc-tier').style.color = color;
+        
+        return { amount, tier, power, dailyHash };
+    }
+
+    function processInvestment() {
+        const data = calculateROI();
+        if (data.amount < 5) {
+            tg.showAlert("Monto mínimo: 5 USDT");
+            return;
+        }
+
+        tg.showConfirm(`¿Activar ${data.power} GH/s en nivel ${data.tier}?`, (ok) => {
+            if (ok) {
+                // Envía los datos a Bots.Business
+                tg.sendData(JSON.stringify({
+                    action: "invest",
+                    amount: data.amount,
+                    tier: data.tier,
+                    power: data.power
+                }));
+            }
+        });
+    }
+
+    // --- 4. IDEA PRO: ANIMACIÓN DE MINERÍA ---
+    function startMiningAnimation() {
+        let hashCount = 0;
+        const hashDisplay = document.getElementById('main-balance'); 
+        // Si tienes 1000 hash = 1 USDT, aquí simulamos que sube
+        setInterval(() => {
+            hashCount += 0.01; 
+            if(hashDisplay) hashDisplay.innerText = hashCount.toFixed(2);
+        }, 3000); // Sube un poco cada 3 segundos
+    }
+
     function copyLink() {
         const copyText = document.getElementById("ref-link");
         copyText.select();
         document.execCommand("copy");
-        tg.showAlert("¡Enlace copiado!");
+        tg.showScanQrPopup({ text: "¡Enlace copiado!" }); // Efecto visual de Telegram
+        setTimeout(() => tg.closeScanQrPopup(), 1000);
     }
 
     window.onload = initUser;
