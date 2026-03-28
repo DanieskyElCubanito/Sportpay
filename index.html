@@ -432,6 +432,20 @@
         }
     }
 
+    function reinvestBalance() {
+    const currentBalance = parseFloat(document.getElementById('main-balance').innerText);
+    if (currentBalance < 1) {
+        tg.showAlert("Mínimo 1.00 USDT para reinvertir");
+        return;
+    }
+    tg.showConfirm(`¿Reinvertir ${currentBalance} USDT con bono del 5%?`, (ok) => {
+        if (ok) {
+            switchTab('planes');
+            document.getElementById('invest-amount').value = currentBalance;
+            calculateROI();
+        }
+    });
+    }
     window.onload = initUser;
 </script>
 
