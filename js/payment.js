@@ -78,4 +78,4 @@ function startPaymentTimer(minutes) {
         if(seconds <= 0) clearInterval(paymentTimerInterval);
         seconds--;
     }, 1000);
-            }
+} // <--- ESTA LLAVE ES LA QUE FALTABA
