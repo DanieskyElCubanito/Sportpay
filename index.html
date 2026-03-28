@@ -18,6 +18,7 @@
             --text-main: #ffffff;
             --text-dim: #848da0;
             --glass-border: rgba(255, 255, 255, 0.08);
+            --success: #10b981;
         }
 
         body {
@@ -33,7 +34,6 @@
             padding-bottom: 110px;
         }
 
-        /* --- NUEVO ENCABEZADO PROFESIONAL --- */
         .header-profile {
             display: flex;
             align-items: center;
@@ -68,7 +68,6 @@
             font-weight: 600;
         }
 
-        /* BOTÓN HISTORIAL (Flecha derecha) */
         .btn-history-top {
             width: 44px;
             height: 44px;
@@ -80,10 +79,17 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: 0.2s;
         }
 
-        /* --- DASHBOARD CARDS --- */
+        /* SISTEMA DE VISTAS */
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block !important;
+        }
+
         .main-card {
             background: var(--card-glass);
             backdrop-filter: blur(15px);
@@ -92,7 +98,6 @@
             border: 1px solid var(--glass-border);
             margin-bottom: 20px;
             position: relative;
-            overflow: hidden;
         }
 
         .balance-label {
@@ -111,7 +116,6 @@
             align-items: baseline;
         }
 
-        /* --- BOTONES PREMIUM DE NAVEGACIÓN INFERIOR --- */
         .nav-bar {
             position: fixed;
             bottom: 20px;
@@ -126,7 +130,6 @@
             justify-content: space-around;
             padding: 0 10px;
             border: 1px solid var(--glass-border);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
             z-index: 9999;
         }
 
@@ -136,51 +139,15 @@
             align-items: center;
             gap: 4px;
             text-decoration: none;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            width: 60px;
-        }
-
-        .nav-btn i {
-            font-size: 1.4rem;
-            color: var(--text-dim);
-            transition: 0.3s;
-        }
-
-        .nav-btn span {
-            font-size: 0.65rem;
-            font-weight: 700;
             color: var(--text-dim);
         }
 
-        /* Estado Activo con Color y Brillo */
-        .nav-btn.active i {
+        .nav-btn.active {
             color: var(--accent-blue);
-            text-shadow: 0 0 15px rgba(0, 136, 204, 0.8);
-            transform: translateY(-5px);
         }
 
-        .nav-btn.active span {
-            color: white;
-        }
-
-        .nav-btn.active::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            width: 6px;
-            height: 6px;
-            background: var(--accent-blue);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--accent-blue);
-        }
-
-        /* Estilo para los botones de acción Invertir/Retirar */
-        .action-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
+        .nav-btn i { font-size: 1.4rem; }
+        .nav-btn span { font-size: 0.65rem; font-weight: 700; }
 
         .btn-action {
             padding: 14px;
@@ -191,27 +158,16 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            font-size: 0.9rem;
             cursor: pointer;
         }
 
-        .btn-blue {
-            background: var(--accent-gradient);
-            color: white;
-            box-shadow: 0 8px 20px rgba(0, 136, 204, 0.3);
-        }
-
-        .btn-dark {
-            background: #1c2333;
-            color: white;
-            border: 1px solid var(--glass-border);
-        }
+        .btn-blue { background: var(--accent-gradient); color: white; }
+        .btn-dark { background: #1c2333; color: white; border: 1px solid var(--glass-border); }
     </style>
 </head>
 <body>
 
 <div class="app-shell">
-    
     <div class="header-profile">
         <div class="user-info">
             <img id="user-pic" class="user-photo" src="https://via.placeholder.com/100" alt="Profile">
@@ -229,16 +185,15 @@
         <div class="main-card">
             <div class="balance-label">Balance Disponible</div>
             <div class="balance-val">$<span id="main-balance">0.00</span></div>
-            <div class="action-group">
+            <div class="action-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                 <button class="btn-action btn-blue" onclick="switchTab('planes')">
                     <i class="fa-solid fa-circle-plus"></i> Invertir
                 </button>
-                <button class="btn-action btn-dark" onclick="switchTab('withdraw')">
+                <button class="btn-action btn-dark" onclick="switchTab('dashboard')">
                     <i class="fa-solid fa-wallet"></i> Retirar
                 </button>
             </div>
         </div>
-
         <div class="main-card">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
@@ -251,33 +206,8 @@
             </div>
         </div>
     </section>
-
-    </div>
-
-<nav class="nav-bar">
-    <a href="#" class="nav-btn active" onclick="switchTab('dashboard')">
-        <i class="fa-solid fa-house-chimney"></i>
-        <span>Home</span>
-    </a>
-    <a href="#" class="nav-btn" onclick="switchTab('planes')">
-        <i class="fa-solid fa-bolt-lightning"></i>
-        <span>Planes</span>
-    </a>
-    <a href="#" class="nav-btn" onclick="switchTab('red')">
-        <i class="fa-solid fa-users-viewfinder"></i>
-        <span>Red</span>
-    </a>
-    <a href="#" class="nav-btn" onclick="switchTab('misiones')">
-        <i class="fa-solid fa-gift"></i>
-        <span>Misiones</span>
-    </a>
-</nav>
-
-<script>
-    // La lógica de la Parte 2 conectará la foto y el ID de Telegram
     <section id="planes" class="view">
         <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 20px;">Mining Nodes</h2>
-        
         <div class="main-card" style="border-left: 4px solid #a855f7;">
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
@@ -286,12 +216,9 @@
                 </div>
                 <div style="text-align: right;">
                     <div style="color: var(--success); font-weight: 700;">+6.5% Daily</div>
-                    <div style="font-size: 0.7rem; color: var(--text-dim);">Settle: 24h</div>
                 </div>
             </div>
-            <button class="btn-action btn-blue" style="margin-top: 15px; width: 100%;" onclick="buyPlan('Master', 50)">
-                Activar Nodo
-            </button>
+            <button class="btn-action btn-blue" style="margin-top: 15px; width: 100%;" onclick="buyPlan('Master', 50)">Activar Nodo</button>
         </div>
 
         <div class="main-card" style="border-left: 4px solid #f59e0b;">
@@ -304,45 +231,33 @@
                     <div style="color: var(--success); font-weight: 700;">+7.0% Daily</div>
                 </div>
             </div>
-            <button class="btn-action btn-dark" style="margin-top: 15px; width: 100%;" onclick="buyPlan('Giga', 100)">
-                Activar Nodo
-            </button>
+            <button class="btn-action btn-dark" style="margin-top: 15px; width: 100%;" onclick="buyPlan('Giga', 100)">Activar Nodo</button>
         </div>
     </section>
 
     <section id="red" class="view">
         <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 20px;">Mi Red</h2>
-        <div class="main-card" style="text-align: center; background: linear-gradient(180deg, rgba(0,136,204,0.1) 0%, var(--card-glass) 100%);">
+        <div class="main-card" style="text-align: center;">
             <i class="fa-solid fa-share-nodes" style="font-size: 2.5rem; color: var(--accent-blue); margin-bottom: 15px;"></i>
             <div class="balance-val" style="justify-content: center; font-size: 2.5rem;" id="ref-count">0</div>
             <div class="balance-label">Afiliados Activos</div>
         </div>
-        
         <div class="main-card">
             <div class="balance-label" style="margin-bottom: 12px;">Enlace Personal</div>
-            <input type="text" id="ref-link" readonly value="https://t.me/SportsPay_Bot?start=user" 
-                   style="width: 100%; background: #0d111c; border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; color: var(--text-dim); font-family: monospace; margin-bottom: 15px;">
-            <button class="btn-action btn-blue" style="width: 100%;" onclick="copyLink()">
+            <input type="text" id="ref-link" readonly value="https://t.me/SportsPay_Bot?start=user">
+            <button class="btn-action btn-blue" style="width: 100%; margin-top: 15px;" onclick="copyLink()">
                 <i class="fa-solid fa-copy"></i> Copiar Invitación
             </button>
         </div>
     </section>
 
     <section id="misiones" class="view">
-        <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 20px;">Tareas y Misiones</h2>
+        <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 20px;">Misiones</h2>
         <div class="main-card" style="display: flex; align-items: center; gap: 15px; padding: 15px;">
             <div style="font-size: 1.5rem; color: #1da1f2;"><i class="fa-brands fa-twitter"></i></div>
             <div style="flex: 1;">
                 <div style="font-weight: 700; font-size: 0.9rem;">Seguir en Twitter</div>
                 <div style="font-size: 0.75rem; color: var(--success);">+0.50 USDT</div>
-            </div>
-            <button class="btn-action btn-dark" style="padding: 8px 15px; font-size: 0.75rem;">Ir</button>
-        </div>
-        <div class="main-card" style="display: flex; align-items: center; gap: 15px; padding: 15px;">
-            <div style="font-size: 1.5rem; color: #ff0000;"><i class="fa-brands fa-youtube"></i></div>
-            <div style="flex: 1;">
-                <div style="font-weight: 700; font-size: 0.9rem;">Suscribirse al Canal</div>
-                <div style="font-size: 0.75rem; color: var(--success);">+1.00 USDT</div>
             </div>
             <button class="btn-action btn-dark" style="padding: 8px 15px; font-size: 0.75rem;">Ir</button>
         </div>
@@ -353,83 +268,57 @@
             <button onclick="switchTab('dashboard')" style="background: none; border: none; color: white; font-size: 1.2rem;"><i class="fa-solid fa-arrow-left"></i></button>
             <h2 style="font-size: 1.5rem; font-weight: 800; margin: 0;">Historial</h2>
         </div>
-        <div id="logs-container">
-            <div style="text-align: center; color: var(--text-dim); margin-top: 50px;">
-                <i class="fa-solid fa-box-open" style="font-size: 3rem; opacity: 0.2;"></i>
-                <p>No hay transacciones recientes</p>
-            </div>
+        <div id="logs-container" style="text-align: center; color: var(--text-dim); margin-top: 50px;">
+            <i class="fa-solid fa-box-open" style="font-size: 3rem; opacity: 0.2;"></i>
+            <p>No hay transacciones recientes</p>
         </div>
     </section>
-
-<script>
+</div> <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
+    tg.ready();
 
-    // 1. CARGAR DATOS REALES DE TELEGRAM
     function initUser() {
         const user = tg.initDataUnsafe?.user;
-        
         if (user) {
-            // Nombre Completo
-            const fullName = `${user.first_name} ${user.last_name || ""}`;
-            document.getElementById('user-full-name').innerText = fullName;
-            
-            // ID de Usuario
+            document.getElementById('user-full-name').innerText = (user.first_name + " " + (user.last_name || "")).trim();
             document.getElementById('user-id').innerText = `ID: ${user.id}`;
-            
-            // Foto de Perfil (Si tiene)
             if (user.photo_url) {
                 document.getElementById('user-pic').src = user.photo_url;
             } else {
-                // Si no hay foto, generamos un avatar con la inicial
                 document.getElementById('user-pic').src = `https://ui-avatars.com/api/?name=${user.first_name}&background=0088cc&color=fff`;
             }
-
-            // Actualizar enlace de referido
             document.getElementById('ref-link').value = `https://t.me/SportsPay_Bot?start=${user.id}`;
         }
     }
 
-    // 2. NAVEGACIÓN ENTRE PESTAÑAS
     function switchTab(tabId) {
-        // Ocultar todas las vistas
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        // Desactivar todos los botones de la nav
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
 
-        // Activar la seleccionada
-        document.getElementById(tabId).classList.add('active');
-        
-        // Activar el botón correspondiente en la barra inferior (si existe)
+        const targetView = document.getElementById(tabId);
+        if (targetView) targetView.classList.add('active');
+
         const activeBtn = document.querySelector(`.nav-btn[onclick*="${tabId}"]`);
         if (activeBtn) activeBtn.classList.add('active');
 
-        // Vibración al cambiar
         if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
     }
 
-    // 3. FUNCIONES DE ACCIÓN
     function copyLink() {
         const copyText = document.getElementById("ref-link");
         copyText.select();
         document.execCommand("copy");
-        tg.showAlert("¡Enlace de invitación copiado!");
+        tg.showAlert("¡Enlace copiado!");
     }
 
-    function buyPlan(planName, price) {
-        tg.showConfirm(`¿Confirmas la activación del Nodo ${planName} por ${price} USDT?`, (ok) => {
-            if (ok) {
-                tg.showProgress();
-                // Aquí enviarías el comando al bot de Bots.Business
-                setTimeout(() => { tg.close(); }, 1500);
-            }
+    function buyPlan(plan, price) {
+        tg.showConfirm(`¿Activar Nodo ${plan} por ${price} USDT?`, (ok) => {
+            if (ok) tg.sendData(JSON.stringify({action: "buy", plan: plan}));
         });
     }
 
-    // Ejecutar al cargar
     window.onload = initUser;
 </script>
-</script>
-
 </body>
-</html>
+    </html>
