@@ -16,14 +16,21 @@ window.showToast = function(message) {
 };
 
 // --- 2. MOTOR DE MINERÍA EN TIEMPO REAL ---
+
+
+// --- 2. MOTOR DE MINERÍA EN TIEMPO REAL (CORREGIDO) ---
 function startMiningEngine() {
     setInterval(() => {
         const currentGHS = (state.totalInvestedUSDT || 0) * 1000;
+        
         if (currentGHS > 0) {
-            // Ganancia por segundo basada en el poder
+            // Calculamos la ganancia por segundo
             const gainPerSecond = (currentGHS * 0.0000001); 
+            
+            // IMPORTANTE: Solo sumamos al acumulado temporal (Mining), NO al balance principal
             state.accumulatedMining = (state.accumulatedMining || 0) + gainPerSecond;
             
+            // Actualizamos SOLO el número de la tarjeta de minería inferior
             const miningDisplay = document.getElementById('mining-balance');
             if (miningDisplay) {
                 miningDisplay.innerText = state.accumulatedMining.toFixed(4);
@@ -32,46 +39,25 @@ function startMiningEngine() {
     }, 1000);
 }
 
-// --- 3. FUNCIÓN PARA RECLAMAR ---
-window.claimMining = function() {
-    const accumulated = state.accumulatedMining || 0;
-    if (accumulated <= 0) {
-        window.showToast("No hay saldo para reclamar ⛏️");
-        return;
-    }
-
-    state.totalEarnedUSD = (state.totalEarnedUSD || 0) + accumulated;
-    state.accumulatedMining = 0;
-    
-    if (typeof state.save === 'function') state.save(); 
-    
-    window.showToast(`¡+$${accumulated.toFixed(4)} reclamados! 🚀`);
-    if (window.Telegram?.WebApp?.HapticFeedback) {
-        window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-    }
-    updateDashboard();
-};
-
-// --- 4. ACTUALIZACIÓN DEL DASHBOARD (NIVELES Y % REALES) ---
+// --- 4. ACTUALIZACIÓN DEL DASHBOARD (FIJO) ---
 export function updateDashboard() {
     const invested = state.totalInvestedUSDT || 0;
     const currentGHS = invested * 1000;
     
-    // Lógica de Niveles y Tasas
+    // Determinamos Nivel y %
     let planName = "Gratis";
     let rateText = "0.0%";
-
     if (invested >= 3000) { planName = "GIGA"; rateText = "7.5%"; }
     else if (invested >= 300) { planName = "MASTER"; rateText = "6.5%"; }
     else if (invested >= 20) { planName = "NODE"; rateText = "5.5%"; }
     else if (invested >= 1) { planName = "MICRO"; rateText = "4.5%"; }
 
     const elements = {
-        'main-balance': (state.totalEarnedUSD || 0).toFixed(2),
+        // AQUÍ ESTABA EL ERROR: Usar solo totalEarnedUSD sin sumarle el acumulado
+        'main-balance': (state.totalEarnedUSD || 0).toFixed(2), 
         'user-plan-name': planName,
         'stat-rate-display': rateText,
-        'mining-speed': `${currentGHS.toLocaleString()} GH/s activos`,
-        'user-id': localStorage.getItem('user_id') || '000000'
+        'mining-speed': `${currentGHS.toLocaleString()} GH/s activos`
     };
 
     for (const [id, val] of Object.entries(elements)) {
@@ -79,6 +65,7 @@ export function updateDashboard() {
         if (el) el.innerText = val;
     }
 }
+
 window.updateDashboard = updateDashboard;
 
 // --- 5. CALCULADORA Y RENDIMIENTOS ---
