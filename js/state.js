@@ -98,3 +98,7 @@ window.onload = () => {
         t.innerText = `${(23-d.getHours()).toString().padStart(2,'0')}:${(59-d.getMinutes()).toString().padStart(2,'0')}:${(59-d.getSeconds()).toString().padStart(2,'0')}`;
     }, 1000);
 };
+
+// Al final de js/state.js
+window.state = state; 
+window.saveInvestment = saveInvestment;
