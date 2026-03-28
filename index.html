@@ -206,34 +206,53 @@
             </div>
         </div>
     </section>
-    <section id="planes" class="view">
-        <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 20px;">Mining Nodes</h2>
-        <div class="main-card" style="border-left: 4px solid #a855f7;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                <div>
-                    <span style="color: #a855f7; font-size: 0.7rem; font-weight: 800; letter-spacing: 1px;">NODE MASTER</span>
-                    <div style="font-size: 1.8rem; font-weight: 900; margin: 5px 0;">50.00 USDT</div>
-                </div>
-                <div style="text-align: right;">
-                    <div style="color: var(--success); font-weight: 700;">+6.5% Daily</div>
-                </div>
+<section id="planes" class="view">
+    <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 20px;">Purchase Hash Power</h2>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+        <div class="stat-card" style="background: rgba(59, 130, 246, 0.1); border: 1px solid #3b82f6; padding: 10px; border-radius: 15px; text-align: center;">
+            <span style="font-size: 0.7rem; font-weight: 700;">MICRO</span>
+            <div style="color: #3b82f6; font-weight: 800;">4.5%</div>
+        </div>
+        <div class="stat-card" style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; padding: 10px; border-radius: 15px; text-align: center;">
+            <span style="font-size: 0.7rem; font-weight: 700;">NODE</span>
+            <div style="color: #10b981; font-weight: 800;">5.5%</div>
+        </div>
+        <div class="stat-card" style="background: rgba(168, 85, 247, 0.1); border: 1px solid #a855f7; padding: 10px; border-radius: 15px; text-align: center;">
+            <span style="font-size: 0.7rem; font-weight: 700;">MASTER</span>
+            <div style="color: #a855f7; font-weight: 800;">6.5%</div>
+        </div>
+        <div class="stat-card" style="background: rgba(245, 158, 11, 0.1); border: 1px solid #f59e0b; padding: 10px; border-radius: 15px; text-align: center;">
+            <span style="font-size: 0.7rem; font-weight: 700;">GIGA</span>
+            <div style="color: #f59e0b; font-weight: 800;">7.5%</div>
+        </div>
+    </div>
+
+    <div class="main-card">
+        <div class="balance-label" style="margin-bottom: 10px;">Amount (USDT)</div>
+        <input type="number" id="invest-amount" placeholder="0.00" oninput="calculateROI()" 
+               style="font-size: 2rem; font-weight: 800; text-align: center; margin-bottom: 20px;">
+        
+        <div style="background: rgba(0,0,0,0.2); border-radius: 15px; padding: 15px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span style="color: var(--text-dim); font-size: 0.8rem;">Power:</span>
+                <span id="calc-power" style="font-weight: 700; color: var(--accent-blue);">0 GH/s</span>
             </div>
-            <button class="btn-action btn-blue" style="margin-top: 15px; width: 100%;" onclick="buyPlan('Master', 50)">Activar Nodo</button>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span style="color: var(--text-dim); font-size: 0.8rem;">Daily Hash:</span>
+                <span id="calc-hash" style="font-weight: 700; color: var(--success);">0 HASH</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span style="color: var(--text-dim); font-size: 0.8rem;">Node Tier:</span>
+                <span id="calc-tier" style="font-weight: 700;">---</span>
+            </div>
         </div>
 
-        <div class="main-card" style="border-left: 4px solid #f59e0b;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                <div>
-                    <span style="color: #f59e0b; font-size: 0.7rem; font-weight: 800; letter-spacing: 1px;">NODE GIGA</span>
-                    <div style="font-size: 1.8rem; font-weight: 900; margin: 5px 0;">100.00 USDT</div>
-                </div>
-                <div style="text-align: right;">
-                    <div style="color: var(--success); font-weight: 700;">+7.0% Daily</div>
-                </div>
-            </div>
-            <button class="btn-action btn-dark" style="margin-top: 15px; width: 100%;" onclick="buyPlan('Giga', 100)">Activar Nodo</button>
-        </div>
-    </section>
+        <button class="btn-action btn-blue" style="width: 100%; margin-top: 20px; height: 60px; font-size: 1.1rem;" onclick="processInvestment()">
+            ACTIVATE NODE
+        </button>
+    </div>
+</section>
     
     <section id="red" class="view">
         <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 20px;">Mi Red</h2>
