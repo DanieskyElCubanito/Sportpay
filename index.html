@@ -435,19 +435,20 @@
         }, 3000); // Sube un poco cada 3 segundos
     }
 
-    function copyLink() {
-        const copyText = document.getElementById("ref-link");
-        copyText.select();
-        document.execCommand("copy");
-        tg.showScanQrPopup({ text: "¡Enlace copiado!" }); // Efecto visual de Telegram
-        setTimeout(() => tg.closeScanQrPopup(), 1000);
-    }
+    <script>
+        function copyLink() {
+            const copyText = document.getElementById("ref-link");
+            copyText.select();
+            document.execCommand("copy");
+            tg.showScanQrPopup({ text: "¡Enlace copiado!" });
+            setTimeout(() => tg.closeScanQrPopup(), 1000);
+        }
 
-    window.onload = initUser;
+        window.onload = initUser;
+    </script> <script src="js/state.js" type="module"></script>
+    <script src="js/payment.js"></script> 
+    <script src="js/calculator.js"></script>
+    <script src="js/main.js"></script>
 
-    <script src="js/state.js" type="module"></script>
-<script src="js/payment.js"></script> 
-<script src="js/calculator.js"></script>
-<script src="js/main.js"></script>
 </body>
 </html>
