@@ -15,21 +15,15 @@ window.showToast = function(message) {
     setTimeout(() => { if (toast) toast.remove(); }, 3000);
 };
 
-// --- 2. MOTOR DE MINERÍA EN TIEMPO REAL (NUEVO) ---
-// Esta función hace que el saldo de "Minería en curso" suba segundo a segundo
+// --- 2. MOTOR DE MINERÍA EN TIEMPO REAL ---
 function startMiningEngine() {
     setInterval(() => {
-        // Obtenemos el poder actual (GHS) desde el estado
         const currentGHS = (state.totalInvestedUSDT || 0) * 1000;
-        
         if (currentGHS > 0) {
-            // Calculamos la ganancia por segundo (ajusta esta fórmula según tu ROI)
+            // Ganancia por segundo basada en el poder
             const gainPerSecond = (currentGHS * 0.0000001); 
-            
-            // Sumamos al acumulado temporal en el estado
             state.accumulatedMining = (state.accumulatedMining || 0) + gainPerSecond;
             
-            // Actualizamos solo el número de la minería en la pantalla
             const miningDisplay = document.getElementById('mining-balance');
             if (miningDisplay) {
                 miningDisplay.innerText = state.accumulatedMining.toFixed(4);
@@ -38,82 +32,100 @@ function startMiningEngine() {
     }, 1000);
 }
 
-// --- 3. FUNCIÓN PARA RECLAMAR (NUEVO) ---
+// --- 3. FUNCIÓN PARA RECLAMAR ---
 window.claimMining = function() {
     const accumulated = state.accumulatedMining || 0;
-    
     if (accumulated <= 0) {
         window.showToast("No hay saldo para reclamar ⛏️");
         return;
     }
 
-    // 1. Sumar al balance principal y a la ganancia total
     state.totalEarnedUSD = (state.totalEarnedUSD || 0) + accumulated;
-    state.totalProfit = (state.totalProfit || 0) + accumulated; // Para la card de Ganancia Total
-    
-    // 2. Resetear acumulado
     state.accumulatedMining = 0;
     
-    // 3. Guardar en localStorage a través del state
     if (typeof state.save === 'function') state.save(); 
     
-    // 4. Feedback visual
     window.showToast(`¡+$${accumulated.toFixed(4)} reclamados! 🚀`);
     if (window.Telegram?.WebApp?.HapticFeedback) {
         window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
     }
-    
-    // 5. Actualizar toda la interfaz
     updateDashboard();
 };
 
-// --- 4. ACTUALIZACIÓN DEL DASHBOARD (DATOS REALES) ---
+// --- 4. ACTUALIZACIÓN DEL DASHBOARD (NIVELES Y % REALES) ---
 export function updateDashboard() {
-    const currentGHS = (state.totalInvestedUSDT || 0) * 1000;
-    const currentRate = calculateRate(state.totalInvestedUSDT || 0);
-    const dailyEarn = (state.totalInvestedUSDT || 0) * (currentRate / 100);
+    const invested = state.totalInvestedUSDT || 0;
+    const currentGHS = invested * 1000;
+    
+    // Lógica de Niveles y Tasas
+    let planName = "Gratis";
+    let rateText = "0.0%";
+
+    if (invested >= 3000) { planName = "GIGA"; rateText = "7.5%"; }
+    else if (invested >= 300) { planName = "MASTER"; rateText = "6.5%"; }
+    else if (invested >= 20) { planName = "NODE"; rateText = "5.5%"; }
+    else if (invested >= 1) { planName = "MICRO"; rateText = "4.5%"; }
 
     const elements = {
-        'main-balance': (state.totalEarnedUSD || 0).toFixed(2), // Balance arriba
-        'total-profit': `+$${(state.totalProfit || 0).toFixed(2)}`, // Card izquierda
-        'main-power': currentGHS.toLocaleString(),
-        'mining-speed': `${currentGHS.toLocaleString()} GH/s activos`, // Texto azul bajo minería
-        'stat-daily': dailyEarn.toFixed(4),
-        'stat-rate': currentRate.toFixed(1),
+        'main-balance': (state.totalEarnedUSD || 0).toFixed(2),
+        'user-plan-name': planName,
+        'stat-rate-display': rateText,
+        'mining-speed': `${currentGHS.toLocaleString()} GH/s activos`,
         'user-id': localStorage.getItem('user_id') || '000000'
     };
 
     for (const [id, val] of Object.entries(elements)) {
         const el = document.getElementById(id);
-        if (el) {
-            // Si es el total-profit, manejamos el color verde
-            if (id === 'total-profit') el.innerText = val;
-            else el.innerText = val;
-        }
+        if (el) el.innerText = val;
     }
 }
 window.updateDashboard = updateDashboard;
 
-// --- (Resto de tus funciones: calculateRate, calculateReturns, renderHistory, etc. se mantienen igual) ---
+// --- 5. CALCULADORA Y RENDIMIENTOS ---
 function calculateRate(qty) {
-    if (qty >= 3000) return 7.0;
+    if (qty >= 3000) return 7.5;
     if (qty >= 300) return 6.5;
-    if (qty >= 20) return 6.0;
-    return 5.5;
+    if (qty >= 20) return 5.5;
+    if (qty >= 1) return 4.5;
+    return 0;
 }
 
 window.calculateReturns = function() {
     const inputEl = document.getElementById('buy-amount');
     const outputEl = document.getElementById('ae-calc-total');
-    const container = document.getElementById('input-box-container');
     if (!inputEl || !outputEl) return;
     const val = parseFloat(inputEl.value) || 0;
-    const totalGHS = val * 1000;
-    outputEl.innerText = totalGHS.toLocaleString('en-US');
-    if(container) container.style.borderColor = val > 0 ? "#3b82f6" : "#f1f5f9";
+    outputEl.innerText = (val * 1000).toLocaleString('en-US');
 };
 
-// --- INICIALIZACIÓN ---
+// --- 6. REINVERTIR ---
+window.reinvestBalance = function() {
+    const currentBalance = state.totalEarnedUSD || 0;
+    if (currentBalance < 1) {
+        window.Telegram.WebApp.showAlert("Mínimo 1.00 USDT para reinvertir");
+        return;
+    }
+    window.Telegram.WebApp.showConfirm(`¿Reinvertir ${currentBalance.toFixed(2)} USDT con bono del 5%?`, (ok) => {
+        if (ok) {
+            // Aquí iría tu lógica para sumar al totalInvestedUSDT y resetear balance
+            window.showToast("Función de reinversión activada 🔄");
+        }
+    });
+};
+
+// --- 7. LIVE FEED ---
+function startLiveFeed() {
+    const feedText = document.getElementById('live-feed-text');
+    if (!feedText) return;
+    const run = () => {
+        const id = Math.floor(Math.random()*900+100);
+        feedText.innerHTML = `⚡ User <b>${id}***</b> just purchased hash power!`;
+        setTimeout(run, 5000);
+    };
+    run();
+}
+
+// --- 8. INICIALIZACIÓN ---
 window.onload = () => {
     const tg = window.Telegram?.WebApp;
     if(tg) { tg.ready(); tg.expand(); }
@@ -121,19 +133,8 @@ window.onload = () => {
     processDailyEarnings();
     updateDashboard();
     startLiveFeed();
-    startMiningEngine(); // Inicia el contador de minería
+    startMiningEngine();
 
     const buyInput = document.getElementById('buy-amount');
     if (buyInput) buyInput.addEventListener('input', window.calculateReturns);
-
-    // Temporizador de Próximo Pago (Real)
-    setInterval(() => {
-        const timerEl = document.getElementById('payment-timer');
-        if(!timerEl) return;
-        const now = new Date();
-        const h = (23-now.getHours()).toString().padStart(2,'0');
-        const m = (59-now.getMinutes()).toString().padStart(2,'0');
-        const s = (59-now.getSeconds()).toString().padStart(2,'0');
-        timerEl.innerText = `${h}:${m}:${s}`;
-    }, 1000);
 };
