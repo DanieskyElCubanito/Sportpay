@@ -328,6 +328,30 @@
     </div>
 </nav>
 
+    <div id="payModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; justify-content: center; align-items: center; flex-direction: column; padding: 20px; box-sizing: border-box;">
+    <div class="main-card" style="width: 100%; max-width: 350px; text-align: center; position: relative; border: 1px solid var(--accent-blue);">
+        <button onclick="document.getElementById('payModal').style.display='none'" style="position: absolute; right: 15px; top: 15px; background: none; border: none; color: white; font-size: 1.5rem;">&times;</button>
+        
+        <h3 style="margin-bottom: 5px;">Finalizar Depósito</h3>
+        <div id="payment-countdown" style="font-family: monospace; color: var(--accent-blue); font-size: 1.2rem; margin-bottom: 20px;">00:30:00</div>
+        
+        <div style="background: white; padding: 10px; border-radius: 15px; display: inline-block; margin-bottom: 20px;">
+            <img id="qr-image" src="" style="width: 150px; height: 150px; display: block;">
+        </div>
+
+        <div class="balance-label">Enviar exactamente:</div>
+        <div id="pay-amount-display" style="font-size: 1.5rem; font-weight: 800; color: #fff; margin-bottom: 15px;">0.00 USDT</div>
+
+        <div style="background: rgba(0,0,0,0.5); padding: 10px; border-radius: 10px; word-break: break-all; font-size: 0.8rem; font-family: monospace; border: 1px dashed var(--accent-blue);">
+            <span id="wallet-address-display">Generando...</span>
+        </div>
+        
+        <button class="btn-action btn-blue" style="width: 100%; margin-top: 15px;" onclick="copyAddress()">
+            <i class="fa-solid fa-copy"></i> Copiar Dirección
+        </button>
+    </div>
+    </div>
+    
 <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
