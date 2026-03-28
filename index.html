@@ -372,6 +372,7 @@
     tg.expand();
     tg.ready();
 
+    // 1. Inicialización de Usuario
     function initUser() {
         const user = tg.initDataUnsafe?.user;
         if (user) {
@@ -380,29 +381,33 @@
             document.getElementById('user-pic').src = user.photo_url || `https://ui-avatars.com/api/?name=${user.first_name}&background=0088cc&color=fff`;
             document.getElementById('ref-link').value = `https://t.me/SportsPay_Bot?start=${user.id}`;
         }
-        // ELIMINA startMiningAnimation() de aquí
     }
 
+    // 2. Navegación entre pestañas
     function switchTab(tabId) {
+        // Cambiar vistas
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
-    }
-    
-    // Llama a la inicialización
-    initUser();
-</script>
-        
-        // Activar el botón correspondiente
-        const btns = document.querySelectorAll('.nav-btn');
-        btns.forEach(btn => {
-            if(btn.getAttribute('onclick').includes(tabId)) btn.classList.add('active');
+        const targetView = document.getElementById(tabId);
+        if (targetView) targetView.classList.add('active');
+
+        // Actualizar botones de la barra de navegación
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.classList.remove('active');
+            // Verificamos si el onclick contiene el ID de la pestaña
+            if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(tabId)) {
+                btn.classList.add('active');
+            }
         });
+
         if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
     }
 
+    // 3. Lógica de la Calculadora (ROI)
     function calculateROI() {
-        const amount = parseFloat(document.getElementById('invest-amount').value) || 0;
+        const input = document.getElementById('invest-amount');
+        if (!input) return;
+        
+        const amount = parseFloat(input.value) || 0;
         let rate = 0; let tier = "None"; let color = "#848da0";
 
         if (amount >= 1 && amount < 25) { rate = 0.045; tier = "MICRO"; color = "#3b82f6"; }
@@ -412,56 +417,57 @@
 
         document.getElementById('calc-power').innerText = (amount * 10).toFixed(1) + " GH/s";
         document.getElementById('calc-hash').innerText = (amount * rate * 1000).toFixed(0) + " HASH";
-        document.getElementById('calc-tier').innerText = tier;
-        document.getElementById('calc-tier').style.color = color;
-        document.getElementById('invest-amount').style.borderBottomColor = amount >= 1 ? color : "#0088cc";
+        
+        const tierEl = document.getElementById('calc-tier');
+        tierEl.innerText = tier;
+        tierEl.style.color = color;
+        
+        input.style.borderBottomColor = amount >= 1 ? color : "#0088cc";
         return { amount, tier };
     }
 
-    function startMiningAnimation() {
-        let count = 0;
-        setInterval(() => {
-            count += 0.01;
-            document.getElementById('main-balance').innerText = count.toFixed(2);
-        }, 3000);
-    }
-
+    // 4. Utilidades (Copiar y Reinvertir)
     function copyLink() {
         const link = document.getElementById("ref-link");
-        link.select();
-        document.execCommand("copy");
-        tg.showAlert("¡Enlace copiado!");
+        navigator.clipboard.writeText(link.value);
+        tg.showAlert("¡Enlace de invitación copiado!");
     }
 
     function copyAddress() {
         const addr = document.getElementById('wallet-address-display').innerText;
         if(addr !== "Generando...") {
             navigator.clipboard.writeText(addr);
-            tg.showAlert("Billetera copiada");
+            tg.showAlert("Dirección copiada correctamente");
         }
     }
 
     function reinvestBalance() {
-    const currentBalance = parseFloat(document.getElementById('main-balance').innerText);
-    if (currentBalance < 1) {
-        tg.showAlert("Mínimo 1.00 USDT para reinvertir");
-        return;
-    }
-    tg.showConfirm(`¿Reinvertir ${currentBalance} USDT con bono del 5%?`, (ok) => {
-        if (ok) {
-            switchTab('planes');
-            document.getElementById('invest-amount').value = currentBalance;
-            calculateROI();
+        // Obtenemos el balance desde el ID del HTML
+        const currentBalance = parseFloat(document.getElementById('main-balance').innerText) || 0;
+        
+        if (currentBalance < 1) {
+            tg.showAlert("Necesitas al menos 1.00 USDT para reinvertir.");
+            return;
         }
-    });
+
+        tg.showConfirm(`¿Quieres reinvertir ${currentBalance.toFixed(2)} USDT? Recibirás un bono del 5%.`, (ok) => {
+            if (ok) {
+                switchTab('planes');
+                document.getElementById('invest-amount').value = currentBalance;
+                calculateROI();
+                tg.showAlert("Monto cargado. ¡Haz clic en ACTIVAR NODO para finalizar!");
+            }
+        });
     }
+
+    // Inicialización al cargar la ventana
     window.onload = initUser;
 </script>
 
 <script src="js/state.js" type="module"></script>
 <script src="js/payment.js"></script> 
 <script src="js/calculator.js"></script>
-<script src="js/main.js"></script>
+<script src="js/main.js" type="module"></script>
 
 </body>
-    </html>
+</html>
