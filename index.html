@@ -363,32 +363,37 @@
 
     // --- 3. LÓGICA DE LA CALCULADORA DE INVERSIÓN ---
     function calculateROI() {
-        const amount = parseFloat(document.getElementById('invest-amount').value) || 0;
-        let rate = 0;
-        let tier = "None";
-        let color = "#848da0";
+    const amount = parseFloat(document.getElementById('invest-amount').value) || 0;
+    let rate = 0;
+    let tier = "None";
+    let color = "#848da0";
 
-        // Rangos oficiales que pediste
-        if (amount >= 5 && amount <= 20) {
-            rate = 0.045; tier = "MICRO"; color = "#3b82f6";
-        } else if (amount >= 25 && amount <= 80) {
-            rate = 0.055; tier = "NODE"; color = "#10b981";
-        } else if (amount >= 100 && amount <= 450) {
-            rate = 0.065; tier = "MASTER"; color = "#a855f7";
-        } else if (amount >= 500 && amount <= 2000) {
-            rate = 0.075; tier = "GIGA"; color = "#f59e0b";
-        }
-
-        const power = amount * 10; // 1 USDT = 10 GH/s
-        const dailyHash = (amount * rate) * 1000; // 1000 Hash = 1 USDT de ganancia
-
-        document.getElementById('calc-power').innerText = `${power.toFixed(1)} GH/s`;
-        document.getElementById('calc-hash').innerText = `${dailyHash.toFixed(0)} HASH`;
-        document.getElementById('calc-tier').innerText = tier;
-        document.getElementById('calc-tier').style.color = color;
-        
-        return { amount, tier, power, dailyHash };
+    // Lógica continua: Sin huecos entre números
+    if (amount >= 1 && amount < 25) {
+        rate = 0.045; tier = "MICRO"; color = "#3b82f6";
+    } else if (amount >= 25 && amount < 100) {
+        rate = 0.055; tier = "NODE"; color = "#10b981";
+    } else if (amount >= 100 && amount < 500) {
+        rate = 0.065; tier = "MASTER"; color = "#a855f7";
+    } else if (amount >= 500) {
+        // Este plan cubre desde 500 hasta cualquier monto superior
+        rate = 0.075; tier = "GIGA"; color = "#f59e0b";
     }
+
+    const power = amount * 10; 
+    const dailyHash = (amount * rate) * 1000; 
+
+    // Actualizar la interfaz
+    document.getElementById('calc-power').innerText = `${power.toFixed(1)} GH/s`;
+    document.getElementById('calc-hash').innerText = `${dailyHash.toFixed(0)} HASH`;
+    document.getElementById('calc-tier').innerText = tier;
+    document.getElementById('calc-tier').style.color = color;
+    
+    // Cambiar el color del borde del input según el nivel para que sea dinámico
+    document.getElementById('invest-amount').style.borderBottomColor = (amount >= 1) ? color : "var(--accent-blue)";
+
+    return { amount, tier, power, dailyHash };
+}
 
     function processInvestment() {
         const data = calculateROI();
