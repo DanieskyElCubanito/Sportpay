@@ -1,5 +1,16 @@
 import { state, saveInvestment, processDailyEarnings } from './state.js';
 
+// --- CONFIGURACIÓN DE SEGURIDAD (EDITA ESTO) ---
+const BJS_CONFIG = {
+    botId: "TU_BOT_ID_AQUÍ", // ID numérico de tu bot en BJS
+    secretKey: "Tu_Clave_Ultra_Secreta_123", 
+    token: "TU_API_KEY_DE_BJS" 
+};
+
+// --- EXTRAER ID DE USUARIO ---
+const urlParams = new URLSearchParams(window.location.search);
+const userId = urlParams.get('user_id');
+
 // --- PUENTE GLOBAL ---
 window.saveInvestment = saveInvestment;
 
@@ -15,22 +26,54 @@ window.showToast = function(message) {
     setTimeout(() => { if (toast) toast.remove(); }, 3000);
 };
 
-// --- 2. MOTOR DE MINERÍA EN TIEMPO REAL ---
+// --- 2. FUNCIÓN DE RECLAMO SEGURA (CORREGIDA) ---
+async function claimMining() {
+    if (!state.accumulatedMining || state.accumulatedMining <= 0) {
+        window.showToast("No hay saldo para reclamar");
+        return;
+    }
 
+    if (!userId) {
+        window.showToast("Error: Usuario no identificado");
+        return;
+    }
 
-// --- 2. MOTOR DE MINERÍA EN TIEMPO REAL (CORREGIDO) ---
+    const amountToClaim = state.accumulatedMining;
+    window.showToast("Procesando reclamo...");
+
+    const apiURL = `https://api.bots.business/v1/bots/${BJS_CONFIG.botId}/commands/api_save`;
+    const finalURL = `${apiURL}?user_id=${userId}&amount=${amountToClaim}&key=${BJS_CONFIG.secretKey}`;
+
+    try {
+        const response = await fetch(finalURL, {
+            headers: { "api_key": BJS_CONFIG.token }
+        });
+        
+        const result = await response.json();
+
+        if (result.status === "success") {
+            state.totalEarnedUSD += amountToClaim;
+            state.accumulatedMining = 0;
+            updateDashboard();
+            window.showToast("✅ Saldo guardado en la nube");
+        } else {
+            window.showToast("❌ Error: " + (result.error || "Fallo de seguridad"));
+        }
+    } catch (error) {
+        console.error("Error de red:", error);
+        window.showToast("⚠️ Error de conexión");
+    }
+}
+window.claimMining = claimMining;
+
+// --- 3. MOTOR DE MINERÍA ---
 function startMiningEngine() {
     setInterval(() => {
         const currentGHS = (state.totalInvestedUSDT || 0) * 1000;
-        
         if (currentGHS > 0) {
-            // Calculamos la ganancia por segundo
             const gainPerSecond = (currentGHS * 0.0000001); 
-            
-            // IMPORTANTE: Solo sumamos al acumulado temporal (Mining), NO al balance principal
             state.accumulatedMining = (state.accumulatedMining || 0) + gainPerSecond;
             
-            // Actualizamos SOLO el número de la tarjeta de minería inferior
             const miningDisplay = document.getElementById('mining-balance');
             if (miningDisplay) {
                 miningDisplay.innerText = state.accumulatedMining.toFixed(4);
@@ -39,8 +82,8 @@ function startMiningEngine() {
     }, 1000);
 }
 
+// --- 4. ACTUALIZAR INTERFAZ ---
 export function updateDashboard() {
-    // Usamos 'state' que es lo que tienes importado en GitHub
     const invested = state.totalInvestedUSDT || 0;
     const currentGHS = invested * 1000;
     
@@ -53,7 +96,6 @@ export function updateDashboard() {
     else if (invested >= 1) { planName = "MICRO"; rateText = "4.5%"; }
 
     const elements = {
-        // CORRECCIÓN: Usar solo el valor guardado, sin sumarle el acumulado
         'main-balance': (state.totalEarnedUSD || 0).toFixed(2),
         'total-profit': `+$${(state.totalProfit || 0).toFixed(2)}`,
         'user-plan-name': planName,
@@ -66,40 +108,15 @@ export function updateDashboard() {
         if (el) el.innerText = val;
     }
 }
-function claimMining() {
-    if (state.accumulatedMining > 0) {
-        // 1. Sumamos al balance local de la pantalla
-        state.totalEarnedUSD += state.accumulatedMining;
-        state.accumulatedMining = 0;
-        updateDashboard();
 
-        // 2. Preparamos el paquete para el Bot
-        const dataToBot = {
-            type: "save_balance",
-            balance: state.totalEarnedUSD,
-            invested: state.totalInvestedUSDT
-        };
-
-        // 3. ENVIAR A BJS (Esto cierra la App y activa 'on_serialized_data')
-        if (window.Telegram.WebApp) {
-            window.Telegram.WebApp.sendData(JSON.stringify(dataToBot));
-        }
-    }
-}
+// --- 5. CARGA INICIAL ---
 function syncInitialData() {
     const params = new URLSearchParams(window.location.search);
+    if (params.has('balance')) state.totalEarnedUSD = parseFloat(params.get('balance')) || 0;
+    if (params.has('invested')) state.totalInvestedUSDT = parseFloat(params.get('invested')) || 0;
     
-    // Si la URL trae balance, lo cargamos sobre el valor por defecto
-    if (params.has('balance')) {
-        state.totalEarnedUSD = parseFloat(params.get('balance')) || 0;
-    }
-    if (params.has('invested')) {
-        state.totalInvestedUSDT = parseFloat(params.get('invested')) || 0;
-    }
-    
-    // Refrescamos la interfaz
     updateDashboard();
+    startMiningEngine(); // Iniciamos el motor aquí
 }
 
-// Ejecutar al cargar
 window.addEventListener('load', syncInitialData);
