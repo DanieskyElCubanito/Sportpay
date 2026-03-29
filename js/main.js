@@ -2,9 +2,9 @@ import { state, saveInvestment, processDailyEarnings } from './state.js';
 
 // --- CONFIGURACIÓN DE SEGURIDAD (EDITA ESTO) ---
 const BJS_CONFIG = {
-    botId: "TU_BOT_ID_AQUÍ", // ID numérico de tu bot en BJS
-    secretKey: "Tu_Clave_Ultra_Secreta_123", 
-    token: "TU_API_KEY_DE_BJS" 
+    botId: "8101312620", // ID numérico de tu bot en BJS
+    secretKey: "1$MillonDannyMeli*@#€", 
+    token: "X6MBnt6bQxIc66AoNZ3xLXHGmKXs7Zq5kx75GWK8" 
 };
 
 // --- EXTRAER ID DE USUARIO ---
