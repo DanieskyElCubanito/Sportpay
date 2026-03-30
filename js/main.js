@@ -1,20 +1,17 @@
 import { state, saveInvestment, processDailyEarnings } from './state.js';
 
-// --- CONFIGURACIÓN DE SEGURIDAD (EDITA ESTO) ---
+// --- CONFIGURACIÓN DE SEGURIDAD ---
 const BJS_CONFIG = {
-    botId: "8101312620", // ID numérico de tu bot en BJS
+    botId: "8101312620",
     secretKey: "1$MillonDannyMeli*@#€", 
     token: "X6MBnt6bQxIc66AoNZ3xLXHGmKXs7Zq5kx75GWK8" 
 };
 
-// --- EXTRAER ID DE USUARIO ---
 const urlParams = new URLSearchParams(window.location.search);
 const userId = urlParams.get('user_id');
 
-// --- PUENTE GLOBAL ---
 window.saveInvestment = saveInvestment;
 
-// --- 1. UI GLOBAL (TOAST) ---
 window.showToast = function(message) {
     const oldToast = document.querySelector('.toast-notification');
     if (oldToast) oldToast.remove();
@@ -26,7 +23,37 @@ window.showToast = function(message) {
     setTimeout(() => { if (toast) toast.remove(); }, 3000);
 };
 
-// --- 2. FUNCIÓN DE RECLAMO SEGURA (CORREGIDA) ---
+// --- ACTUALIZAR INTERFAZ (Movida arriba para que sea accesible) ---
+export function updateDashboard() {
+    const invested = state.totalInvestedUSDT || 0;
+    const balance = state.totalEarnedUSD || 0;
+    const currentGHS = invested * 1000;
+    
+    let planName = "Gratis";
+    let rateText = "0.0%";
+
+    if (invested >= 3000) { planName = "GIGA"; rateText = "7.5%"; }
+    else if (invested >= 300) { planName = "MASTER"; rateText = "6.5%"; }
+    else if (invested >= 20) { planName = "NODE"; rateText = "5.5%"; }
+    else if (invested >= 1) { planName = "MICRO"; rateText = "4.5%"; }
+
+    // Forzamos la actualización en el DOM
+    const mainBalEl = document.getElementById('main-balance');
+    if (mainBalEl) mainBalEl.innerText = balance.toFixed(2);
+
+    const elements = {
+        'total-profit': `+$${(state.totalProfit || 0).toFixed(2)}`,
+        'user-plan-name': planName,
+        'stat-rate-display': rateText,
+        'mining-speed': `${currentGHS.toLocaleString()} GH/s activos`
+    };
+
+    for (const [id, val] of Object.entries(elements)) {
+        const el = document.getElementById(id);
+        if (el) el.innerText = val;
+    }
+}
+
 async function claimMining() {
     if (!state.accumulatedMining || state.accumulatedMining <= 0) {
         window.showToast("No hay saldo para reclamar");
@@ -34,7 +61,7 @@ async function claimMining() {
     }
 
     if (!userId) {
-        window.showToast("Error: Usuario no identificado");
+        window.showToast("Error: Abre la app desde el Bot");
         return;
     }
 
@@ -52,21 +79,20 @@ async function claimMining() {
         const result = await response.json();
 
         if (result.status === "success") {
-            state.totalEarnedUSD += amountToClaim;
+            // Actualizamos el objeto state
+            state.totalEarnedUSD = (state.totalEarnedUSD || 0) + amountToClaim;
             state.accumulatedMining = 0;
             updateDashboard();
             window.showToast("✅ Saldo guardado en la nube");
         } else {
-            window.showToast("❌ Error: " + (result.error || "Fallo de seguridad"));
+            window.showToast("❌ " + (result.error || "Error"));
         }
     } catch (error) {
-        console.error("Error de red:", error);
         window.showToast("⚠️ Error de conexión");
     }
 }
 window.claimMining = claimMining;
 
-// --- 3. MOTOR DE MINERÍA ---
 function startMiningEngine() {
     setInterval(() => {
         const currentGHS = (state.totalInvestedUSDT || 0) * 1000;
@@ -82,41 +108,19 @@ function startMiningEngine() {
     }, 1000);
 }
 
-// --- 4. ACTUALIZAR INTERFAZ ---
-export function updateDashboard() {
-    const invested = state.totalInvestedUSDT || 0;
-    const currentGHS = invested * 1000;
-    
-    let planName = "Gratis";
-    let rateText = "0.0%";
-
-    if (invested >= 3000) { planName = "GIGA"; rateText = "7.5%"; }
-    else if (invested >= 300) { planName = "MASTER"; rateText = "6.5%"; }
-    else if (invested >= 20) { planName = "NODE"; rateText = "5.5%"; }
-    else if (invested >= 1) { planName = "MICRO"; rateText = "4.5%"; }
-
-    const elements = {
-        'main-balance': (state.totalEarnedUSD || 0).toFixed(2),
-        'total-profit': `+$${(state.totalProfit || 0).toFixed(2)}`,
-        'user-plan-name': planName,
-        'stat-rate-display': rateText,
-        'mining-speed': `${currentGHS.toLocaleString()} GH/s activos`
-    };
-
-    for (const [id, val] of Object.entries(elements)) {
-        const el = document.getElementById(id);
-        if (el) el.innerText = val;
-    }
-}
-
-// --- 5. CARGA INICIAL ---
 function syncInitialData() {
     const params = new URLSearchParams(window.location.search);
-    if (params.has('balance')) state.totalEarnedUSD = parseFloat(params.get('balance')) || 0;
-    if (params.has('invested')) state.totalInvestedUSDT = parseFloat(params.get('invested')) || 0;
+    
+    // IMPORTANTE: Sobrescribimos los valores de 'state' con lo que viene de la URL
+    if (params.has('balance')) {
+        state.totalEarnedUSD = parseFloat(params.get('balance'));
+    }
+    if (params.has('invested')) {
+        state.totalInvestedUSDT = parseFloat(params.get('invested'));
+    }
     
     updateDashboard();
-    startMiningEngine(); // Iniciamos el motor aquí
+    startMiningEngine();
 }
 
 window.addEventListener('load', syncInitialData);
