@@ -1,3 +1,14 @@
+function syncInitialData() {
+    const params = new URLSearchParams(window.location.search);
+    
+    // ESTA LÍNEA DE PRUEBA:
+    alert("Datos recibidos: Balance=" + params.get('balance') + " ID=" + params.get('user_id'));
+
+    if (params.has('balance')) {
+        state.totalEarnedUSD = parseFloat(params.get('balance'));
+    }
+    // ... resto del código
+}
 import { state, saveInvestment, processDailyEarnings } from './state.js';
 
 // --- CONFIGURACIÓN DE SEGURIDAD ---
