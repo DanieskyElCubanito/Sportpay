@@ -123,3 +123,18 @@ async function saveDataToBotReinvest(uid, bal, inv, amountReinvested) {
         window.showToast("📡 Error de red (Sin conexión)", "error");
     }
 }
+    function startMining() {
+        setInterval(() => {
+            if (state.invested > 0) {
+                state.miningAcc += (state.invested * 1000) * 0.0000001;
+                const el = document.getElementById('mining-balance');
+                if (el) el.innerText = state.miningAcc.toFixed(4);
+            }
+        }, 1000); // <-- ¡Aquí estaba el número partido!
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        updateUI();
+        startMining();
+    });
+})();
