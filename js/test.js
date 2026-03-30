@@ -19,65 +19,94 @@
         setTimeout(() => toast.remove(), 3000);
     };
 
-    // --- 2. MODAL DE CONFIRMACIÓN PROFESIONAL ---
-    window.openReinvestModal = function() {
-        if (state.balance <= 0) {
-            window.showToast("❌ No tienes saldo para reinvertir", "error");
-            return;
-        }
+// --- MODAL PROFESIONAL DE REINVERSIÓN ---
+window.openReinvestModal = function() {
+    if (state.balance <= 0) {
+        window.showToast("❌ No tienes saldo para reinvertir", "error");
+        return;
+    }
 
-        const modal = document.createElement('div');
-        modal.id = "custom-modal";
-        modal.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:flex; align-items:center; justify-content:center; z-index:11000; backdrop-filter:blur(5px);";
-        
-        modal.innerHTML = `
-            <div style="background:#1e293b; width:85%; border-radius:24px; padding:25px; text-align:center; border:1px solid #334155; animation: zoomIn 0.3s ease-out;">
-                <div style="font-size:40px; margin-bottom:15px;">🔄</div>
-                <h2 style="color:white; margin-bottom:10px; font-size:20px;">Confirmar Reinversión</h2>
-                <p style="color:#94a3b8; font-size:14px; margin-bottom:20px;">¿Deseas reinvertir su saldo de <b>$${state.balance.toFixed(2)}</b>?<br><span style="color:#10b981;">+ 5% de bono extra</span></p>
-                <div style="display:flex; gap:10px;">
-                    <button onclick="document.getElementById('custom-modal').remove()" style="flex:1; padding:12px; border-radius:12px; border:none; background:#334155; color:white; font-weight:600;">Cancelar</button>
-                    <button id="btn-confirm-reinvest" style="flex:1; padding:12px; border-radius:12px; border:none; background:linear-gradient(135deg, #3b82f6, #1d4ed8); color:white; font-weight:700;">Reinvertir</button>
+    // Calculamos los datos para mostrarlos en el modal
+    const amount = state.balance;
+    const bonus = amount * 0.05;
+
+    // Si ya hay un modal abierto, lo cerramos por seguridad
+    const oldModal = document.getElementById('custom-reinvest-modal');
+    if (oldModal) oldModal.remove();
+
+    // Creamos el diseño del modal profesional (Dark Theme)
+    const modalHtml = `
+        <div id="custom-reinvest-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index:99999; backdrop-filter:blur(4px);">
+            <div style="background:#151e2b; width:85%; max-width:340px; border-radius:24px; padding:25px; text-align:center; border:1px solid #334155; animation: slideUp 0.3s ease-out; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);">
+                
+                <div style="background:#1e293b; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:28px; margin:0 auto 15px auto;">
+                    🔄
+                </div>
+                
+                <h2 style="color:white; margin:0 0 15px 0; font-size:22px; font-weight:700;">Reinversión</h2>
+                
+                <div style="background:#0f172a; border-radius:16px; padding:15px; margin-bottom:20px; text-align:left;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                        <span style="color:#94a3b8; font-size:14px;">Monto a reinvertir:</span>
+                        <b style="color:white;">$${amount.toFixed(2)}</b>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span style="color:#94a3b8; font-size:14px;">Bono extra (+5%):</span>
+                        <b style="color:#10b981;">+$${bonus.toFixed(2)}</b>
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:12px;">
+                    <button onclick="document.getElementById('custom-reinvest-modal').remove()" style="flex:1; padding:14px; border-radius:14px; border:none; background:#334155; color:white; font-weight:600; font-size:15px; cursor:pointer;">Cancelar</button>
+                    <button onclick="executeReinvestDirectly()" style="flex:1; padding:14px; border-radius:14px; border:none; background:linear-gradient(135deg, #10b981, #059669); color:white; font-weight:700; font-size:15px; cursor:pointer;">Confirmar</button>
                 </div>
             </div>
-        `;
-        document.body.appendChild(modal);
+        </div>
+    `;
+    
+    // Inyectamos el modal en la pantalla
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+};
 
-        document.getElementById('btn-confirm-reinvest').onclick = function() {
-            modal.remove();
-            executeReinvest();
-        };
-    };
+// --- EJECUCIÓN DIRECTA (SIN PANTALLA DE CÓDIGO QR) ---
+window.executeReinvestDirectly = function() {
+    // 1. Cerramos el modal
+    document.getElementById('custom-reinvest-modal').remove();
 
-    // --- 3. LÓGICA DE EJECUCIÓN Y GUARDADO ---
-    async function executeReinvest() {
-        const amount = state.balance;
-        const bonus = amount * 0.05;
-        const totalPlusBonus = amount + bonus;
+    // 2. Cálculos matemáticos
+    const amount = state.balance;
+    const bonus = amount * 0.05;
+    const totalToInvest = amount + bonus;
 
-        // Actualización Local
-        state.invested += totalPlusBonus;
-        state.balance = 0;
-        updateUI();
+    // 3. Actualizamos la aplicación al instante
+    state.invested += totalToInvest;
+    state.balance = 0;
+    
+    // Actualizamos los números en pantalla (Asegúrate de que esta función exista en tu código)
+    const elBalance = document.getElementById('main-balance');
+    if (elBalance) elBalance.innerText = state.balance.toFixed(2);
+    
+    // 4. Mostramos el mensaje de éxito bonito
+    window.showToast(`✅ Reinversión completada: +$${totalToInvest.toFixed(2)} activos`);
 
-        window.showToast(`✅ Reinversión de $${amount.toFixed(2)} exitosa`);
+    // 5. Guardamos en el Bot (Llamada en segundo plano)
+    saveDataToBotReinvest(state.userId, state.balance, state.invested, amount);
+};
 
-        // GUARDADO REAL EN EL BOT (Persistencia)
-        const botId = "8101312620";
-        const key = "1$MillonDannyMeli*@#€";
-        const token = "X6MBnt6bQxIc66AoNZ3xLXHGmKXs7Zq5kx75GWK8";
-        
-        // Enviamos los nuevos valores al bot para que NO se borren al cerrar
-        const url = `https://api.bots.business/v1/bots/${botId}/commands/api_save?user_id=${state.userId}&balance=0&invested=${state.invested}&key=${key}&action=reinvest&amount=${amount}`;
-
-        try {
-            const resp = await fetch(url, { headers: { "api_key": token } });
-            const res = await resp.json();
-            if(res.status === "success") console.log("Guardado en BJS");
-        } catch (e) {
-            console.error("Error al guardar en el bot");
-        }
+// Función para enviar los datos a BJS sin interrumpir al usuario
+async function saveDataToBotReinvest(uid, bal, inv, amountReinvested) {
+    const botId = "8101312620";
+    const key = "1$MillonDannyMeli*@#€"; // Tu clave secreta real
+    const token = "X6MBnt6bQxIc66AoNZ3xLXHGmKXs7Zq5kx75GWK8";
+    
+    const url = `https://api.bots.business/v1/bots/${botId}/commands/api_save?user_id=${uid}&balance=${bal}&invested=${inv}&action=reinvest&amount=${amountReinvested}&key=${key}`;
+    
+    try {
+        await fetch(url, { headers: { "api_key": token } });
+    } catch (e) {
+        console.error("Error guardando en BJS");
     }
+}
 
     function updateUI() {
         const b = document.getElementById('main-balance');
@@ -92,7 +121,7 @@
                 const el = document.getElementById('mining-balance');
                 if (el) el.innerText = state.miningAcc.toFixed(4);
             }
-        }, 1000);
+        }, 1000); // <-- ¡Aquí estaba el número partido!
     }
 
     window.addEventListener('DOMContentLoaded', () => {
