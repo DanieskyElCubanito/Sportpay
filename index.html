@@ -455,29 +455,42 @@
     }
 
     function reinvestBalance() {
-    const currentBalance = parseFloat(document.getElementById('main-balance').innerText) || 0;
+    // 1. Buscamos el elemento del balance con cuidado
+    const balanceElement = document.getElementById('main-balance');
     
-    if (currentBalance < 1) {
-        tg.showPopup({
-            title: "Saldo Insuficiente",
-            message: "Necesitas al menos 1.00 USDT para reinvertir.",
-            buttons: [{type: "close"}]
-        });
+    if (!balanceElement) {
+        console.error("Error: No se encontró el elemento 'main-balance'");
+        tg.showAlert("Error interno: No se pudo leer el balance.");
         return;
     }
 
+    const currentBalance = parseFloat(balanceElement.innerText) || 0;
+    
+    // 2. Validación de monto mínimo
+    if (currentBalance < 1) {
+        tg.showAlert("Necesitas al menos 1.00 USDT para reinvertir.");
+        return;
+    }
+
+    // 3. Confirmación nativa de Telegram
     tg.showConfirm(`¿Confirmas la reinversión de ${currentBalance.toFixed(2)} USDT? Recibirás un bono del 5%.`, (ok) => {
         if (ok) {
-            // ENVIAMOS LA ORDEN AL BOT
-            notificarAlBot("reinvest", currentBalance);
-            
-            // Efecto visual inmediato en la App
-            tg.showAlert("Procesando reinversión... El bot actualizará tu plan en unos segundos.");
-            document.getElementById('main-balance').innerText = "0.00"; // Bajamos el balance visualmente
-            switchTab('dashboard');
+            try {
+                // LLAMADA AL WEBHOOK (La función que creamos antes)
+                notificarAlBot("reinvest", currentBalance);
+                
+                // Respuesta visual
+                tg.showAlert("Solicitud de reinversión enviada al bot.");
+                balanceElement.innerText = "0.00"; // Reset visual
+                switchTab('dashboard');
+                
+            } catch (e) {
+                console.error("Error al notificar al bot:", e);
+                tg.showAlert("Error al conectar con el servidor.");
+            }
         }
     });
-            }
+}
     
     // 5. Navegación (Se mantiene igual)
     function switchTab(tabId) {
