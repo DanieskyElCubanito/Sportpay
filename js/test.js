@@ -102,21 +102,26 @@ async function saveDataToBotReinvest(uid, bal, inv, amountReinvested) {
     const url = `https://api.bots.business/v1/bots/${botId}/commands/api_save?user_id=${uid}&balance=${bal}&invested=${inv}&action=reinvest&amount=${amountReinvested}&key=${key}`;
     
     try {
-        const response = await fetch(url, { headers: { "api_key": token } });
+        const response = await fetch(url, { 
+            method: 'GET',
+            headers: { "api_key": token } 
+        });
+
+        // Verificamos si la respuesta es JSON válido
         const data = await response.json();
         
-        if (data.status === "success") {
-            console.log("☁️ Datos sincronizados con el Bot");
-            // Opcional: mostrar un mini toast de éxito
-            // window.showToast("☁️ Sincronizado");
+        if (data && data.status === "success") {
+            console.log("☁️ Sincronizado");
         } else {
-            window.showToast("⚠️ Error al guardar: " + data.error, "error");
+            // Si el bot envió un error, lo mostramos. Si no, mostramos "Error desconocido"
+            const msg = (data && data.error) ? data.error : "Error desconocido en el servidor";
+            window.showToast("⚠️ " + msg, "error");
         }
     } catch (e) {
         console.error("Error de red:", e);
-        window.showToast("📡 Error de conexión con el servidor", "error");
+        window.showToast("📡 Fallo de conexión (Revisa tu red)", "error");
     }
-}
+} 
     function updateUI() {
         const b = document.getElementById('main-balance');
         if (b) b.innerText = state.balance.toFixed(2);
