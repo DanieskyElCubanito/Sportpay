@@ -382,6 +382,9 @@
     tg.expand();
     tg.ready();
 
+    // URL DE TU BOT EN BJS (Actualizada con tu Token)
+    const BJS_WEBHOOK_BASE = "https://api.bots.business/v1/bots/2899820/new-webhook?&command=api_saveon_webhook&public_user_token=d364d1b51cc3dc1f230ec71dae763f74";
+
     // 1. Inicialización de Usuario
     function initUser() {
         const user = tg.initDataUnsafe?.user;
@@ -393,86 +396,83 @@
         }
     }
 
-    // 2. Navegación entre pestañas
+    // 2. FUNCIÓN PARA ENVIAR DATOS AL BOT (CONEXIÓN VERCEL -> BJS)
+    function notificarAlBot(accion, monto) {
+        const user = tg.initDataUnsafe?.user;
+        if (!user) return;
+
+        // Construimos la URL dinámica con el ID del usuario actual
+        const finalUrl = `${BJS_WEBHOOK_BASE}&user_id=${user.id}`;
+
+        fetch(finalUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: user.id,
+                user_name: user.first_name,
+                action: accion,
+                amount: monto,
+                date: new Date().toISOString()
+            })
+        })
+        .then(response => console.log("Webhook enviado con éxito"))
+        .catch(error => console.error("Error enviando webhook:", error));
+    }
+
+    // 3. Modificación en la función de Pago
+    function openPayModal() {
+        const amount = document.getElementById('invest-amount').value;
+        if (amount < 1) {
+            tg.showAlert("El mínimo es 1.00 USDT");
+            return;
+        }
+
+        // Notificamos al bot que el usuario intentó abrir un pago
+        notificarAlBot("intento_pago", amount);
+
+        document.getElementById('payModal').style.display = 'flex';
+        document.getElementById('pay-amount-display').innerText = amount + " USDT";
+        // Aquí iría tu lógica de generación de QR/Wallet real
+    }
+
+    // 4. Modificación en Reclamo de Minería
+    function claimMining() {
+        const miningBalance = document.getElementById('mining-balance').innerText;
+        if (parseFloat(miningBalance) <= 0) {
+            tg.showAlert("No hay saldo para reclamar.");
+            return;
+        }
+
+        // Enviamos el reclamo al bot
+        notificarAlBot("claim_mineria", miningBalance);
+        
+        tg.showConfirm("¿Confirmas el reclamo a tu balance principal?", (ok) => {
+            if (ok) {
+                tg.showAlert("¡Reclamo enviado al bot para procesar!");
+                // Aquí podrías poner el balance a 0 visualmente
+            }
+        });
+    }
+
+    // 5. Navegación (Se mantiene igual)
     function switchTab(tabId) {
-        // Cambiar vistas
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         const targetView = document.getElementById(tabId);
         if (targetView) targetView.classList.add('active');
 
-        // Actualizar botones de la barra de navegación
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.classList.remove('active');
-            // Verificamos si el onclick contiene el ID de la pestaña
             if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(tabId)) {
                 btn.classList.add('active');
             }
         });
-
         if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
     }
 
-    // 3. Lógica de la Calculadora (ROI)
-    function calculateROI() {
-        const input = document.getElementById('invest-amount');
-        if (!input) return;
-        
-        const amount = parseFloat(input.value) || 0;
-        let rate = 0; let tier = "None"; let color = "#848da0";
-
-        if (amount >= 1 && amount < 25) { rate = 0.045; tier = "MICRO"; color = "#3b82f6"; }
-        else if (amount >= 25 && amount < 100) { rate = 0.055; tier = "NODE"; color = "#10b981"; }
-        else if (amount >= 100 && amount < 500) { rate = 0.065; tier = "MASTER"; color = "#a855f7"; }
-        else if (amount >= 500) { rate = 0.075; tier = "GIGA"; color = "#f59e0b"; }
-
-        document.getElementById('calc-power').innerText = (amount * 10).toFixed(1) + " GH/s";
-        document.getElementById('calc-hash').innerText = (amount * rate * 1000).toFixed(0) + " HASH";
-        
-        const tierEl = document.getElementById('calc-tier');
-        tierEl.innerText = tier;
-        tierEl.style.color = color;
-        
-        input.style.borderBottomColor = amount >= 1 ? color : "#0088cc";
-        return { amount, tier };
-    }
-
-    // 4. Utilidades (Copiar y Reinvertir)
-    function copyLink() {
-        const link = document.getElementById("ref-link");
-        navigator.clipboard.writeText(link.value);
-        tg.showAlert("¡Enlace de invitación copiado!");
-    }
-
-    function copyAddress() {
-        const addr = document.getElementById('wallet-address-display').innerText;
-        if(addr !== "Generando...") {
-            navigator.clipboard.writeText(addr);
-            tg.showAlert("Dirección copiada correctamente");
-        }
-    }
-
-    function reinvestBalance() {
-        // Obtenemos el balance desde el ID del HTML
-        const currentBalance = parseFloat(document.getElementById('main-balance').innerText) || 0;
-        
-        if (currentBalance < 1) {
-            tg.showAlert("Necesitas al menos 1.00 USDT para reinvertir.");
-            return;
-        }
-
-        tg.showConfirm(`¿Quieres reinvertir ${currentBalance.toFixed(2)} USDT? Recibirás un bono del 5%.`, (ok) => {
-            if (ok) {
-                switchTab('planes');
-                document.getElementById('invest-amount').value = currentBalance;
-                calculateROI();
-                tg.showAlert("Monto cargado. ¡Haz clic en ACTIVAR NODO para finalizar!");
-            }
-        });
-    }
-
-    // Inicialización al cargar la ventana
     window.onload = initUser;
 </script>
+
+
 
 <script src="js/test.js"></script>
 <script src="js/state.js" type="module"></script>
