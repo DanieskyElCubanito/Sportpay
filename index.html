@@ -454,6 +454,31 @@
         });
     }
 
+    function reinvestBalance() {
+    const currentBalance = parseFloat(document.getElementById('main-balance').innerText) || 0;
+    
+    if (currentBalance < 1) {
+        tg.showPopup({
+            title: "Saldo Insuficiente",
+            message: "Necesitas al menos 1.00 USDT para reinvertir.",
+            buttons: [{type: "close"}]
+        });
+        return;
+    }
+
+    tg.showConfirm(`¿Confirmas la reinversión de ${currentBalance.toFixed(2)} USDT? Recibirás un bono del 5%.`, (ok) => {
+        if (ok) {
+            // ENVIAMOS LA ORDEN AL BOT
+            notificarAlBot("reinvest", currentBalance);
+            
+            // Efecto visual inmediato en la App
+            tg.showAlert("Procesando reinversión... El bot actualizará tu plan en unos segundos.");
+            document.getElementById('main-balance').innerText = "0.00"; // Bajamos el balance visualmente
+            switchTab('dashboard');
+        }
+    });
+            }
+    
     // 5. Navegación (Se mantiene igual)
     function switchTab(tabId) {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
