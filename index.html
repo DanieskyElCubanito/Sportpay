@@ -382,18 +382,10 @@
     tg.expand();
     tg.ready();
 
+    // URL de tu bot (Verifica que sea la misma que generamos)
     const BJS_WEBHOOK_BASE = "https://api.bots.business/v1/bots/2899820/new-webhook?&command=api_saveon_webhook&public_user_token=d364d1b51cc3dc1f230ec71dae763f74";
 
-    function initUser() {
-        const user = tg.initDataUnsafe?.user;
-        if (user) {
-            document.getElementById('user-full-name').innerText = (user.first_name + " " + (user.last_name || "")).trim();
-            document.getElementById('user-id').innerText = `ID: ${user.id}`;
-            document.getElementById('user-pic').src = user.photo_url || `https://ui-avatars.com/api/?name=${user.first_name}&background=0088cc&color=fff`;
-            document.getElementById('ref-link').value = `https://t.me/SportsPay_Bot?start=${user.id}`;
-        }
-    }
-
+    // Función unificada para enviar datos a BJS
     function notificarAlBot(accion, monto) {
         const user = tg.initDataUnsafe?.user;
         if (!user) return;
@@ -405,88 +397,39 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 user_id: user.id,
-                user_name: user.first_name,
                 action: accion,
-                amount: monto,
-                date: new Date().toISOString()
+                amount: monto
             })
         })
-        .then(response => console.log("Webhook enviado con éxito"))
-        .catch(error => console.error("Error enviando webhook:", error));
+        .then(response => console.log("Webhook enviado correctamente"))
+        .catch(error => console.error("Error en fetch:", error));
     }
 
-    // Unificamos: Ahora esta función abre el flujo de reinversión
-    function openReinvestModal() {
-        reinvestBalance();
-    }
-
+    // Esta es la función que debe llamar tu botón de Reinvertir
     function reinvestBalance() {
-        const balanceElement = document.getElementById('main-balance');
-        if (!balanceElement) return;
+        const balanceEl = document.getElementById('main-balance');
+        const valor = parseFloat(balanceEl.innerText) || 0;
 
-        const currentBalance = parseFloat(balanceElement.innerText) || 0;
-        
-        if (currentBalance < 1) {
+        if (valor < 1) {
             tg.showAlert("Necesitas al menos 1.00 USDT para reinvertir.");
             return;
         }
 
-        tg.showConfirm(`¿Confirmas la reinversión de ${currentBalance.toFixed(2)} USDT?`, (ok) => {
+        tg.showConfirm(`¿Confirmas la reinversión de ${valor.toFixed(2)} USDT?`, (ok) => {
             if (ok) {
-                notificarAlBot("reinvest", currentBalance);
-                tg.showAlert("Solicitud enviada al bot.");
-                balanceElement.innerText = "0.00";
+                notificarAlBot("reinvest", valor);
+                tg.showAlert("Solicitud enviada. El bot procesará tu saldo.");
+                balanceEl.innerText = "0.00"; // Reset visual
                 switchTab('dashboard');
             }
         });
     }
 
-    function openPayModal() {
-        const amount = document.getElementById('invest-amount').value;
-        if (amount < 1) {
-            tg.showAlert("El mínimo es 1.00 USDT");
-            return;
-        }
-        notificarAlBot("intento_pago", amount);
-        document.getElementById('payModal').style.display = 'flex';
-        document.getElementById('pay-amount-display').innerText = amount + " USDT";
+    // Mantenemos esta para que no de error si el botón aún dice openReinvestModal
+    function openReinvestModal() {
+        reinvestBalance();
     }
-
-    function claimMining() {
-        const miningBalanceEl = document.getElementById('mining-balance');
-        const miningBalance = miningBalanceEl ? miningBalanceEl.innerText : "0";
-        
-        if (parseFloat(miningBalance) <= 0) {
-            tg.showAlert("No hay saldo para reclamar.");
-            return;
-        }
-
-        notificarAlBot("claim_mineria", miningBalance);
-        tg.showConfirm("¿Confirmas el reclamo?", (ok) => {
-            if (ok) {
-                tg.showAlert("Reclamo enviado.");
-                if(miningBalanceEl) miningBalanceEl.innerText = "0.0000";
-            }
-        });
-    }
-
-    function switchTab(tabId) {
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        const targetView = document.getElementById(tabId);
-        if (targetView) targetView.classList.add('active');
-
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.classList.remove('active');
-            if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(tabId)) {
-                btn.classList.add('active');
-            }
-        });
-    }
-
-    window.onload = initUser;
 </script>
-
-    
 
 <script src="js/test.js"></script>
 <script src="js/state.js" type="module"></script>
