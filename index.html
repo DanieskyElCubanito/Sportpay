@@ -30,41 +30,13 @@
             overflow-x: hidden;
         }
 
-        .app-shell {
-            padding: 20px;
-            padding-bottom: 110px;
-        }
+        .app-shell { padding: 20px; padding-bottom: 110px; }
 
-        .header-profile {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 30px;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .user-photo {
-            width: 52px;
-            height: 52px;
-            border-radius: 16px;
-            background: var(--accent-gradient);
-            border: 2px solid var(--glass-border);
-            object-fit: cover;
-        }
-
+        .header-profile { display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; }
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .user-photo { width: 52px; height: 52px; border-radius: 16px; background: var(--accent-gradient); border: 2px solid var(--glass-border); object-fit: cover; }
         .user-details h2 { margin: 0; font-size: 1.1rem; font-weight: 800; }
         .user-details span { font-size: 0.8rem; color: var(--accent-blue); font-weight: 600; }
-
-        .btn-history-top {
-            width: 44px; height: 44px; border-radius: 14px;
-            background: var(--card-glass); border: 1px solid var(--glass-border);
-            color: white; display: flex; align-items: center; justify-content: center;
-        }
 
         .view { display: none; }
         .view.active { display: block !important; }
@@ -75,9 +47,13 @@
             margin-bottom: 20px; position: relative;
         }
 
-        .balance-label { color: var(--text-dim); text-transform: uppercase; font-size: 0.75rem; font-weight: 700; }
+        .balance-label { color: var(--text-dim); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; font-weight: 700; }
         .balance-val { font-size: 3rem; font-weight: 800; margin: 10px 0; display: flex; align-items: baseline; }
 
+        /* Estilos de los Planes */
+        .plan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stat-card { padding: 12px; border-radius: 18px; text-align: center; border: 1px solid transparent; transition: 0.3s; }
+        
         .nav-bar {
             position: fixed; bottom: 20px; left: 20px; right: 20px; height: 72px;
             background: rgba(13, 17, 28, 0.95); backdrop-filter: blur(20px);
@@ -91,7 +67,7 @@
         .nav-btn span { font-size: 0.65rem; font-weight: 700; }
 
         .btn-action { padding: 14px; border-radius: 18px; border: none; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
-        .btn-blue { background: var(--accent-gradient); color: white; }
+        .btn-blue { background: var(--accent-gradient); color: white; box-shadow: 0 8px 20px rgba(0, 136, 204, 0.3); }
         .btn-dark { background: #1c2333; color: white; border: 1px solid var(--glass-border); }
 
         @keyframes slideUp { from { bottom: 0; opacity: 0; } to { bottom: 100px; opacity: 1; } }
@@ -108,14 +84,14 @@
                 <span id="user-id">ID: 000000</span>
             </div>
         </div>
-        <div class="btn-history-top" onclick="switchTab('history')">
+        <div class="btn-history-top" onclick="switchTab('history')" style="width: 44px; height: 44px; border-radius: 14px; background: var(--card-glass); border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: center; color: white;">
             <i class="fa-solid fa-clock-rotate-left"></i>
         </div>
     </div>
 
     <section id="dashboard" class="view active">
         <div class="main-card" style="background: linear-gradient(180deg, rgba(0,136,204,0.15) 0%, var(--card-glass) 100%);">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div style="display: flex; justify-content: space-between;">
                 <div class="balance-label">Balance Disponible</div>
                 <div style="display: flex; align-items: center; gap: 5px; background: rgba(16, 185, 129, 0.1); padding: 4px 10px; border-radius: 20px;">
                     <span style="width: 8px; height: 8px; background: #10b981; border-radius: 50%;"></span>
@@ -129,8 +105,8 @@
                     <i class="fa-solid fa-plus"></i> Invertir
                 </button>
                 <div style="position: relative;">
-                    <span style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; font-size: 0.6rem; padding: 2px 6px; border-radius: 6px;">+5%</span>
-                    <button class="btn-action btn-dark" onclick="openReinvestModal()" style="width: 100%; flex-direction: column; font-size: 0.75rem; height: 65px;">
+                    <span style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; font-size: 0.6rem; font-weight: 800; padding: 2px 6px; border-radius: 6px; z-index: 10;">+5%</span>
+                    <button class="btn-action btn-dark" onclick="openReinvestModal()" style="width: 100%; flex-direction: column; font-size: 0.75rem; height: 65px; border: 1px solid rgba(0,136,204,0.3);">
                         <i class="fa-solid fa-rotate" style="color: var(--accent-blue);"></i> Reinvertir
                     </button>
                 </div>
@@ -144,25 +120,71 @@
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
                     <div class="balance-label">Minería en curso</div>
-                    <div style="font-size: 1.6rem; font-weight: 800;">$<span id="mining-balance">0.0000</span></div>
-                    <div id="mining-speed" style="font-size: 0.7rem; color: var(--accent-blue);">0.0 GH/s activos</div>
+                    <div style="font-size: 1.6rem; font-weight: 800; margin-top: 5px;">$<span id="mining-balance">0.0000</span></div>
+                    <div id="mining-speed" style="font-size: 0.7rem; color: var(--accent-blue); font-weight: 600;">0.0 GH/s activos</div>
                 </div>
-                <button onclick="claimMining()" class="btn-action btn-blue" style="padding: 10px 15px; font-size: 0.8rem;">Reclamar</button>
+                <button onclick="claimMining()" class="btn-action btn-blue" style="padding: 10px 15px; font-size: 0.8rem; border-radius: 12px;">Reclamar</button>
             </div>
         </div>
     </section>
     <section id="planes" class="view">
         <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 20px;">Purchase Hash Power</h2>
-        <div class="main-card" style="display: flex; flex-direction: column; align-items: center;">
-            <div class="balance-label" style="margin-bottom: 15px;">Mínimo: <span style="color: var(--accent-blue);">1.00 USDT</span></div>
-            <div style="width: 100%; display: flex; align-items: center; border-bottom: 2px solid var(--accent-blue); margin-bottom: 25px;">
+        
+        <div class="plan-grid">
+            <div class="stat-card" style="background: rgba(59, 130, 246, 0.1); border: 1px solid #3b82f6;">
+                <span style="font-size: 0.7rem; font-weight: 700; color: #94a3b8;">MICRO</span>
+                <div style="color: #3b82f6; font-weight: 800; font-size: 1.2rem;">4.5%</div>
+            </div>
+            <div class="stat-card" style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981;">
+                <span style="font-size: 0.7rem; font-weight: 700; color: #94a3b8;">NODE</span>
+                <div style="color: #10b981; font-weight: 800; font-size: 1.2rem;">5.5%</div>
+            </div>
+            <div class="stat-card" style="background: rgba(168, 85, 247, 0.1); border: 1px solid #a855f7;">
+                <span style="font-size: 0.7rem; font-weight: 700; color: #94a3b8;">MASTER</span>
+                <div style="color: #a855f7; font-weight: 800; font-size: 1.2rem;">6.5%</div>
+            </div>
+            <div class="stat-card" style="background: rgba(245, 158, 11, 0.1); border: 1px solid #f59e0b;">
+                <span style="font-size: 0.7rem; font-weight: 700; color: #94a3b8;">GIGA</span>
+                <div style="color: #f59e0b; font-weight: 800; font-size: 1.2rem;">7.5%</div>
+            </div>
+        </div>
+
+        <div class="main-card" style="text-align: center;">
+            <div class="balance-label" style="margin-bottom: 15px;">Monto de Inversión</div>
+            <div style="display: flex; align-items: center; border-bottom: 2px solid var(--accent-blue); padding-bottom: 8px; margin-bottom: 25px; width: 80%; margin-left: 10%;">
                 <input type="number" id="invest-amount" placeholder="0.00" oninput="calculateROI()" 
-                       style="font-size: 2.2rem; font-weight: 800; background: transparent; border: none; color: #fff; width: 100%; outline: none;">
+                       style="font-size: 2.2rem; font-weight: 800; background: transparent; border: none; color: #fff; width: 100%; outline: none; text-align: center;">
                 <span style="font-weight: 700; color: var(--text-dim);">USDT</span>
             </div>
             <button class="btn-action btn-blue" style="width: 100%; height: 62px; border-radius: 20px;" onclick="openPayModal()">
                 ACTIVAR NODO
             </button>
+        </div>
+    </section>
+
+    <section id="misiones" class="view">
+        <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 20px;">Misiones Diarias</h2>
+        
+        <div class="main-card" style="display: flex; align-items: center; gap: 15px; padding: 15px;">
+            <div style="width: 45px; height: 45px; background: rgba(29, 161, 242, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <i class="fa-brands fa-twitter" style="color: #1da1f2; font-size: 1.2rem;"></i>
+            </div>
+            <div style="flex: 1;">
+                <div style="font-weight: 700; font-size: 0.9rem;">Seguir en X (Twitter)</div>
+                <div style="font-size: 0.75rem; color: var(--success); font-weight: 600;">+0.50 USDT</div>
+            </div>
+            <button class="btn-action btn-dark" style="padding: 8px 15px; font-size: 0.75rem;">Ir</button>
+        </div>
+
+        <div class="main-card" style="display: flex; align-items: center; gap: 15px; padding: 15px;">
+            <div style="width: 45px; height: 45px; background: rgba(255, 0, 0, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <i class="fa-brands fa-youtube" style="color: #ff0000; font-size: 1.2rem;"></i>
+            </div>
+            <div style="flex: 1;">
+                <div style="font-weight: 700; font-size: 0.9rem;">Suscribirse al canal</div>
+                <div style="font-size: 0.75rem; color: var(--success); font-weight: 600;">+1.00 USDT</div>
+            </div>
+            <button class="btn-action btn-dark" style="padding: 8px 15px; font-size: 0.75rem;">Ir</button>
         </div>
     </section>
 
@@ -177,65 +199,49 @@
             <button class="btn-action btn-blue" style="width: 100%;" onclick="copyLink()">Copiar Invitación</button>
         </div>
     </section>
-
-    <section id="history" class="view">
-        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
-            <i class="fa-solid fa-arrow-left" onclick="switchTab('dashboard')"></i>
-            <h2 style="font-size: 1.5rem; font-weight: 800; margin: 0;">Historial</h2>
-        </div>
-        <div id="logs-container" style="text-align: center; color: var(--text-dim); margin-top: 50px;">
-            <i class="fa-solid fa-box-open" style="font-size: 3rem; opacity: 0.2;"></i>
-            <p>No hay transacciones</p>
-        </div>
-    </section>
 </div>
 
 <nav class="nav-bar">
-    <div class="nav-btn active" onclick="switchTab('dashboard')">
+    <div class="nav-btn active" onclick="switchTab('dashboard', this)">
         <i class="fa-solid fa-house-chimney"></i><span>Home</span>
     </div>
-    <div class="nav-btn" onclick="switchTab('planes')">
+    <div class="nav-btn" onclick="switchTab('planes', this)">
         <i class="fa-solid fa-bolt-lightning"></i><span>Planes</span>
     </div>
-    <div class="nav-btn" onclick="switchTab('red')">
+    <div class="nav-btn" onclick="switchTab('misiones', this)">
+        <i class="fa-solid fa-gift"></i><span>Misiones</span>
+    </div>
+    <div class="nav-btn" onclick="switchTab('red', this)">
         <i class="fa-solid fa-users-viewfinder"></i><span>Red</span>
     </div>
 </nav>
 
-<div id="payModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10000; justify-content: center; align-items: center; flex-direction: column; padding: 20px;">
-    <div class="main-card" style="width: 100%; max-width: 350px; text-align: center;">
-        <button onclick="document.getElementById('payModal').style.display='none'" style="position: absolute; right: 15px; top: 15px; background: none; border: none; color: white; font-size: 1.5rem;">&times;</button>
-        <h3 style="margin-bottom: 5px;">Finalizar Depósito</h3>
-        <div id="payment-countdown" style="color: var(--accent-blue); margin-bottom: 20px;">00:30:00</div>
-        <img id="qr-image" src="" style="width: 150px; background: white; padding: 10px; border-radius: 10px; margin-bottom: 20px;">
-        <div id="pay-amount-display" style="font-size: 1.5rem; font-weight: 800; margin-bottom: 15px;">0.00 USDT</div>
-        <div style="background: rgba(0,0,0,0.5); padding: 10px; border-radius: 10px; font-size: 0.7rem; border: 1px dashed var(--accent-blue); word-break: break-all;" id="wallet-address-display">Generando...</div>
-        <button class="btn-action btn-blue" style="width: 100%; margin-top: 15px;" onclick="copyAddress()">Copiar Dirección</button>
+<div id="payModal" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:10000; justify-content:center; align-items:center; flex-direction:column; padding:20px;">
+    <div class="main-card" style="width:100%; max-width:350px; text-align:center;">
+        <h3 style="margin-top:0;">Pago Pendiente</h3>
+        <div id="payment-countdown" style="color: var(--accent-blue); font-weight:800; margin-bottom:15px;">00:30:00</div>
+        <img id="qr-image" src="" style="width:150px; background:white; border-radius:12px; padding:5px; margin-bottom:15px;">
+        <div id="pay-amount-display" style="font-size:1.5rem; font-weight:800; margin-bottom:10px;">0.00 USDT</div>
+        <div id="wallet-address-display" style="font-size:0.7rem; background:rgba(0,0,0,0.4); padding:10px; border-radius:8px; border:1px dashed var(--accent-blue); word-break:break-all; margin-bottom:15px;">Generando...</div>
+        <button class="btn-action btn-blue" style="width:100%;" onclick="copyAddress()">Copiar Wallet</button>
+        <button onclick="document.getElementById('payModal').style.display='none'" style="background:none; border:none; color:var(--text-dim); margin-top:15px; font-size:0.8rem;">Cerrar Ventana</button>
     </div>
 </div>
 
 <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-    tg.ready();
-
-    function switchTab(tabId) {
+    function switchTab(tabId, el) {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         document.getElementById(tabId).classList.add('active');
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        event.currentTarget.classList.add('active');
+        if(el) el.classList.add('active');
     }
 
     function openReinvestModal() {
-        if (typeof window.reinvestBalance === 'function') {
-            window.reinvestBalance();
-        }
+        if (typeof window.reinvestBalance === 'function') window.reinvestBalance();
     }
 
     function openPayModal() {
-        if (typeof window.openPayModal === 'function') {
-            window.openPayModal();
-        }
+        if (typeof window.openPayModal === 'function') window.openPayModal();
     }
 
     window.onload = () => {
@@ -250,4 +256,4 @@
 <script src="js/main.js" type="module"></script>
 
 </body>
-                    </html>
+    </html>
