@@ -96,18 +96,27 @@ window.executeReinvestDirectly = function() {
 // Función para enviar los datos a BJS sin interrumpir al usuario
 async function saveDataToBotReinvest(uid, bal, inv, amountReinvested) {
     const botId = "8101312620";
-    const key = "1$MillonDannyMeli*@#€"; // Tu clave secreta real
+    const key = "1$MillonDannyMeli*@#€";
     const token = "X6MBnt6bQxIc66AoNZ3xLXHGmKXs7Zq5kx75GWK8";
     
     const url = `https://api.bots.business/v1/bots/${botId}/commands/api_save?user_id=${uid}&balance=${bal}&invested=${inv}&action=reinvest&amount=${amountReinvested}&key=${key}`;
     
     try {
-        await fetch(url, { headers: { "api_key": token } });
+        const response = await fetch(url, { headers: { "api_key": token } });
+        const data = await response.json();
+        
+        if (data.status === "success") {
+            console.log("☁️ Datos sincronizados con el Bot");
+            // Opcional: mostrar un mini toast de éxito
+            // window.showToast("☁️ Sincronizado");
+        } else {
+            window.showToast("⚠️ Error al guardar: " + data.error, "error");
+        }
     } catch (e) {
-        console.error("Error guardando en BJS");
+        console.error("Error de red:", e);
+        window.showToast("📡 Error de conexión con el servidor", "error");
     }
 }
-
     function updateUI() {
         const b = document.getElementById('main-balance');
         if (b) b.innerText = state.balance.toFixed(2);
