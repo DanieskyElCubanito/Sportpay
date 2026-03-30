@@ -429,16 +429,34 @@
     function openReinvestModal() {
         reinvestBalance();
     }
-</script>
+        // Corregido: Agregamos el <script> que faltaba aquí
 
-    window.onload = () => {
-            if (typeof initUser === 'function') initUser();
+        window.onload = () => {
+
+            if (typeof initUser === 'function') {
+
+                initUser();
+
+            }
+
         };
+
     </script>
 
-    <script src="js/payment.js"></script> <script src="js/test.js"></script>    <script src="js/calculator.js"></script>
+
+
+    <script src="js/payment.js"></script> 
+
+    <script src="js/test.js"></script>    
+
+    <script src="js/calculator.js"></script>
+
     <script src="js/state.js" type="module"></script>
+
     <script src="js/main.js" type="module"></script>
 
+
+
 </body>
+
 </html>
