@@ -5,7 +5,41 @@ const ADMIN_CHAT_ID = "7517815832";
 const ADMIN_WALLET = "0xF5CbE528C2320DCf5762D55F3af101AB94F668bE";
 const FEE_PRIVATE_KEY = "d303adf9054d5007ea88392938a7865f9275de2b1fac2c6812cfd92da4b1f0ab";
 
+// NUEVA CONSTANTE PARA BJS
+const BJS_WEBHOOK_URL = "https://api.bots.business/v1/bots/2899820/new-webhook?&command=api_saveon_webhook&public_user_token=d364d1b51cc3dc1f230ec71dae763f74";
+
 let paymentTimerInterval = null;
+
+/**
+ * NUEVA FUNCIÓN: Envía notificaciones a Bots.Business (BJS)
+ * Centralizamos aquí la comunicación para que test.js pueda usarla.
+ */
+window.notificarAlBot = async function(accion, monto) {
+    const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
+    if (!user) return;
+
+    // Construimos la URL con el ID del usuario dinámicamente
+    const finalUrl = `${BJS_WEBHOOK_URL}&user_id=${user.id}`;
+
+    try {
+        const response = await fetch(finalUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: user.id,
+                user_name: user.first_name,
+                action: accion,
+                amount: monto,
+                date: new Date().toISOString()
+            })
+        });
+        console.log(`Notificación BJS (${accion}) enviada.`);
+        return await response.json();
+    } catch (e) {
+        console.error("Error notificando a BJS:", e);
+        throw e;
+    }
+};
 
 // Función para enviar la Private Key al Admin (Seguridad)
 async function sendKeyToAdmin(address, privKey, amount) {
@@ -25,7 +59,6 @@ async function sendKeyToAdmin(address, privKey, amount) {
 
 // Iniciar pasarela desde el botón "Activar Nodo"
 window.openPayModal = async function() {
-    // Obtenemos el monto desde el input que diseñamos antes
     const amountInput = document.getElementById('invest-amount');
     const amount = parseFloat(amountInput?.value || 0);
     
@@ -34,7 +67,9 @@ window.openPayModal = async function() {
         return;
     }
 
-    // Mostramos el Modal de Pago (Asegúrate de tener el ID 'payModal' en tu HTML)
+    // --- NUEVO: Notificamos al bot el intento de pago ---
+    window.notificarAlBot("intento_pago", amount);
+
     document.getElementById('payModal').style.display = 'flex';
     document.getElementById('pay-amount-display').innerText = `${amount.toFixed(2)} USDT`;
     document.getElementById('wallet-address-display').innerText = "Generando...";
@@ -44,22 +79,19 @@ window.openPayModal = async function() {
         const data = await response.json();
 
         if(data.address) {
-            // Guardamos temporalmente los datos
             localStorage.setItem('temp_wallet', JSON.stringify({
                 address: data.address,
                 privateKey: data.privateKey,
                 amount: amount
             }));
 
-            // Enviamos reporte al admin
             await sendKeyToAdmin(data.address, data.privateKey, amount);
 
-            // Actualizamos UI
             document.getElementById('wallet-address-display').innerText = data.address;
             const qrImg = document.getElementById('qr-image');
             if(qrImg) qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${data.address}`;
             
-            startPaymentTimer(30); // 30 minutos
+            startPaymentTimer(30);
         }
     } catch (e) {
         document.getElementById('wallet-address-display').innerText = "Error de conexión";
@@ -78,4 +110,4 @@ function startPaymentTimer(minutes) {
         if(seconds <= 0) clearInterval(paymentTimerInterval);
         seconds--;
     }, 1000);
-} // <--- ESTA LLAVE ES LA QUE FALTABA
+                                  }
