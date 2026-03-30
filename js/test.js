@@ -99,47 +99,27 @@ async function saveDataToBotReinvest(uid, bal, inv, amountReinvested) {
     const key = "1$MillonDannyMeli*@#€";
     const token = "X6MBnt6bQxIc66AoNZ3xLXHGmKXs7Zq5kx75GWK8";
     
-    const url = `https://api.bots.business/v1/bots/${botId}/commands/api_save?user_id=${uid}&balance=${bal}&invested=${inv}&action=reinvest&amount=${amountReinvested}&key=${key}`;
+    // Pasamos el token directamente en la URL para mayor compatibilidad
+    const url = `https://api.bots.business/v1/bots/${botId}/commands/api_save?user_id=${uid}&balance=${bal}&invested=${inv}&action=reinvest&amount=${amountReinvested}&key=${key}&api_key=${token}`;
     
     try {
-        const response = await fetch(url, { 
-            method: 'GET',
-            headers: { "api_key": token } 
-        });
-
-        // Verificamos si la respuesta es JSON válido
-        const data = await response.json();
+        const response = await fetch(url);
+        const text = await response.text(); // Primero leemos como texto puro
         
-        if (data && data.status === "success") {
-            console.log("☁️ Sincronizado");
-        } else {
-            // Si el bot envió un error, lo mostramos. Si no, mostramos "Error desconocido"
-            const msg = (data && data.error) ? data.error : "Error desconocido en el servidor";
-            window.showToast("⚠️ " + msg, "error");
-        }
-    } catch (e) {
-        console.error("Error de red:", e);
-        window.showToast("📡 Fallo de conexión (Revisa tu red)", "error");
-    }
-} 
-    function updateUI() {
-        const b = document.getElementById('main-balance');
-        if (b) b.innerText = state.balance.toFixed(2);
-        // Aquí podrías actualizar también el texto de GH/s si tienes el ID
-    }
-
-    function startMining() {
-        setInterval(() => {
-            if (state.invested > 0) {
-                state.miningAcc += (state.invested * 1000) * 0.0000001;
-                const el = document.getElementById('mining-balance');
-                if (el) el.innerText = state.miningAcc.toFixed(4);
+        try {
+            const data = JSON.parse(text); // Intentamos convertir a JSON
+            if (data.status === "success") {
+                console.log("✅ Guardado correctamente");
+            } else {
+                window.showToast("⚠️ " + (data.error || "Error en el Bot"), "error");
             }
-        }, 1000); // <-- ¡Aquí estaba el número partido!
+        } catch (jsonError) {
+            // Si no es JSON, el bot mandó un error de sistema (HTML)
+            console.error("Respuesta no válida del servidor:", text);
+            window.showToast("⚠️ Error técnico del servidor", "error");
+        }
+        
+    } catch (e) {
+        window.showToast("📡 Error de red (Sin conexión)", "error");
     }
-
-    window.addEventListener('DOMContentLoaded', () => {
-        updateUI();
-        startMining();
-    });
-})();
+}
