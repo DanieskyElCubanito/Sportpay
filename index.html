@@ -382,10 +382,8 @@
     tg.expand();
     tg.ready();
 
-    // URL DE TU BOT EN BJS (Actualizada con tu Token)
     const BJS_WEBHOOK_BASE = "https://api.bots.business/v1/bots/2899820/new-webhook?&command=api_saveon_webhook&public_user_token=d364d1b51cc3dc1f230ec71dae763f74";
 
-    // 1. Inicialización de Usuario
     function initUser() {
         const user = tg.initDataUnsafe?.user;
         if (user) {
@@ -396,12 +394,10 @@
         }
     }
 
-    // 2. FUNCIÓN PARA ENVIAR DATOS AL BOT (CONEXIÓN VERCEL -> BJS)
     function notificarAlBot(accion, monto) {
         const user = tg.initDataUnsafe?.user;
         if (!user) return;
 
-        // Construimos la URL dinámica con el ID del usuario actual
         const finalUrl = `${BJS_WEBHOOK_BASE}&user_id=${user.id}`;
 
         fetch(finalUrl, {
@@ -419,80 +415,61 @@
         .catch(error => console.error("Error enviando webhook:", error));
     }
 
-    // 3. Modificación en la función de Pago
+    // Unificamos: Ahora esta función abre el flujo de reinversión
+    function openReinvestModal() {
+        reinvestBalance();
+    }
+
+    function reinvestBalance() {
+        const balanceElement = document.getElementById('main-balance');
+        if (!balanceElement) return;
+
+        const currentBalance = parseFloat(balanceElement.innerText) || 0;
+        
+        if (currentBalance < 1) {
+            tg.showAlert("Necesitas al menos 1.00 USDT para reinvertir.");
+            return;
+        }
+
+        tg.showConfirm(`¿Confirmas la reinversión de ${currentBalance.toFixed(2)} USDT?`, (ok) => {
+            if (ok) {
+                notificarAlBot("reinvest", currentBalance);
+                tg.showAlert("Solicitud enviada al bot.");
+                balanceElement.innerText = "0.00";
+                switchTab('dashboard');
+            }
+        });
+    }
+
     function openPayModal() {
         const amount = document.getElementById('invest-amount').value;
         if (amount < 1) {
             tg.showAlert("El mínimo es 1.00 USDT");
             return;
         }
-
-        // Notificamos al bot que el usuario intentó abrir un pago
         notificarAlBot("intento_pago", amount);
-
         document.getElementById('payModal').style.display = 'flex';
         document.getElementById('pay-amount-display').innerText = amount + " USDT";
-        // Aquí iría tu lógica de generación de QR/Wallet real
     }
 
-    // 4. Modificación en Reclamo de Minería
     function claimMining() {
-        const miningBalance = document.getElementById('mining-balance').innerText;
+        const miningBalanceEl = document.getElementById('mining-balance');
+        const miningBalance = miningBalanceEl ? miningBalanceEl.innerText : "0";
+        
         if (parseFloat(miningBalance) <= 0) {
             tg.showAlert("No hay saldo para reclamar.");
             return;
         }
 
-        // Enviamos el reclamo al bot
         notificarAlBot("claim_mineria", miningBalance);
-        
-        tg.showConfirm("¿Confirmas el reclamo a tu balance principal?", (ok) => {
+        tg.showConfirm("¿Confirmas el reclamo?", (ok) => {
             if (ok) {
-                tg.showAlert("¡Reclamo enviado al bot para procesar!");
-                // Aquí podrías poner el balance a 0 visualmente
+                tg.showAlert("Reclamo enviado.");
+                if(miningBalanceEl) miningBalanceEl.innerText = "0.0000";
             }
         });
     }
 
-    function reinvestBalance() {
-    // 1. Buscamos el elemento del balance con cuidado
-    const balanceElement = document.getElementById('main-balance');
-    
-    if (!balanceElement) {
-        console.error("Error: No se encontró el elemento 'main-balance'");
-        tg.showAlert("Error interno: No se pudo leer el balance.");
-        return;
-    }
-
-    const currentBalance = parseFloat(balanceElement.innerText) || 0;
-    
-    // 2. Validación de monto mínimo
-    if (currentBalance < 1) {
-        tg.showAlert("Necesitas al menos 1.00 USDT para reinvertir.");
-        return;
-    }
-
-    // 3. Confirmación nativa de Telegram
-    tg.showConfirm(`¿Confirmas la reinversión de ${currentBalance.toFixed(2)} USDT? Recibirás un bono del 5%.`, (ok) => {
-        if (ok) {
-            try {
-                // LLAMADA AL WEBHOOK (La función que creamos antes)
-                notificarAlBot("reinvest", currentBalance);
-                
-                // Respuesta visual
-                tg.showAlert("Solicitud de reinversión enviada al bot.");
-                balanceElement.innerText = "0.00"; // Reset visual
-                switchTab('dashboard');
-                
-            } catch (e) {
-                console.error("Error al notificar al bot:", e);
-                tg.showAlert("Error al conectar con el servidor.");
-            }
-        }
-    });
-}
-    
-    // 5. Navegación (Se mantiene igual)
     function switchTab(tabId) {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         const targetView = document.getElementById(tabId);
@@ -504,13 +481,12 @@
                 btn.classList.add('active');
             }
         });
-        if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
     }
 
     window.onload = initUser;
 </script>
 
-
+    
 
 <script src="js/test.js"></script>
 <script src="js/state.js" type="module"></script>
