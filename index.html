@@ -431,6 +431,11 @@
     }
 </script>
 
+    window.onload = () => {
+            if (typeof initUser === 'function') initUser();
+        };
+
+
 <script src="js/test.js"></script>
 <script src="js/state.js" type="module"></script>
 <script src="js/payment.js"></script> 
