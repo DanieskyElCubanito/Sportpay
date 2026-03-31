@@ -53,4 +53,32 @@ export default async function handler(req, res) {
     }
     return res.status(200).json({ status: "success" });
   }
-                 }
+}
+// Lógica para procesar los 5 niveles de referidos
+async function payReferralCommission(sponsorId, amount, level = 1) {
+    const percentages = [0.08, 0.04, 0.015, 0.01, 0.005]; // 8%, 4%, 1.5%, 1%, 0.5%
+    
+    if (level > 5 || !sponsorId) return;
+
+    const commission = amount * percentages[level - 1];
+
+    // 1. Buscamos al patrocinador
+    const { data: sponsor } = await supabase
+        .from('users')
+        .select('user_id, balance, invited_by')
+        .eq('user_id', sponsorId)
+        .single();
+
+    if (sponsor) {
+        // 2. Le sumamos su comisión
+        await supabase
+            .from('users')
+            .update({ balance: sponsor.balance + commission })
+            .eq('user_id', sponsorId);
+
+        // 3. Saltamos al siguiente nivel (Recursividad)
+        if (sponsor.invited_by) {
+            await payReferralCommission(sponsor.invited_by, amount, level + 1);
+        }
+    }
+}
