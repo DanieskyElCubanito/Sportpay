@@ -206,37 +206,40 @@ syncInitialData();
 
     // --- ACTUALIZACIÓN DE EXECUTE REINVEST (MODO GET PARA EVITAR ERROR DE CONEXIÓN) ---
     window.executeReinvestDirectly = async function() {
-        const modal = document.getElementById('custom-reinvest-modal');
-        const amount = parseFloat(document.getElementById('main-balance')?.innerText || 0);
-        if (modal) modal.remove();
+    const modal = document.getElementById('custom-reinvest-modal');
+    const amount = parseFloat(document.getElementById('main-balance')?.innerText || 0);
+    if (modal) modal.remove();
 
-        // Usamos GET con los parámetros en la URL para máxima compatibilidad
-        const apiURL = `https://api.bots.business/v1/bots/${BJS_CONFIG.botId}/commands/api_reinvest?user_id=${localState.userId}&amount=${amount}`;
+    // Según tu captura, los valores deben estar codificados en la URL para Webhooks
+    const apiURL = `https://api.bots.business/v1/bots/${BJS_CONFIG.botId}/commands/api_reinvest?user_id=${userId}&amount=${amount}`;
 
-        try {
-            const response = await fetch(apiURL, {
-                method: 'GET',
-                headers: { "api_key": BJS_CONFIG.token }
-            });
-
-            const result = await response.json();
-
-            if (result.status === "success") {
-                // Sincronizamos con los datos reales que devolvió el Bot
-                state.totalEarnedUSD = result.balance;
-                state.totalInvestedUSDT = result.invested;
-                
-                window.updateUI();
-                window.showToast(`✅ ¡Reinversión guardada en el Bot!`);
-                if (typeof syncInitialData === 'function') syncInitialData();
-            } else {
-                window.showToast("❌ " + (result.message || "Error al procesar"), "error");
+    try {
+        const response = await fetch(apiURL, {
+            method: 'GET', // Usamos GET como sugiere la doc para parámetros de consulta
+            headers: { 
+                "api_key": BJS_CONFIG.token
             }
-        } catch (e) {
-            window.showToast("⚠️ Error de conexión con el Bot", "error");
-            console.error("Error:", e);
+        });
+
+        const result = await response.json();
+
+        if (result.status === "success") {
+            // Sincronizamos con la respuesta real del servidor
+            state.totalEarnedUSD = result.balance;
+            state.totalInvestedUSDT = result.invested;
+            
+            window.updateDashboard(); 
+            window.showToast(`✅ ¡Reinversión procesada correctamente!`);
+            
+            if (typeof syncInitialData === 'function') syncInitialData();
+        } else {
+            window.showToast("❌ " + (result.message || "Error en el servidor"), "error");
         }
-    };
+    } catch (e) {
+        window.showToast("⚠️ Error de comunicación con el Bot", "error");
+        console.error("Error detallado:", e);
+    }
+};
 
     function startMining() {
         setInterval(() => {
