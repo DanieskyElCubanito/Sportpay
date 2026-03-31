@@ -1,6 +1,3 @@
-// IMPORTANTE: Asegúrate de que state.js esté en la misma carpeta 'js'
-import { state, saveInvestment, processDailyEarnings } from './state.js';
-
 // --- CONFIGURACIÓN ---
 const BJS_CONFIG = {
     botId: "8101312620",
@@ -16,6 +13,7 @@ const urlInvested = urlParams.get('invested');
 
 // --- FORZAR SINCRONIZACIÓN ---
 function syncInitialData() {
+    if (typeof window.state === 'undefined') window.state = {};
     console.log("Sincronizando... Balance recibido:", urlBalance);
 
     if (urlBalance !== null) {
@@ -30,7 +28,7 @@ function syncInitialData() {
 }
 
 // --- ACTUALIZAR PANTALLA ---
-export function updateDashboard() {
+function updateDashboard() {
     const mainBalEl = document.getElementById('main-balance');
     if (mainBalEl) {
         mainBalEl.innerText = (state.totalEarnedUSD || 0).toFixed(2);
@@ -39,7 +37,6 @@ export function updateDashboard() {
     const invested = state.totalInvestedUSDT || 0;
     const currentGHS = invested * 1000;
     
-    // Actualizar otros textos si existen
     const elements = {
         'total-profit': `+$${(state.totalProfit || 0).toFixed(2)}`,
         'mining-speed': `${currentGHS.toLocaleString()} GH/s activos`
@@ -50,6 +47,7 @@ export function updateDashboard() {
         if (el) el.innerText = val;
     }
 }
+window.updateDashboard = updateDashboard;
 
 // --- RECLAMAR SALDO ---
 async function claimMining() {
@@ -76,11 +74,10 @@ function initUser() {
     const idEl = document.getElementById('user-id');
     const picEl = document.getElementById('user-pic');
 
-    // Comprobar si existe el objeto WebApp de Telegram
     if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe.user) {
         
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Expande la app a pantalla completa
+        tg.expand(); 
 
         const user = tg.initDataUnsafe.user;
         const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
@@ -91,23 +88,22 @@ function initUser() {
         if (user.photo_url) {
             picEl.src = user.photo_url;
         } else {
-            // Generar una imagen con la letra inicial si el usuario tiene su foto de Telegram oculta
             picEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=0088cc&color=fff&bold=true`;
         }
 
     } else {
-        // MODO DESARROLLADOR: Esto aparecerá si lo abres en Chrome fuera de Telegram
         nameEl.innerText = 'Modo Navegador';
         idEl.innerText = 'ID: Prueba Web';
         picEl.src = 'https://ui-avatars.com/api/?name=Web+Test&background=f59e0b&color=fff';
-        console.warn("⚠️ Ejecutando fuera de Telegram. No se pueden cargar datos reales del usuario.");
+        console.warn("⚠️ Ejecutando fuera de Telegram.");
     }
 }
+window.initUser = initUser;
 
-// Asegurarse de que se ejecute al cargar la página
 window.onload = () => {
     initUser();
 };
+
 // --- MOTOR ---
 function startMiningEngine() {
     setInterval(() => {
@@ -116,10 +112,9 @@ function startMiningEngine() {
             state.accumulatedMining = (state.accumulatedMining || 0) + (invested * 1000 * 0.0000001);
             const display = document.getElementById('mining-balance');
             if (display) display.innerText = state.accumulatedMining.toFixed(4);
+
         }
     }, 1000);
 }
 
-// EJECUCIÓN DIRECTA (Sin esperar al load para evitar fallos en móviles)
 syncInitialData();
-
