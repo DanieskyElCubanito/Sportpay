@@ -6,7 +6,7 @@ function calculateROI() {
 
     const amount = parseFloat(amountInput.value) || 0;
 
-    // Si el campo está vacío o es 0, reiniciar valores
+    // Si el campo está vacío o es 0, reiniciar valores a cero
     if (amount <= 0) {
         powerDisplay.innerText = "0.0 GH/s";
         hashDisplay.innerText = "0 HASH";
@@ -15,9 +15,8 @@ function calculateROI() {
         return;
     }
 
-    // Configuración de minería (ajusta "10" si quieres dar más o menos GH/s por dólar)
-    const ghPerUsdt = 10; 
-    const totalGHs = (amount * ghPerUsdt).toFixed(1);
+    // 1 USDT = 1000 GH/s
+    const totalGHs = (amount * 1000).toFixed(1);
     
     let dailyPercentage = 0;
     let tierName = "";
@@ -42,15 +41,17 @@ function calculateROI() {
         tierColor = "#f59e0b";
     }
 
-    // Calcular ganancia diaria
-    const dailyProfit = (amount * dailyPercentage).toFixed(2);
+    // Ganancia diaria en USDT
+    const dailyProfitUSDT = amount * dailyPercentage;
+    
+    // 1 USDT de ganancia = 1000 HASH
+    const dailyHash = (dailyProfitUSDT * 1000).toFixed(0);
 
     // Actualizar el HTML
     powerDisplay.innerText = `${totalGHs} GH/s`;
-    hashDisplay.innerText = `${dailyProfit} HASH/día`; 
+    hashDisplay.innerText = `${dailyHash} HASH`; 
     tierDisplay.innerText = tierName;
     tierDisplay.style.color = tierColor;
 }
 
-// Hacer que la función sea global para que el HTML pueda llamarla al escribir
 window.calculateROI = calculateROI;
