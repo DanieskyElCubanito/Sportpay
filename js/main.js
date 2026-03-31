@@ -65,7 +65,8 @@ async function claimMining() {
     if (!state.accumulatedMining || state.accumulatedMining <= 0) return;
     
     const amount = state.accumulatedMining;
-    const apiURL = `https://api.bots.business/v1/bots/${BJS_CONFIG.botId}/commands/api_save`;
+    // Asegúrate de que localState.userId contenga el ID numérico
+const apiURL = `https://api.bots.business/v1/bots/${botId}/commands/api_reinvest?user_id=${localState.userId}&amount=${amount}`;
     const finalURL = `${apiURL}?user_id=${userId}&amount=${amount}&key=${BJS_CONFIG.secretKey}`;
 
     try {
