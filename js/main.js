@@ -1,8 +1,8 @@
 // --- 1. CONFIGURACIÓN GLOBAL ---
-const BJS_CONFIG = {
-    botId: "8101312620",
-    secretKey: "1$MillonDannyMeli*@#€", 
-    token: "X6MBnt6bQxIc66AoNZ3xLXHGmKXs7Zq5kx75GWK8" 
+// Ahora apuntamos a nuestras propias rutas en Vercel
+const API_URLS = {
+    user: '/api/user',
+    reinvest: '/api/reinvest'
 };
 
 // Estado único de la aplicación
@@ -14,51 +14,34 @@ window.state = {
     accumulatedMining: 0
 };
 
-// Capturar ID de usuario (Prioridad: URL > Telegram WebApp)
+// Capturar ID de usuario y parámetros de referidos
 const urlParams = new URLSearchParams(window.location.search);
+const startParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param; // Para referidos
 state.userId = urlParams.get('user_id') || window.Telegram?.WebApp?.initDataUnsafe?.user?.id || "000000";
 
 // --- 2. SINCRONIZACIÓN Y PANEL ---
 
-// --- DENTRO DE TU main.js ---
-
 async function syncInitialData() {
-    if (!state.userId) return;
+    if (!state.userId || state.userId === "000000") return;
 
-    // Intentamos cargar lo que diga la URL primero (por si el bot tarda)
-    const urlBalance = parseFloat(urlParams.get('balance')) || 0;
-    const urlInvested = parseFloat(urlParams.get('invested')) || 0;
-    
-    state.totalEarnedUSD = urlBalance;
-    state.totalInvestedUSDT = urlInvested;
-    updateDashboard(); // Mostramos lo de la URL de inmediato
-
-    const apiURL = `https://api.bots.business/v1/bots/${BJS_CONFIG.botId}/commands/get_user_data?user_id=${state.userId}`;
-    
     try {
-        const response = await fetch(apiURL, { 
-            headers: { "api_key": BJS_CONFIG.token } 
-        });
+        // Llamamos a TU propia API en Vercel para obtener los 50 USDT y referidos
+        const response = await fetch(`${API_URLS.user}?user_id=${state.userId}&invited_by=${startParam || ''}`);
         const data = await response.json();
 
-        // Si el bot tiene datos más actualizados, los usamos
-        if (data.status === "success" || data.balance !== undefined) {
+        if (data.status === "success") {
             state.totalEarnedUSD = parseFloat(data.balance);
             state.totalInvestedUSDT = parseFloat(data.invested || 0);
             state.referralCount = data.referrals || 0;
             updateDashboard();
         }
     } catch (e) {
-        console.log("Usando saldo de respaldo de la URL");
+        console.error("Error sincronizando con la API de Vercel:", e);
+        // Fallback: intentar cargar de la URL si la API falla
+        state.totalEarnedUSD = parseFloat(urlParams.get('balance')) || 0;
+        updateDashboard();
     }
 }
-
-// --- FUNCIÓN PARA AÑADIR SALDO (Asegúrate de tenerla) ---
-window.addBalance = function() {
-    // Aquí puedes poner el link a tu bot o la pasarela de pago
-    // Por ejemplo, abrir el bot para depositar:
-    window.Telegram.WebApp.openTelegramLink(`https://t.me/TuBotNombre?start=deposit`);
-};
 
 function updateDashboard() {
     const mainBalEl = document.getElementById('main-balance');
@@ -71,37 +54,14 @@ function updateDashboard() {
     if (idEl) idEl.innerText = `ID: ${state.userId}`;
     
     if (speedEl) {
+        // 1 USDT invertido = 1000 GH/s
         const currentGHS = (state.totalInvestedUSDT || 0) * 1000;
         speedEl.innerText = `${currentGHS.toLocaleString()} GH/s activos`;
     }
 }
 
-// --- 3. ACCIONES DE RECLAMAR Y REINVERTIR ---
+// --- 3. ACCIONES DE REINVERTIR Y RECLAMAR ---
 
-// Función para RECLAMAR saldo minado
-window.claimMining = async function() {
-    if (state.accumulatedMining <= 0) {
-        window.showToast("❌ Nada para reclamar", "error");
-        return;
-    }
-    
-    const amount = state.accumulatedMining;
-    const apiURL = `https://api.bots.business/v1/bots/${BJS_CONFIG.botId}/commands/api_save?user_id=${state.userId}&amount=${amount}&key=${BJS_CONFIG.secretKey}`;
-
-    try {
-        const response = await fetch(apiURL, { headers: { "api_key": BJS_CONFIG.token } });
-        const result = await response.json();
-        
-        if (result.status === "success") {
-            state.totalEarnedUSD = parseFloat(result.balance);
-            state.accumulatedMining = 0;
-            updateDashboard();
-            window.showToast("✅ Saldo reclamado");
-        }
-    } catch (e) { window.showToast("⚠️ Error de conexión", "error"); }
-};
-
-// Función para ABRIR EL MODAL (Faltaba en el anterior)
 window.openReinvestModal = function() {
     if (state.totalEarnedUSD < 1) {
         window.showToast("❌ Mínimo 1.00 USDT", "error");
@@ -131,54 +91,55 @@ window.openReinvestModal = function() {
     document.body.insertAdjacentHTML('beforeend', modalHtml);
 };
 
-// Función para EJECUTAR la reinversión
-// Comando: api_reinvest
-try {
-    // 1. Captura de datos profesional (usando options como indica la doc)
-    let uid = options.user_id; 
-    let amount = parseFloat(options.amount);
+window.executeReinvestDirectly = async function() {
+    const modal = document.getElementById('custom-reinvest-modal');
+    if (modal) modal.remove();
 
-    if (!uid) {
-        WebApp.render({ content: { status: "error", message: "ID de usuario faltante" } });
+    try {
+        const response = await fetch(API_URLS.reinvest, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: state.userId,
+                amount: state.totalEarnedUSD
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.status === "success") {
+            state.totalEarnedUSD = parseFloat(result.balance);
+            state.totalInvestedUSDT = parseFloat(result.invested);
+            updateDashboard();
+            window.showToast("✅ Reinversión exitosa");
+        } else {
+            window.showToast(`❌ ${result.message}`, "error");
+        }
+    } catch (e) {
+        window.showToast("⚠️ Error de conexión con la API", "error");
+    }
+};
+
+window.claimMining = function() {
+    if (state.accumulatedMining <= 0) {
+        window.showToast("❌ Nada para reclamar", "error");
         return;
     }
+    // Sumamos lo minado al balance local y reseteamos el contador
+    state.totalEarnedUSD += state.accumulatedMining;
+    state.accumulatedMining = 0;
+    updateDashboard();
+    window.showToast("✅ Saldo reclamado");
+    
+    // Aquí podrías hacer un fetch a /api/user para guardar el nuevo balance permanentemente
+};
 
-    // 2. Cargar propiedades (User.getProperty sigue siendo válido)
-    let bal = User.getProperty("balance", uid) || 0;
-    let inv = User.getProperty("total_invested", uid) || 0;
-
-    // 3. Validación de Negocio
-    if (isNaN(amount) || amount < 1) {
-        WebApp.render({ content: { status: "error", message: "Monto inválido" } });
-    } else if (bal < amount) {
-        WebApp.render({ content: { status: "error", message: "Saldo insuficiente" } });
-    } else {
-        // 4. Lógica de Reinversión
-        let bonus = amount * 0.05;
-        let nBal = bal - amount;
-        let nInv = inv + amount + bonus;
-
-        User.setProperty("balance", nBal, "float", uid);
-        User.setProperty("total_invested", nInv, "float", uid);
-
-        // 5. RESPUESTA JSON PURA (Mechanical Necessity para evitar errores)
-        WebApp.render({
-            content: { 
-                status: "success", 
-                balance: nBal, 
-                invested: nInv 
-            }
-        });
-    }
-} catch (err) {
-    // En caso de error crítico, ver la pestaña "Error" como sugiere la captura
-    WebApp.render({ content: { status: "error", message: "Error interno del bot" } });
-}
 // --- 4. MOTOR DE MINERÍA Y PERFIL ---
 
 function startMiningEngine() {
     setInterval(() => {
         if (state.totalInvestedUSDT > 0) {
+            // Ganancia por segundo: Inversión * Factor
             state.accumulatedMining += (state.totalInvestedUSDT * 1000 * 0.0000001);
             const display = document.getElementById('mining-balance');
             if (display) display.innerText = state.accumulatedMining.toFixed(6);
