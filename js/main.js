@@ -1,7 +1,7 @@
 // --- 1. CONFIGURACIÓN GLOBAL ---
 const BJS_CONFIG = {
     botId: "8101312620",
-    secretKey: "1$MillonDannyMeli*@#€", // Para api_save
+    secretKey: "1$MillonDannyMeli*@#€", 
     token: "X6MBnt6bQxIc66AoNZ3xLXHGmKXs7Zq5kx75GWK8" 
 };
 
@@ -14,14 +14,14 @@ window.state = {
     accumulatedMining: 0
 };
 
-// Capturar ID de usuario (URL o Telegram)
+// Capturar ID de usuario (Prioridad: URL > Telegram WebApp)
 const urlParams = new URLSearchParams(window.location.search);
-state.userId = urlParams.get('user_id') || window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+state.userId = urlParams.get('user_id') || window.Telegram?.WebApp?.initDataUnsafe?.user?.id || "000000";
 
-// --- 2. SINCRONIZACIÓN Y DATOS ---
+// --- 2. SINCRONIZACIÓN Y PANEL ---
 
 async function syncInitialData() {
-    if (!state.userId) return;
+    if (!state.userId || state.userId === "000000") return;
 
     const apiURL = `https://api.bots.business/v1/bots/${BJS_CONFIG.botId}/commands/get_user_data?user_id=${state.userId}`;
     
@@ -36,7 +36,7 @@ async function syncInitialData() {
             updateDashboard();
         }
     } catch (e) {
-        console.error("Error sincronizando:", e);
+        console.error("Error sincronizando datos:", e);
     }
 }
 
@@ -47,8 +47,8 @@ function updateDashboard() {
     const idEl = document.getElementById('user-id');
 
     if (mainBalEl) mainBalEl.innerText = state.totalEarnedUSD.toFixed(2);
-    if (refEl) refEl.innerText = state.referralCount || 0;
-    if (idEl) idEl.innerText = `ID: ${state.userId || 'Prueba'}`;
+    if (refEl) refEl.innerText = state.referralCount;
+    if (idEl) idEl.innerText = `ID: ${state.userId}`;
     
     if (speedEl) {
         const currentGHS = (state.totalInvestedUSDT || 0) * 1000;
@@ -56,17 +56,16 @@ function updateDashboard() {
     }
 }
 
-// --- 3. FUNCIONES DE BOTONES (REINVERTIR Y RECLAMAR) ---
+// --- 3. ACCIONES DE RECLAMAR Y REINVERTIR ---
 
-// RECLAMAR LO MINADO (api_save)
+// Función para RECLAMAR saldo minado
 window.claimMining = async function() {
     if (state.accumulatedMining <= 0) {
-        window.showToast("❌ No hay nada acumulado para reclamar", "error");
+        window.showToast("❌ Nada para reclamar", "error");
         return;
     }
     
     const amount = state.accumulatedMining;
-    // URL usando la secretKey para seguridad
     const apiURL = `https://api.bots.business/v1/bots/${BJS_CONFIG.botId}/commands/api_save?user_id=${state.userId}&amount=${amount}&key=${BJS_CONFIG.secretKey}`;
 
     try {
@@ -77,23 +76,48 @@ window.claimMining = async function() {
             state.totalEarnedUSD = parseFloat(result.balance);
             state.accumulatedMining = 0;
             updateDashboard();
-            window.showToast("✅ Saldo reclamado con éxito");
-        } else {
-            window.showToast("❌ " + (result.message || "Error al reclamar"), "error");
+            window.showToast("✅ Saldo reclamado");
         }
-    } catch (e) {
-        window.showToast("⚠️ Error de conexión", "error");
-    }
+    } catch (e) { window.showToast("⚠️ Error de conexión", "error"); }
 };
 
-// REINVERTIR (api_reinvest)
-window.executeReinvestDirectly = async function() {
-    const modal = document.getElementById('custom-reinvest-modal');
-    if (modal) modal.remove();
+// Función para ABRIR EL MODAL (Faltaba en el anterior)
+window.openReinvestModal = function() {
+    if (state.totalEarnedUSD < 1) {
+        window.showToast("❌ Mínimo 1.00 USDT", "error");
+        return;
+    }
 
     const amount = state.totalEarnedUSD;
-    if (amount < 1) return window.showToast("Mínimo 1 USDT", "error");
+    const bonus = amount * 0.05;
 
+    const oldModal = document.getElementById('custom-reinvest-modal');
+    if (oldModal) oldModal.remove();
+
+    const modalHtml = `
+        <div id="custom-reinvest-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index:99999; backdrop-filter:blur(5px);">
+            <div style="background:#151e2b; width:85%; max-width:340px; border-radius:24px; padding:25px; text-align:center; border:1px solid #334155; color:white;">
+                <h2 style="margin:0 0 15px 0;">Confirmar</h2>
+                <div style="background:#0f172a; border-radius:16px; padding:15px; margin-bottom:20px; text-align:left;">
+                    <p style="margin:5px 0; color:#94a3b8;">Monto: <b>$${amount.toFixed(2)}</b></p>
+                    <p style="margin:5px 0; color:#94a3b8;">Bono (+5%): <b style="color:#10b981;">+$${bonus.toFixed(2)}</b></p>
+                </div>
+                <div style="display:flex; gap:12px;">
+                    <button onclick="document.getElementById('custom-reinvest-modal').remove()" style="flex:1; padding:12px; border-radius:12px; background:#334155; color:white; border:none;">Cerrar</button>
+                    <button onclick="executeReinvestDirectly()" style="flex:1; padding:12px; border-radius:12px; background:#0088cc; color:white; border:none; font-weight:bold;">Reinvertir</button>
+                </div>
+            </div>
+        </div>`;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+};
+
+// Función para EJECUTAR la reinversión
+window.executeReinvestDirectly = async function() {
+    const modal = document.getElementById('custom-reinvest-modal');
+    const amount = state.totalEarnedUSD;
+    if (modal) modal.remove();
+
+    // Usando 'options' para BJS según tus capturas
     const apiURL = `https://api.bots.business/v1/bots/${BJS_CONFIG.botId}/commands/api_reinvest?user_id=${state.userId}&amount=${amount}`;
 
     try {
@@ -101,28 +125,24 @@ window.executeReinvestDirectly = async function() {
             method: 'GET',
             headers: { "api_key": BJS_CONFIG.token, "Accept": "application/json" }
         });
-
         const result = await response.json();
 
         if (result && result.status === "success") {
             state.totalEarnedUSD = parseFloat(result.balance);
             state.totalInvestedUSDT = parseFloat(result.invested);
             updateDashboard();
-            window.showToast("✅ Reinversión exitosa (+5% Bono)");
+            window.showToast("✅ Reinversión exitosa");
         } else {
             window.showToast("❌ " + (result.message || "Error"), "error");
         }
-    } catch (e) {
-        window.showToast("⚠️ Error de conexión", "error");
-    }
+    } catch (e) { window.showToast("⚠️ Error de conexión", "error"); }
 };
 
-// --- 4. MOTOR Y PERFIL ---
+// --- 4. MOTOR DE MINERÍA Y PERFIL ---
 
 function startMiningEngine() {
     setInterval(() => {
         if (state.totalInvestedUSDT > 0) {
-            // Ganancia por segundo basada en inversión
             state.accumulatedMining += (state.totalInvestedUSDT * 1000 * 0.0000001);
             const display = document.getElementById('mining-balance');
             if (display) display.innerText = state.accumulatedMining.toFixed(6);
@@ -131,16 +151,17 @@ function startMiningEngine() {
 }
 
 function initUserProfile() {
-    const nameEl = document.getElementById('user-full-name');
-    const picEl = document.getElementById('user-pic');
-
     if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
         const user = window.Telegram.WebApp.initDataUnsafe.user;
-        const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
-        if (nameEl) nameEl.innerText = fullName || 'Usuario';
+        const nameEl = document.getElementById('user-full-name');
+        const picEl = document.getElementById('user-pic');
+        
+        if (nameEl) nameEl.innerText = `${user.first_name || ''} ${user.last_name || ''}`.trim();
         if (picEl && user.photo_url) picEl.src = user.photo_url;
     }
 }
+
+// --- 5. UTILIDADES ---
 
 window.showToast = function(message, type = "success") {
     const old = document.querySelector('.toast-notif');
@@ -153,7 +174,7 @@ window.showToast = function(message, type = "success") {
     setTimeout(() => toast.remove(), 3000);
 };
 
-// --- 5. LANZAMIENTO ---
+// --- 6. LANZAMIENTO ---
 
 window.onload = () => {
     if (window.Telegram?.WebApp) {
