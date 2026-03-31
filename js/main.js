@@ -1,5 +1,4 @@
 // --- 1. CONFIGURACIÓN GLOBAL ---
-// Ahora apuntamos a nuestras propias rutas en Vercel
 const API_URLS = {
     user: '/api/user',
     reinvest: '/api/reinvest'
@@ -14,30 +13,46 @@ window.state = {
     accumulatedMining: 0
 };
 
-// Capturar ID de usuario y parámetros de referidos
-const urlParams = new URLSearchParams(window.location.search);
-const startParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param; // Para referidos
-state.userId = urlParams.get('user_id') || window.Telegram?.WebApp?.initDataUnsafe?.user?.id || "000000";
+// --- 2. CAPTURA DE ID MEJORADA (Evita los ceros) ---
+function getTelegramUser() {
+    // Intentamos obtener el ID de 3 fuentes diferentes para asegurar la carga
+    const tgData = window.Telegram?.WebApp?.initDataUnsafe;
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    const id = tgData?.user?.id || urlParams.get('user_id');
+    return id ? String(id) : null;
+}
 
-// --- 2. SINCRONIZACIÓN Y PANEL ---
+// --- 3. SINCRONIZACIÓN Y PANEL ---
 
 async function syncInitialData() {
-    if (!state.userId || state.userId === "000000") return;
+    state.userId = getTelegramUser();
+    
+    // Si después de intentar obtenerlo sigue siendo null, no intentamos el fetch
+    if (!state.userId) {
+        console.error("Error: No se pudo obtener el ID de Telegram.");
+        const idEl = document.getElementById('user-id');
+        if (idEl) idEl.innerText = "ID: No detectado (Abre desde TG)";
+        return;
+    }
+
+    const startParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param || '';
 
     try {
-        // Llamamos a TU propia API en Vercel para obtener los 50 USDT y referidos
-        const response = await fetch(`${API_URLS.user}?user_id=${state.userId}&invited_by=${startParam || ''}`);
+        // Llamada a tu propia API en Vercel
+        const response = await fetch(`${API_URLS.user}?user_id=${state.userId}&invited_by=${startParam}`);
         const data = await response.json();
 
-        if (data.status === "success") {
-            state.totalEarnedUSD = parseFloat(data.balance);
+        // Adaptamos la lectura tanto si viene objeto directo o con status success
+        if (data && (data.user_id || data.status === "success")) {
+            state.totalEarnedUSD = parseFloat(data.balance || 0);
             state.totalInvestedUSDT = parseFloat(data.invested || 0);
             state.referralCount = data.referrals || 0;
             updateDashboard();
         }
     } catch (e) {
         console.error("Error sincronizando con la API de Vercel:", e);
-        // Fallback: intentar cargar de la URL si la API falla
+        const urlParams = new URLSearchParams(window.location.search);
         state.totalEarnedUSD = parseFloat(urlParams.get('balance')) || 0;
         updateDashboard();
     }
@@ -60,7 +75,7 @@ function updateDashboard() {
     }
 }
 
-// --- 3. ACCIONES DE REINVERTIR Y RECLAMAR ---
+// --- 4. ACCIONES DE REINVERTIR Y RECLAMAR ---
 
 window.openReinvestModal = function() {
     if (state.totalEarnedUSD < 1) {
@@ -125,21 +140,17 @@ window.claimMining = function() {
         window.showToast("❌ Nada para reclamar", "error");
         return;
     }
-    // Sumamos lo minado al balance local y reseteamos el contador
     state.totalEarnedUSD += state.accumulatedMining;
     state.accumulatedMining = 0;
     updateDashboard();
     window.showToast("✅ Saldo reclamado");
-    
-    // Aquí podrías hacer un fetch a /api/user para guardar el nuevo balance permanentemente
 };
 
-// --- 4. MOTOR DE MINERÍA Y PERFIL ---
+// --- 5. MOTOR DE MINERÍA Y PERFIL ---
 
 function startMiningEngine() {
     setInterval(() => {
         if (state.totalInvestedUSDT > 0) {
-            // Ganancia por segundo: Inversión * Factor
             state.accumulatedMining += (state.totalInvestedUSDT * 1000 * 0.0000001);
             const display = document.getElementById('mining-balance');
             if (display) display.innerText = state.accumulatedMining.toFixed(6);
@@ -148,17 +159,16 @@ function startMiningEngine() {
 }
 
 function initUserProfile() {
-    if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
-        const user = window.Telegram.WebApp.initDataUnsafe.user;
+    const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
+    if (user) {
         const nameEl = document.getElementById('user-full-name');
         const picEl = document.getElementById('user-pic');
-        
         if (nameEl) nameEl.innerText = `${user.first_name || ''} ${user.last_name || ''}`.trim();
         if (picEl && user.photo_url) picEl.src = user.photo_url;
     }
 }
 
-// --- 5. UTILIDADES ---
+// --- 6. UTILIDADES ---
 
 window.showToast = function(message, type = "success") {
     const old = document.querySelector('.toast-notif');
@@ -171,14 +181,18 @@ window.showToast = function(message, type = "success") {
     setTimeout(() => toast.remove(), 3000);
 };
 
-// --- 6. LANZAMIENTO ---
+// --- 7. LANZAMIENTO (Asegura la carga de Telegram) ---
 
 window.onload = () => {
     if (window.Telegram?.WebApp) {
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
     }
-    initUserProfile();
-    syncInitialData();
-    startMiningEngine();
+    
+    // Pequeño retraso para que Telegram inyecte los datos del usuario
+    setTimeout(() => {
+        initUserProfile();
+        syncInitialData();
+        startMiningEngine();
+    }, 150);
 };
