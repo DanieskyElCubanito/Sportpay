@@ -4,21 +4,25 @@ const API_URLS = {
     reinvest: '/api/reinvest'
 };
 
-// Estado único de la aplicación
+// Estado único de la aplicación (Actualizado con Niveles)
 window.state = {
     userId: null,
     totalEarnedUSD: 0,
     totalInvestedUSDT: 0,
     referralCount: 0,
-    accumulatedMining: 0
+    accumulatedMining: 0,
+    // Datos de red por nivel
+    refsL1: 0,
+    refsL2: 0,
+    refsL3: 0,
+    refsL4: 0,
+    refsL5: 0
 };
 
 // --- 2. CAPTURA DE ID MEJORADA (Evita los ceros) ---
 function getTelegramUser() {
-    // Intentamos obtener el ID de 3 fuentes diferentes para asegurar la carga
     const tgData = window.Telegram?.WebApp?.initDataUnsafe;
     const urlParams = new URLSearchParams(window.location.search);
-    
     const id = tgData?.user?.id || urlParams.get('user_id');
     return id ? String(id) : null;
 }
@@ -28,7 +32,6 @@ function getTelegramUser() {
 async function syncInitialData() {
     state.userId = getTelegramUser();
     
-    // Si después de intentar obtenerlo sigue siendo null, no intentamos el fetch
     if (!state.userId) {
         console.error("Error: No se pudo obtener el ID de Telegram.");
         const idEl = document.getElementById('user-id');
@@ -39,15 +42,21 @@ async function syncInitialData() {
     const startParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param || '';
 
     try {
-        // Llamada a tu propia API en Vercel
         const response = await fetch(`${API_URLS.user}?user_id=${state.userId}&invited_by=${startParam}`);
         const data = await response.json();
 
-        // Adaptamos la lectura tanto si viene objeto directo o con status success
         if (data && (data.user_id || data.status === "success")) {
             state.totalEarnedUSD = parseFloat(data.balance || 0);
             state.totalInvestedUSDT = parseFloat(data.invested || 0);
             state.referralCount = data.referrals || 0;
+            
+            // Sincronizar niveles si la API los provee
+            state.refsL1 = data.refsL1 || 0;
+            state.refsL2 = data.refsL2 || 0;
+            state.refsL3 = data.refsL3 || 0;
+            state.refsL4 = data.refsL4 || 0;
+            state.refsL5 = data.refsL5 || 0;
+
             updateDashboard();
         }
     } catch (e) {
@@ -63,13 +72,32 @@ function updateDashboard() {
     const speedEl = document.getElementById('mining-speed');
     const refEl = document.getElementById('ref-count');
     const idEl = document.getElementById('user-id');
+    const refInput = document.getElementById('ref-link');
 
     if (mainBalEl) mainBalEl.innerText = state.totalEarnedUSD.toFixed(2);
     if (refEl) refEl.innerText = state.referralCount;
     if (idEl) idEl.innerText = `ID: ${state.userId}`;
     
+    // Actualizar Enlace de Referido automático
+    if (refInput && state.userId) {
+        // Reemplaza 'TuBotNombre_bot' por el alias real de tu bot en BotFather
+        refInput.value = `https://t.me/CryptoDogeFarming_bot?start=${state.userId}`;
+    }
+
+    // Actualizar contadores de niveles en el HTML
+    const l1 = document.getElementById('ref-L1');
+    const l2 = document.getElementById('ref-L2');
+    const l3 = document.getElementById('ref-L3');
+    const l4 = document.getElementById('ref-L4');
+    const l5 = document.getElementById('ref-L5');
+
+    if (l1) l1.innerText = state.refsL1;
+    if (l2) l2.innerText = state.refsL2;
+    if (l3) l3.innerText = state.refsL3;
+    if (l4) l4.innerText = state.refsL4;
+    if (l5) l5.innerText = state.refsL5;
+    
     if (speedEl) {
-        // 1 USDT invertido = 1000 GH/s
         const currentGHS = (state.totalInvestedUSDT || 0) * 1000;
         speedEl.innerText = `${currentGHS.toLocaleString()} GH/s activos`;
     }
@@ -115,7 +143,7 @@ window.executeReinvestDirectly = async function() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                user_id: state.userId, // <--- Esto debe ser el ID real de Telegram
+                user_id: state.userId,
                 amount: state.totalEarnedUSD
             })
         });
@@ -123,7 +151,6 @@ window.executeReinvestDirectly = async function() {
         const result = await response.json();
 
         if (result.status === "success") {
-            // Actualizamos el estado local con lo que nos devuelve la base de datos
             state.totalEarnedUSD = parseFloat(result.balance);
             state.totalInvestedUSDT = parseFloat(result.invested);
             updateDashboard();
@@ -135,6 +162,7 @@ window.executeReinvestDirectly = async function() {
         window.showToast("⚠️ Error: No se pudo guardar la reinversión", "error");
     }
 };
+
 window.claimMining = function() {
     if (state.accumulatedMining <= 0) {
         window.showToast("❌ Nada para reclamar", "error");
@@ -168,7 +196,17 @@ function initUserProfile() {
     }
 }
 
-// --- 6. UTILIDADES ---
+// --- 6. UTILIDADES Y REFERIDOS ---
+
+window.copyLink = function() {
+    const copyText = document.getElementById("ref-link");
+    if (!copyText || copyText.value === "Cargando enlace...") return;
+    
+    copyText.select();
+    copyText.setSelectionRange(0, 99999); 
+    navigator.clipboard.writeText(copyText.value);
+    window.showToast("✅ Enlace copiado al portapapeles");
+};
 
 window.showToast = function(message, type = "success") {
     const old = document.querySelector('.toast-notif');
@@ -189,7 +227,6 @@ window.onload = () => {
         window.Telegram.WebApp.expand();
     }
     
-    // Pequeño retraso para que Telegram inyecte los datos del usuario
     setTimeout(() => {
         initUserProfile();
         syncInitialData();
