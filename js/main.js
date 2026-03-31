@@ -14,10 +14,8 @@ const urlBalance = urlParams.get('balance');
 async function syncInitialData() {
     if (typeof window.state === 'undefined') window.state = { accumulatedMining: 0 };
     
-    // Si no hay userId, no podemos pedir datos
     if (!userId) return;
 
-    // Llamamos al comando del bot que usa WebApp.render
     const apiURL = `https://api.bots.business/v1/bots/${BJS_CONFIG.botId}/commands/get_user_data?user_id=${userId}`;
     
     try {
@@ -88,7 +86,6 @@ function initUser() {
     const picEl = document.getElementById('user-pic');
 
     if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe.user) {
-        
         const tg = window.Telegram.WebApp;
         tg.expand(); 
 
@@ -103,7 +100,6 @@ function initUser() {
         } else {
             picEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=0088cc&color=fff&bold=true`;
         }
-
     } else {
         nameEl.innerText = 'Modo Navegador';
         idEl.innerText = 'ID: Prueba Web';
@@ -116,7 +112,6 @@ window.onload = () => {
     initUser();
 };
 
-// --- MOTOR ---
 function startMiningEngine() {
     setInterval(() => {
         const invested = state.totalInvestedUSDT || 0;
@@ -133,7 +128,6 @@ syncInitialData();
 (function() {
     const params = new URLSearchParams(window.location.search);
 
-    // Intentamos obtener el ID real de Telegram o de la URL
     const getUserId = () => {
         if (window.Telegram?.WebApp?.initDataUnsafe?.user?.id) {
             return window.Telegram.WebApp.initDataUnsafe.user.id;
@@ -141,27 +135,26 @@ syncInitialData();
         return params.get('user_id') || "000000";
     };
 
-    let state = {
+    let localState = {
         userId: getUserId(),
         balance: parseFloat(params.get('balance')) || 0.00,
         invested: parseFloat(params.get('invested')) || 0.00,
         miningAcc: 0.0000
     };
 
-    // --- 1. ACTUALIZAR INTERFAZ ---
     window.updateUI = function() {
         const elBalance = document.getElementById('main-balance');
-        const elInvested = document.getElementById('main-invested');
         const elUser = document.getElementById('user-id');
-
-        if (elBalance) elBalance.innerText = state.balance.toFixed(2);
-        // Si tienes un elemento para mostrar la inversión total
         const elSpeed = document.getElementById('mining-speed');
-        if (elSpeed) elSpeed.innerText = `${(state.invested * 1000).toLocaleString()} GH/s activos`;
-        if (elUser) elUser.innerText = `ID: ${state.userId}`;
+
+        if (elBalance) elBalance.innerText = (state.totalEarnedUSD || 0).toFixed(2);
+        if (elSpeed) {
+            const currentGHS = (state.totalInvestedUSDT || 0) * 1000;
+            elSpeed.innerText = `${currentGHS.toLocaleString()} GH/s activos`;
+        }
+        if (elUser) elUser.innerText = `ID: ${localState.userId}`;
     };
 
-    // --- 2. TOAST PROFESIONAL ---
     window.showToast = function(message, type = "success") {
         const old = document.querySelector('.toast-notification');
         if (old) old.remove();
@@ -173,9 +166,7 @@ syncInitialData();
         setTimeout(() => toast.remove(), 3000);
     };
 
-    // --- 3. MODAL DE REINVERSIÓN ---
     window.openReinvestModal = function() {
-        // Obtenemos el balance actual del elemento HTML
         const currentBalance = parseFloat(document.getElementById('main-balance')?.innerText || 0);
         
         if (currentBalance < 1) {
@@ -213,55 +204,47 @@ syncInitialData();
         document.body.insertAdjacentHTML('beforeend', modalHtml);
     };
 
-    // --- 4. EJECUCIÓN CON PERSISTENCIA EN EL BOT ---
+    // --- ACTUALIZACIÓN DE EXECUTE REINVEST (MODO GET PARA EVITAR ERROR DE CONEXIÓN) ---
     window.executeReinvestDirectly = async function() {
-    const modal = document.getElementById('custom-reinvest-modal');
-    const amount = parseFloat(document.getElementById('main-balance')?.innerText || 0);
-    if (modal) modal.remove();
+        const modal = document.getElementById('custom-reinvest-modal');
+        const amount = parseFloat(document.getElementById('main-balance')?.innerText || 0);
+        if (modal) modal.remove();
 
-    const botId = "8101312620";
-    const apiKey = "X6MBnt6bQxIc66AoNZ3xLXHGmKXs7Zq5kx75GWK8";
+        // Usamos GET con los parámetros en la URL para máxima compatibilidad
+        const apiURL = `https://api.bots.business/v1/bots/${BJS_CONFIG.botId}/commands/api_reinvest?user_id=${localState.userId}&amount=${amount}`;
 
-    // URL base del comando
-    const apiURL = `https://api.bots.business/v1/bots/${botId}/commands/api_reinvest?user_id=${state.userId}`;
+        try {
+            const response = await fetch(apiURL, {
+                method: 'GET',
+                headers: { "api_key": BJS_CONFIG.token }
+            });
 
-    try {
-        const response = await fetch(apiURL, {
-            method: 'POST', // Usamos POST para enviar datos complejos
-            headers: { 
-                "api_key": apiKey,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ amount: amount }) // Esto llegará como "content" al bot
-        });
+            const result = await response.json();
 
-        const result = await response.json();
-
-        if (result.status === "success") {
-            // Actualización local
-            state.balance = result.balance;
-            state.invested = result.invested;
-            
-            window.updateUI();
-            window.showToast(`✅ ¡Reinversión guardada en el Bot!`);
-            if (typeof syncInitialData === 'function') syncInitialData();
-        } else {
-            window.showToast("❌ " + result.message, "error");
+            if (result.status === "success") {
+                // Sincronizamos con los datos reales que devolvió el Bot
+                state.totalEarnedUSD = result.balance;
+                state.totalInvestedUSDT = result.invested;
+                
+                window.updateUI();
+                window.showToast(`✅ ¡Reinversión guardada en el Bot!`);
+                if (typeof syncInitialData === 'function') syncInitialData();
+            } else {
+                window.showToast("❌ " + (result.message || "Error al procesar"), "error");
+            }
+        } catch (e) {
+            window.showToast("⚠️ Error de conexión con el Bot", "error");
+            console.error("Error:", e);
         }
-    } catch (e) {
-        window.showToast("⚠️ Error de conexión", "error");
-        console.error("Error:", e);
-    }
-};
+    };
 
-    // --- 5. MOTOR DE MINERÍA ---
     function startMining() {
         setInterval(() => {
-            const currentInvested = state.invested || 0;
+            const currentInvested = state.totalInvestedUSDT || 0;
             if (currentInvested > 0) {
-                state.miningAcc += (currentInvested * 1000 * 0.0000001);
+                localState.miningAcc += (currentInvested * 1000 * 0.0000001);
                 const el = document.getElementById('mining-balance');
-                if (el) el.innerText = state.miningAcc.toFixed(4);
+                if (el) el.innerText = localState.miningAcc.toFixed(4);
             }
         }, 1000);
     }
