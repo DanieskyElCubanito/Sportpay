@@ -215,44 +215,44 @@ syncInitialData();
 
     // --- 4. EJECUCIÓN CON PERSISTENCIA EN EL BOT ---
     window.executeReinvestDirectly = async function() {
-        const modal = document.getElementById('custom-reinvest-modal');
-        const amount = parseFloat(document.getElementById('main-balance')?.innerText || 0);
-        if (modal) modal.remove();
+    const modal = document.getElementById('custom-reinvest-modal');
+    const amount = parseFloat(document.getElementById('main-balance')?.innerText || 0);
+    if (modal) modal.remove();
 
-        // Configuración de tu bot (debe coincidir con main.js)
-        const botId = "8101312620";
-        const apiKey = "X6MBnt6bQxIc66AoNZ3xLXHGmKXs7Zq5kx75GWK8";
+    const botId = "8101312620";
+    const apiKey = "X6MBnt6bQxIc66AoNZ3xLXHGmKXs7Zq5kx75GWK8";
 
-        // URL para avisar al bot que guarde los datos
-        const apiURL = `https://api.bots.business/v1/bots/${botId}/commands/api_reinvest?user_id=${state.userId}&params=${amount}`;
+    // URL base del comando
+    const apiURL = `https://api.bots.business/v1/bots/${botId}/commands/api_reinvest?user_id=${state.userId}`;
 
-        try {
-            const response = await fetch(apiURL, { headers: { "api_key": apiKey } });
-            const result = await response.json();
+    try {
+        const response = await fetch(apiURL, {
+            method: 'POST', // Usamos POST para enviar datos complejos
+            headers: { 
+                "api_key": apiKey,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ amount: amount }) // Esto llegará como "content" al bot
+        });
 
-            if (result.status === "success") {
-                const bonus = amount * 0.05;
-                const totalToInvest = amount + bonus;
+        const result = await response.json();
 
-                // Actualizamos el estado local para que se vea el cambio al instante
-                state.invested += totalToInvest;
-                state.balance = 0;
-                
-                window.updateUI();
-                window.showToast(`✅ ¡Reinversión de $${totalToInvest.toFixed(2)} guardada!`);
-                
-                // Si tienes la función syncInitialData en main.js, la llamamos para refrescar todo
-                if (typeof syncInitialData === 'function') syncInitialData();
-                if (typeof switchTab === 'function') switchTab('dashboard');
-            } else {
-                window.showToast("❌ Error: " + (result.message || "No se pudo procesar"), "error");
-            }
-
-        } catch (e) {
-            window.showToast("⚠️ Error de conexión con el servidor", "error");
-            console.error(e);
+        if (result.status === "success") {
+            // Actualización local
+            state.balance = result.balance;
+            state.invested = result.invested;
+            
+            window.updateUI();
+            window.showToast(`✅ ¡Reinversión guardada en el Bot!`);
+            if (typeof syncInitialData === 'function') syncInitialData();
+        } else {
+            window.showToast("❌ " + result.message, "error");
         }
-    };
+    } catch (e) {
+        window.showToast("⚠️ Error de conexión", "error");
+        console.error("Error:", e);
+    }
+};
 
     // --- 5. MOTOR DE MINERÍA ---
     function startMining() {
