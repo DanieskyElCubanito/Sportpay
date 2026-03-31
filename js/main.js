@@ -139,21 +139,16 @@ window.executeReinvestDirectly = async function() {
     const amount = state.totalEarnedUSD;
 
     // URL limpia sin parámetros
-    const apiURL = `https://api.bots.business/v1/bots/${BJS_CONFIG.botId}/commands/api_reinvest`;
+    // Prueba este cambio rápido mientras buscas la info
+const apiURL = `https://api.bots.business/v1/bots/${BJS_CONFIG.botId}/commands/api_reinvest?user_id=${state.userId}&amount=${amount}`;
 
-    try {
-        const response = await fetch(apiURL, {
-            method: 'POST', // CAMBIAMOS A POST
-            headers: { 
-                "api_key": BJS_CONFIG.token,
-                "Content-Type": "application/json" // Decimos que enviamos JSON
-            },
-            body: JSON.stringify({ // ENVIAMOS LOS DATOS EN EL CUERPO
-                user_id: state.userId,
-                amount: amount
-            })
-        });
-
+const response = await fetch(apiURL, {
+    method: 'GET',
+    headers: { 
+        "api_key": BJS_CONFIG.token,
+        "Content-Type": "application/json" // Obligamos a que trate todo como JSON
+    }
+});
         const result = await response.json();
 
         if (result && result.status === "success") {
