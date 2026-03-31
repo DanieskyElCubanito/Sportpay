@@ -32,8 +32,8 @@ export default async function handler(req, res) {
         .from('users')
         .insert([{ 
           user_id: user_id, 
-          balance: 50.00, 
-          invested: 0, 
+          balance: 0.00, 
+          invested: 0.00, 
           referrals: 0 
         }])
         .select()
