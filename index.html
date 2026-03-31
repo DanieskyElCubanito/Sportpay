@@ -156,16 +156,43 @@
     </section>
 
     <section id="red" class="view">
-        <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 20px;">Mi Red de Referidos</h2>
-        <div class="main-card" style="text-align: center;">
-            <div class="balance-val" style="justify-content: center;" id="ref-count">0</div>
-            <div class="balance-label">Afiliados Totales</div>
+    <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 20px;">Mi Red de Referidos</h2>
+    
+    <div class="main-card" style="text-align: center; margin-bottom: 20px;">
+        <div class="balance-val" style="justify-content: center;" id="ref-count">0</div>
+        <div class="balance-label">Afiliados Totales</div>
+    </div>
+
+    <div class="main-card" style="margin-bottom: 20px; padding: 15px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div style="background: #0d111c; padding: 10px; border-radius: 12px; border: 1px solid var(--glass-border);">
+                <div style="color: #10b981; font-weight: bold;">Nivel 1 (8%)</div>
+                <div id="ref-L1" style="font-size: 1.2rem; font-weight: 800;">0</div>
+            </div>
+            <div style="background: #0d111c; padding: 10px; border-radius: 12px; border: 1px solid var(--glass-border);">
+                <div style="color: #60a5fa; font-weight: bold;">Nivel 2 (4%)</div>
+                <div id="ref-L2" style="font-size: 1.2rem; font-weight: 800;">0</div>
+            </div>
+            <div style="background: #0d111c; padding: 10px; border-radius: 12px; border: 1px solid var(--glass-border);">
+                <div style="color: #94a3b8; font-weight: bold;">Nivel 3 (1.5%)</div>
+                <div id="ref-L3" style="font-size: 1.2rem; font-weight: 800;">0</div>
+            </div>
+            <div style="background: #0d111c; padding: 10px; border-radius: 12px; border: 1px solid var(--glass-border);">
+                <div style="color: #94a3b8; font-weight: bold;">Nivel 4 (1%)</div>
+                <div id="ref-L4" style="font-size: 1.2rem; font-weight: 800;">0</div>
+            </div>
+            <div style="background: #0d111c; padding: 10px; border-radius: 12px; border: 1px solid var(--glass-border); grid-column: span 2;">
+                <div style="color: #94a3b8; font-weight: bold; text-align: center;">Nivel 5 (0.5%)</div>
+                <div id="ref-L5" style="font-size: 1.2rem; font-weight: 800; text-align: center;">0</div>
+            </div>
         </div>
-        <div class="main-card">
-            <div class="balance-label" style="margin-bottom: 10px;">Tu Enlace Personal</div>
-            <input type="text" id="ref-link" readonly value="..." style="width: 100%; background: #0d111c; border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; color: var(--text-dim); margin-bottom: 15px;">
-            <button class="btn-action btn-blue" style="width: 100%;" onclick="copyLink()"><i class="fa-solid fa-copy"></i> Copiar Enlace</button>
-        </div>
+    </div>
+
+    <div class="main-card">
+        <div class="balance-label" style="margin-bottom: 10px;">Tu Enlace Personal</div>
+        <input type="text" id="ref-link" readonly value="Cargando enlace..." style="width: 100%; background: #0d111c; border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; color: var(--text-dim); margin-bottom: 15px; font-size: 0.9rem;">
+        <button class="btn-action btn-blue" style="width: 100%;" onclick="copyLink()"><i class="fa-solid fa-copy"></i> Copiar Enlace</button>
+    </div>
     </section>
 
     <section id="misiones" class="view">
