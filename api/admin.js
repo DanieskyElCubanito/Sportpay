@@ -1,7 +1,7 @@
 export default async function handler(req, res) {
   // SEGURIDAD: Solo tú puedes entrar (puedes usar un Token o tu ID de Telegram)
   const { admin_token } = req.query;
-  if (admin_token !== "TU_CLAVE_SECRETA_AQUI") {
+  if (admin_token !== "7517815832) {
     return res.status(401).json({ error: "No autorizado" });
   }
 
