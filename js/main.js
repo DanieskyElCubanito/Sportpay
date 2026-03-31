@@ -207,32 +207,35 @@ syncInitialData();
     // --- ACTUALIZACIÓN DE EXECUTE REINVEST (MODO GET PARA EVITAR ERROR DE CONEXIÓN) ---
     window.executeReinvestDirectly = async function() {
     const amount = parseFloat(document.getElementById('main-balance')?.innerText || 0);
-    if (amount < 1) return window.showToast("Mínimo 1 USDT", "error");
+    const botId = "8101312620";
+    const apiKey = "X6MBnt6bQxIc66AoNZ3xLXHGmKXs7Zq5kx75GWK8";
 
-    // URL limpia para webhookLib
-    const apiURL = `https://api.bots.business/v1/bots/${BJS_CONFIG.botId}/commands/api_reinvest?user_id=${userId}&amount=${amount}`;
+    // URL con parámetros de consulta según tu documentación
+    const apiURL = `https://api.bots.business/v1/bots/${botId}/commands/api_reinvest?user_id=${userId}&amount=${amount}`;
 
     try {
         const response = await fetch(apiURL, {
             method: 'GET',
-            headers: { 
-                "api_key": BJS_CONFIG.token,
-                "Accept": "application/json" // Forzamos que la respuesta sea JSON
-            }
+            headers: { "api_key": apiKey }
         });
 
         const result = await response.json();
 
-        if (result.status === "success") {
+        // Verificamos si el resultado existe antes de usarlo
+        if (result && result.status === "success") {
             state.totalEarnedUSD = result.balance;
             state.totalInvestedUSDT = result.invested;
+            
             window.updateDashboard();
-            window.showToast("✅ Reinversión exitosa");
+            window.showToast(`✅ Reinversión exitosa`);
         } else {
-            window.showToast("❌ " + result.message, "error");
+            // Si result es undefined o status no es success, mostramos un error claro
+            const errorMsg = result ? result.message : "Respuesta vacía del servidor";
+            window.showToast("❌ " + errorMsg, "error");
         }
     } catch (e) {
-        window.showToast("⚠️ Error de servidor", "error");
+        window.showToast("⚠️ Error de conexión", "error");
+        console.error(e);
     }
 };
 
