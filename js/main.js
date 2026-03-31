@@ -115,7 +115,7 @@ window.executeReinvestDirectly = async function() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                user_id: state.userId,
+                user_id: state.userId, // <--- Esto debe ser el ID real de Telegram
                 amount: state.totalEarnedUSD
             })
         });
@@ -123,18 +123,18 @@ window.executeReinvestDirectly = async function() {
         const result = await response.json();
 
         if (result.status === "success") {
+            // Actualizamos el estado local con lo que nos devuelve la base de datos
             state.totalEarnedUSD = parseFloat(result.balance);
             state.totalInvestedUSDT = parseFloat(result.invested);
             updateDashboard();
-            window.showToast("✅ Reinversión exitosa");
+            window.showToast("✅ Reinversión guardada en la nube");
         } else {
             window.showToast(`❌ ${result.message}`, "error");
         }
     } catch (e) {
-        window.showToast("⚠️ Error de conexión con la API", "error");
+        window.showToast("⚠️ Error: No se pudo guardar la reinversión", "error");
     }
 };
-
 window.claimMining = function() {
     if (state.accumulatedMining <= 0) {
         window.showToast("❌ Nada para reclamar", "error");
