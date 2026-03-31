@@ -205,52 +205,61 @@ syncInitialData();
     };
 
     // --- ACTUALIZACIÓN DE EXECUTE REINVEST (MODO GET PARA EVITAR ERROR DE CONEXIÓN) ---
-    window.executeReinvestDirectly = async function() {
+// --- DENTRO DE TU FUNCIÓN ANÓNIMA (IIFE) ---
+window.executeReinvestDirectly = async function() {
+    const modal = document.getElementById('custom-reinvest-modal');
+    // Obtenemos el balance directamente del elemento visual
     const amount = parseFloat(document.getElementById('main-balance')?.innerText || 0);
-    const botId = "8101312620";
-    const apiKey = "X6MBnt6bQxIc66AoNZ3xLXHGmKXs7Zq5kx75GWK8";
+    if (modal) modal.remove();
 
-    // URL con parámetros de consulta según tu documentación
-    const apiURL = `https://api.bots.business/v1/bots/${botId}/commands/api_reinvest?user_id=${userId}&amount=${amount}`;
+    // URL usando parámetros de consulta (Query Params) como sugiere tu doc
+    const apiURL = `https://api.bots.business/v1/bots/${BJS_CONFIG.botId}/commands/api_reinvest?user_id=${localState.userId}&amount=${amount}`;
 
     try {
         const response = await fetch(apiURL, {
             method: 'GET',
-            headers: { "api_key": apiKey }
+            headers: { 
+                "api_key": BJS_CONFIG.token,
+                "Accept": "application/json"
+            }
         });
 
         const result = await response.json();
 
-        // Verificamos si el resultado existe antes de usarlo
+        // Verificación de seguridad para evitar el "undefined"
         if (result && result.status === "success") {
-            state.totalEarnedUSD = result.balance;
-            state.totalInvestedUSDT = result.invested;
+            // Sincronizamos con localState (la variable que usa tu motor de minería)
+            localState.balance = parseFloat(result.balance);
+            localState.invested = parseFloat(result.invested);
             
-            window.updateDashboard();
+            // Actualizamos la interfaz global
+            if (window.updateUI) window.updateUI();
+            if (window.updateDashboard) window.updateDashboard();
+            
             window.showToast(`✅ Reinversión exitosa`);
         } else {
-            // Si result es undefined o status no es success, mostramos un error claro
-            const errorMsg = result ? result.message : "Respuesta vacía del servidor";
+            // Si el bot envía un error, lo mostramos; si no hay mensaje, usamos uno por defecto
+            const errorMsg = (result && result.message) ? result.message : "Error interno del Bot";
             window.showToast("❌ " + errorMsg, "error");
         }
     } catch (e) {
-        window.showToast("⚠️ Error de conexión", "error");
-        console.error(e);
+        window.showToast("⚠️ Error de conexión con el servidor", "error");
+        console.error("Error en Fetch:", e);
     }
 };
 
-    function startMining() {
+// --- MOTOR DE MINERÍA CORREGIDO ---
+function startMining() {
     setInterval(() => {
-        // Usamos localState.invested que es lo que actualiza la función de arriba
-        const currentInvested = localState.invested || 0; 
+        // Usamos localState para que coincida con la reinversión
+        const currentInvested = localState.invested || 0;
         if (currentInvested > 0) {
             localState.miningAcc += (currentInvested * 1000 * 0.0000001);
             const el = document.getElementById('mining-balance');
             if (el) el.innerText = localState.miningAcc.toFixed(4);
         }
     }, 1000);
-    }  
-    window.addEventListener('load', () => {
+}    window.addEventListener('load', () => {
         window.updateUI();
         startMining();
     });
