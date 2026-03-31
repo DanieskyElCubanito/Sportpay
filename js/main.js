@@ -72,40 +72,42 @@ async function claimMining() {
 window.claimMining = claimMining;
 
 function initUser() {
-    // Verificar si estamos dentro de Telegram
-    if (window.Telegram && window.Telegram.WebApp) {
+    const nameEl = document.getElementById('user-full-name');
+    const idEl = document.getElementById('user-id');
+    const picEl = document.getElementById('user-pic');
+
+    // Comprobar si existe el objeto WebApp de Telegram
+    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe.user) {
+        
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Expande la app para que ocupe toda la pantalla
+        tg.expand(); // Expande la app a pantalla completa
 
-        const user = tg.initDataUnsafe?.user;
+        const user = tg.initDataUnsafe.user;
+        const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
 
-        if (user) {
-            // Unir primer nombre y apellido
-            const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
-            document.getElementById('user-full-name').innerText = fullName || 'Usuario Desconocido';
-            
-            // Cargar ID
-            document.getElementById('user-id').innerText = `ID: ${user.id}`;
+        nameEl.innerText = fullName || 'Usuario Telegram';
+        idEl.innerText = `ID: ${user.id}`;
 
-            // Cargar Foto de Perfil
-            const userPic = document.getElementById('user-pic');
-            if (user.photo_url) {
-                userPic.src = user.photo_url;
-            } else {
-                // Avatar por defecto con sus iniciales si tiene la foto de Telegram oculta
-                userPic.src = "https://ui-avatars.com/api/?name=" + encodeURIComponent(fullName) + "&background=0088cc&color=fff&bold=true";
-            }
+        if (user.photo_url) {
+            picEl.src = user.photo_url;
+        } else {
+            // Generar una imagen con la letra inicial si el usuario tiene su foto de Telegram oculta
+            picEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=0088cc&color=fff&bold=true`;
         }
+
     } else {
-        console.warn("La app no se está ejecutando dentro de Telegram.");
+        // MODO DESARROLLADOR: Esto aparecerá si lo abres en Chrome fuera de Telegram
+        nameEl.innerText = 'Modo Navegador';
+        idEl.innerText = 'ID: Prueba Web';
+        picEl.src = 'https://ui-avatars.com/api/?name=Web+Test&background=f59e0b&color=fff';
+        console.warn("⚠️ Ejecutando fuera de Telegram. No se pueden cargar datos reales del usuario.");
     }
 }
 
-// Hacer global para que arranque al abrir la página
-window.initUser = initUser;
-
-// Si no tienes el window.onload en tu index.html, descomenta la línea de abajo:
-// window.onload = initUser;
+// Asegurarse de que se ejecute al cargar la página
+window.onload = () => {
+    initUser();
+};
 // --- MOTOR ---
 function startMiningEngine() {
     setInterval(() => {
