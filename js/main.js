@@ -7,20 +7,33 @@ const BJS_CONFIG = {
 
 // --- CAPTURAR DATOS INMEDIATAMENTE ---
 const urlParams = new URLSearchParams(window.location.search);
-const userId = urlParams.get('user_id');
+const userId = urlParams.get('user_id') || (window.Telegram?.WebApp?.initDataUnsafe?.user?.id);
 const urlBalance = urlParams.get('balance');
-const urlInvested = urlParams.get('invested');
 
-// --- FORZAR SINCRONIZACIÓN ---
-function syncInitialData() {
-    if (typeof window.state === 'undefined') window.state = {};
-    console.log("Sincronizando... Balance recibido:", urlBalance);
+// --- FORZAR SINCRONIZACIÓN (BJS API) ---
+async function syncInitialData() {
+    if (typeof window.state === 'undefined') window.state = { accumulatedMining: 0 };
+    
+    // Si no hay userId, no podemos pedir datos
+    if (!userId) return;
 
-    if (urlBalance !== null) {
-        state.totalEarnedUSD = parseFloat(urlBalance);
-    }
-    if (urlInvested !== null) {
-        state.totalInvestedUSDT = parseFloat(urlInvested);
+    // Llamamos al comando del bot que usa WebApp.render
+    const apiURL = `https://api.bots.business/v1/bots/${BJS_CONFIG.botId}/commands/get_user_data?user_id=${userId}`;
+    
+    try {
+        const response = await fetch(apiURL, { headers: { "api_key": BJS_CONFIG.token } });
+        const data = await response.json();
+
+        if (data.status === "success" || data.balance !== undefined) {
+            state.totalEarnedUSD = parseFloat(data.balance || 0);
+            state.totalInvestedUSDT = parseFloat(data.invested || 0);
+            state.referralCount = data.referrals || 0;
+        } else if (urlBalance !== null) {
+            state.totalEarnedUSD = parseFloat(urlBalance);
+        }
+    } catch (e) {
+        console.error("Error sincronizando con BJS, usando URL params");
+        if (urlBalance !== null) state.totalEarnedUSD = parseFloat(urlBalance);
     }
     
     updateDashboard();
@@ -38,7 +51,7 @@ function updateDashboard() {
     const currentGHS = invested * 1000;
     
     const elements = {
-        'total-profit': `+$${(state.totalProfit || 0).toFixed(2)}`,
+        'ref-count': state.referralCount || 0,
         'mining-speed': `${currentGHS.toLocaleString()} GH/s activos`
     };
 
@@ -95,7 +108,6 @@ function initUser() {
         nameEl.innerText = 'Modo Navegador';
         idEl.innerText = 'ID: Prueba Web';
         picEl.src = 'https://ui-avatars.com/api/?name=Web+Test&background=f59e0b&color=fff';
-        console.warn("⚠️ Ejecutando fuera de Telegram.");
     }
 }
 window.initUser = initUser;
@@ -112,7 +124,6 @@ function startMiningEngine() {
             state.accumulatedMining = (state.accumulatedMining || 0) + (invested * 1000 * 0.0000001);
             const display = document.getElementById('mining-balance');
             if (display) display.innerText = state.accumulatedMining.toFixed(4);
-
         }
     }, 1000);
 }
