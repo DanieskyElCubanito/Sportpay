@@ -20,25 +20,45 @@ state.userId = urlParams.get('user_id') || window.Telegram?.WebApp?.initDataUnsa
 
 // --- 2. SINCRONIZACIÓN Y PANEL ---
 
+// --- DENTRO DE TU main.js ---
+
 async function syncInitialData() {
-    if (!state.userId || state.userId === "000000") return;
+    if (!state.userId) return;
+
+    // Intentamos cargar lo que diga la URL primero (por si el bot tarda)
+    const urlBalance = parseFloat(urlParams.get('balance')) || 0;
+    const urlInvested = parseFloat(urlParams.get('invested')) || 0;
+    
+    state.totalEarnedUSD = urlBalance;
+    state.totalInvestedUSDT = urlInvested;
+    updateDashboard(); // Mostramos lo de la URL de inmediato
 
     const apiURL = `https://api.bots.business/v1/bots/${BJS_CONFIG.botId}/commands/get_user_data?user_id=${state.userId}`;
     
     try {
-        const response = await fetch(apiURL, { headers: { "api_key": BJS_CONFIG.token } });
+        const response = await fetch(apiURL, { 
+            headers: { "api_key": BJS_CONFIG.token } 
+        });
         const data = await response.json();
 
+        // Si el bot tiene datos más actualizados, los usamos
         if (data.status === "success" || data.balance !== undefined) {
-            state.totalEarnedUSD = parseFloat(data.balance || 0);
+            state.totalEarnedUSD = parseFloat(data.balance);
             state.totalInvestedUSDT = parseFloat(data.invested || 0);
             state.referralCount = data.referrals || 0;
             updateDashboard();
         }
     } catch (e) {
-        console.error("Error sincronizando datos:", e);
+        console.log("Usando saldo de respaldo de la URL");
     }
 }
+
+// --- FUNCIÓN PARA AÑADIR SALDO (Asegúrate de tenerla) ---
+window.addBalance = function() {
+    // Aquí puedes poner el link a tu bot o la pasarela de pago
+    // Por ejemplo, abrir el bot para depositar:
+    window.Telegram.WebApp.openTelegramLink(`https://t.me/TuBotNombre?start=deposit`);
+};
 
 function updateDashboard() {
     const mainBalEl = document.getElementById('main-balance');
