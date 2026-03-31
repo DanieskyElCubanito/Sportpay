@@ -226,7 +226,7 @@ window.onload = () => {
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
     }
-    
+
     setTimeout(() => {
         initUserProfile();
         syncInitialData();
