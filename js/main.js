@@ -71,6 +71,41 @@ async function claimMining() {
 }
 window.claimMining = claimMining;
 
+function initUser() {
+    // Verificar si estamos dentro de Telegram
+    if (window.Telegram && window.Telegram.WebApp) {
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Expande la app para que ocupe toda la pantalla
+
+        const user = tg.initDataUnsafe?.user;
+
+        if (user) {
+            // Unir primer nombre y apellido
+            const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
+            document.getElementById('user-full-name').innerText = fullName || 'Usuario Desconocido';
+            
+            // Cargar ID
+            document.getElementById('user-id').innerText = `ID: ${user.id}`;
+
+            // Cargar Foto de Perfil
+            const userPic = document.getElementById('user-pic');
+            if (user.photo_url) {
+                userPic.src = user.photo_url;
+            } else {
+                // Avatar por defecto con sus iniciales si tiene la foto de Telegram oculta
+                userPic.src = "https://ui-avatars.com/api/?name=" + encodeURIComponent(fullName) + "&background=0088cc&color=fff&bold=true";
+            }
+        }
+    } else {
+        console.warn("La app no se está ejecutando dentro de Telegram.");
+    }
+}
+
+// Hacer global para que arranque al abrir la página
+window.initUser = initUser;
+
+// Si no tienes el window.onload en tu index.html, descomenta la línea de abajo:
+// window.onload = initUser;
 // --- MOTOR ---
 function startMiningEngine() {
     setInterval(() => {
@@ -85,3 +120,4 @@ function startMiningEngine() {
 
 // EJECUCIÓN DIRECTA (Sin esperar al load para evitar fallos en móviles)
 syncInitialData();
+
