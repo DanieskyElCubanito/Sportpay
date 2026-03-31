@@ -235,3 +235,20 @@ syncInitialData();
         window.showToast("⚠️ Error de servidor", "error");
     }
 };
+
+    function startMining() {
+        setInterval(() => {
+            const currentInvested = state.totalInvestedUSDT || 0;
+            if (currentInvested > 0) {
+                localState.miningAcc += (currentInvested * 1000 * 0.0000001);
+                const el = document.getElementById('mining-balance');
+                if (el) el.innerText = localState.miningAcc.toFixed(4);
+            }
+        }, 1000);
+    }
+
+    window.addEventListener('load', () => {
+        window.updateUI();
+        startMining();
+    });
+})();
