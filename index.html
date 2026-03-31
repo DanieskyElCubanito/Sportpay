@@ -221,14 +221,18 @@
     }
     function openReinvestModal() { if (typeof window.reinvestBalance === 'function') window.reinvestBalance(); }
     function openPayModal() { if (typeof window.openPayModal === 'function') window.openPayModal(); }
-    window.onload = () => { if (typeof initUser === 'function') initUser(); };
+    window.addEventListener('DOMContentLoaded', () => {
+    if (typeof window.initUser === 'function') {
+        window.initUser();
+    }
+});
 </script>
 
+<script src="js/state.js"></script>
+<script src="js/main.js"></script>
 <script src="js/payment.js"></script> 
 <script src="js/test.js"></script>    
 <script src="js/calculator.js"></script>
-<script src="js/state.js" type="module"></script>
-<script src="js/main.js" type="module"></script>
 
 </body>
                                                                                                                     </html>
