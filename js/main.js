@@ -136,40 +136,39 @@ window.executeReinvestDirectly = async function() {
     const modal = document.getElementById('custom-reinvest-modal');
     if (modal) modal.remove();
 
-    // Importante: Usar el balance que tenemos en el estado actual
     const amount = state.totalEarnedUSD;
 
-    // URL estructurada para webhookLib
-    const apiURL = `https://api.bots.business/v1/bots/${BJS_CONFIG.botId}/commands/api_reinvest?user_id=${state.userId}&amount=${amount}`;
+    // URL limpia sin parámetros
+    const apiURL = `https://api.bots.business/v1/bots/${BJS_CONFIG.botId}/commands/api_reinvest`;
 
     try {
         const response = await fetch(apiURL, {
-            method: 'GET',
+            method: 'POST', // CAMBIAMOS A POST
             headers: { 
                 "api_key": BJS_CONFIG.token,
-                "Accept": "application/json" // Pedimos JSON explícitamente
-            }
+                "Content-Type": "application/json" // Decimos que enviamos JSON
+            },
+            body: JSON.stringify({ // ENVIAMOS LOS DATOS EN EL CUERPO
+                user_id: state.userId,
+                amount: amount
+            })
         });
 
         const result = await response.json();
 
         if (result && result.status === "success") {
-            // Actualizamos los 50 USDT y el nuevo balance
             state.totalEarnedUSD = parseFloat(result.balance);
             state.totalInvestedUSDT = parseFloat(result.invested);
-            
-            updateDashboard(); // Refresca la pantalla
-            window.showToast("✅ Reinversión exitosa (+5% Bono)");
+            updateDashboard();
+            window.showToast("✅ Reinversión exitosa");
         } else {
-            // Si el bot da error, mostramos el mensaje que viene en el JSON
-            window.showToast("❌ " + (result.message || "Error de validación"), "error");
+            // Si sale un error aquí, dime QUÉ DICE el mensaje
+            window.showToast("❌ " + (result.message || "Error de respuesta"), "error");
         }
     } catch (e) {
-        window.showToast("⚠️ Error: El bot no respondió JSON válido", "error");
-        console.error(e);
+        window.showToast("⚠️ Error de conexión POST", "error");
     }
 };
-
 // --- 4. MOTOR DE MINERÍA Y PERFIL ---
 
 function startMiningEngine() {
