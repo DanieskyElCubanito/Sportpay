@@ -208,6 +208,33 @@
 </div>
 
 <script>
+    // 1. Inicializar el SDK de Telegram
+const tg = window.Telegram.WebApp;
+tg.expand(); // Abre la app a pantalla completa
+
+// 2. Obtener el ID del usuario de Telegram
+const user = tg.initDataUnsafe?.user;
+
+if (user) {
+    const userId = user.id;
+
+    // 3. Llamar a tu API en Vercel para registrar/obtener datos
+    fetch(`https://sportspay.vercel.app/api/user?user_id=${userId}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log("Datos cargados:", data);
+            
+            // 4. Actualizar los textos de tu interfaz con los datos de Supabase
+            document.getElementById('balance-text').innerText = data.balance.toFixed(2) + " USDT";
+            document.getElementById('invested-text').innerText = data.invested.toFixed(2) + " USDT";
+        })
+        .catch(error => {
+            console.error("Error al conectar con la API:", error);
+        });
+} else {
+    console.log("No se pudo obtener el usuario (¿estás abriendo esto desde Telegram?)");
+}
+    
     function switchTab(tabId, el) {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         document.getElementById(tabId).classList.add('active');
