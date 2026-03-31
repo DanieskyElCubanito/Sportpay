@@ -209,31 +209,24 @@
 
 <script>
     // 1. Inicializar el SDK de Telegram
+// 1. Conectamos con Telegram
 const tg = window.Telegram.WebApp;
-tg.expand(); // Abre la app a pantalla completa
+tg.ready(); // Avisa a Telegram que la App está lista
 
-// 2. Obtener el ID del usuario de Telegram
+// 2. Sacamos el ID del usuario que abrió la App
 const user = tg.initDataUnsafe?.user;
 
 if (user) {
-    const userId = user.id;
-
-    // 3. Llamar a tu API en Vercel para registrar/obtener datos
-    fetch(`https://sportspay.vercel.app/api/user?user_id=${userId}`)
-        .then(response => response.json())
+    // 3. Llamamos a tu API de Vercel (la que conectamos a Supabase)
+    fetch(`https://sportspay.vercel.app/api/user?user_id=${user.id}`)
+        .then(res => res.json())
         .then(data => {
-            console.log("Datos cargados:", data);
-            
-            // 4. Actualizar los textos de tu interfaz con los datos de Supabase
-            document.getElementById('balance-text').innerText = data.balance.toFixed(2) + " USDT";
-            document.getElementById('invested-text').innerText = data.invested.toFixed(2) + " USDT";
+            // 4. Aquí pones el saldo en tu pantalla
+            document.getElementById('balance').innerText = data.balance.toFixed(2) + " USDT";
+            console.log("Usuario cargado/registrado en Supabase!");
         })
-        .catch(error => {
-            console.error("Error al conectar con la API:", error);
-        });
-} else {
-    console.log("No se pudo obtener el usuario (¿estás abriendo esto desde Telegram?)");
-}
+        .catch(err => console.error("Error conectando:", err));
+} 
     
     function switchTab(tabId, el) {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
