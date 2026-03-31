@@ -61,15 +61,24 @@
 <body>
 
 <div class="app-shell">
-    <div class="header-profile" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px;">
-        <div class="user-info" style="display: flex; align-items: center; gap: 12px;">
-            <img id="user-pic" class="user-photo" src="https://via.placeholder.com/100" style="width: 52px; height: 52px; border-radius: 16px; border: 2px solid var(--glass-border); object-fit: cover;">
-            <div class="user-details">
-                <h2 id="user-full-name" style="margin: 0; font-size: 1.1rem; font-weight: 800;">Cargando...</h2>
-                <span id="user-id" style="font-size: 0.8rem; color: var(--accent-blue); font-weight: 600;">ID: 000000</span>
-            </div>
-        </div>
+    <div class="header-profile" style="display: flex; align-items: center; justify-content: flex-start; gap: 15px; margin-bottom: 30px;">
+    
+    <div style="position: relative; width: 60px; height: 60px;">
+        <img id="user-pic" 
+             src="https://ui-avatars.com/api/?name=User&background=0088cc&color=fff" 
+             style="width: 100%; height: 100%; border-radius: 18px; border: 2px solid var(--glass-border); object-fit: cover; display: block;">
     </div>
+
+    <div style="display: flex; flex-direction: column; justify-content: center;">
+        <h2 id="user-full-name" style="margin: 0; font-size: 1.2rem; font-weight: 800; color: #fff; line-height: 1.2;">
+            Cargando...
+        </h2>
+        <span id="user-id" style="font-size: 0.85rem; color: var(--accent-blue); font-weight: 700; margin-top: 2px;">
+            ID: 0000000000
+        </span>
+    </div>
+
+</div>
 
     <section id="dashboard" class="view active">
         <div class="main-card" style="background: linear-gradient(180deg, rgba(0,136,204,0.15) 0%, var(--card-glass) 100%);">
