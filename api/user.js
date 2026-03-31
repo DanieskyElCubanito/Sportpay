@@ -1,30 +1,56 @@
+import { createClient } from '@supabase/supabase-js'
+
+// Conexión automática usando las variables que pusiste en Vercel
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY
+)
+
 export default async function handler(req, res) {
-  // Configuración de seguridad para que tu Mini App pueda leer la API
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  const { user_id, action, invited_by } = req.body || req.query;
+  const { user_id, action, invited_by } = req.method === 'POST' ? req.body : req.query;
 
-  // 1. Obtener datos del usuario (Aquí es donde recuperas tus 50 USDT)
+  if (!user_id) {
+    return res.status(400).json({ error: "Falta el user_id" });
+  }
+
+  // --- LÓGICA PARA OBTENER DATOS (GET) ---
   if (req.method === 'GET') {
-    // Aquí consultarías tu base de datos real. 
-    // Por ahora, devolvemos tus datos para que la App los muestre:
-    return res.status(200).json({
-      status: "success",
-      balance: 50.00, 
-      invested: 10.50,
-      referrals: 3,
-      userId: user_id
-    });
+    // 1. Intentamos buscar al usuario en la base de datos
+    let { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('user_id', user_id)
+      .single();
+
+    // 2. Si el usuario no existe, lo creamos con sus 50 USDT iniciales
+    if (!user) {
+      const { data: newUser, error: createError } = await supabase
+        .from('users')
+        .insert([{ 
+          user_id: user_id, 
+          balance: 50.00, 
+          invested: 0, 
+          referrals: 0 
+        }])
+        .select()
+        .single();
+      
+      user = newUser;
+    }
+
+    return res.status(200).json(user);
   }
 
-  // 2. Lógica de Referidos (POST)
+  // --- LÓGICA PARA REFERIDOS (POST) ---
   if (req.method === 'POST' && action === 'register_referral') {
-    // Si 'invited_by' existe, sumas la recompensa en la base de datos
-    return res.status(200).json({
-      status: "success",
-      message: `Referido registrado para el patrocinador: ${invited_by}`
-    });
+    if (invited_by && invited_by !== user_id) {
+      // Sumamos +1 referido al patrocinador
+      await supabase.rpc('increment_referrals', { row_id: invited_by });
+    }
+    return res.status(200).json({ status: "success" });
   }
-}
+                 }
