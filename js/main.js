@@ -132,38 +132,48 @@ window.openReinvestModal = function() {
 };
 
 // Función para EJECUTAR la reinversión
-window.executeReinvestDirectly = async function() {
-    const modal = document.getElementById('custom-reinvest-modal');
-    if (modal) modal.remove();
+// Comando: api_reinvest
+try {
+    // 1. Captura de datos profesional (usando options como indica la doc)
+    let uid = options.user_id; 
+    let amount = parseFloat(options.amount);
 
-    const amount = state.totalEarnedUSD;
-
-    // URL limpia sin parámetros
-    // Prueba este cambio rápido mientras buscas la info
-const apiURL = `https://api.bots.business/v1/bots/${BJS_CONFIG.botId}/commands/api_reinvest?user_id=${state.userId}&amount=${amount}`;
-
-const response = await fetch(apiURL, {
-    method: 'GET',
-    headers: { 
-        "api_key": BJS_CONFIG.token,
-        "Content-Type": "application/json" // Obligamos a que trate todo como JSON
+    if (!uid) {
+        WebApp.render({ content: { status: "error", message: "ID de usuario faltante" } });
+        return;
     }
-});
-        const result = await response.json();
 
-        if (result && result.status === "success") {
-            state.totalEarnedUSD = parseFloat(result.balance);
-            state.totalInvestedUSDT = parseFloat(result.invested);
-            updateDashboard();
-            window.showToast("✅ Reinversión exitosa");
-        } else {
-            // Si sale un error aquí, dime QUÉ DICE el mensaje
-            window.showToast("❌ " + (result.message || "Error de respuesta"), "error");
-        }
-    } catch (e) {
-        window.showToast("⚠️ Error de conexión POST", "error");
+    // 2. Cargar propiedades (User.getProperty sigue siendo válido)
+    let bal = User.getProperty("balance", uid) || 0;
+    let inv = User.getProperty("total_invested", uid) || 0;
+
+    // 3. Validación de Negocio
+    if (isNaN(amount) || amount < 1) {
+        WebApp.render({ content: { status: "error", message: "Monto inválido" } });
+    } else if (bal < amount) {
+        WebApp.render({ content: { status: "error", message: "Saldo insuficiente" } });
+    } else {
+        // 4. Lógica de Reinversión
+        let bonus = amount * 0.05;
+        let nBal = bal - amount;
+        let nInv = inv + amount + bonus;
+
+        User.setProperty("balance", nBal, "float", uid);
+        User.setProperty("total_invested", nInv, "float", uid);
+
+        // 5. RESPUESTA JSON PURA (Mechanical Necessity para evitar errores)
+        WebApp.render({
+            content: { 
+                status: "success", 
+                balance: nBal, 
+                invested: nInv 
+            }
+        });
     }
-};
+} catch (err) {
+    // En caso de error crítico, ver la pestaña "Error" como sugiere la captura
+    WebApp.render({ content: { status: "error", message: "Error interno del bot" } });
+}
 // --- 4. MOTOR DE MINERÍA Y PERFIL ---
 
 function startMiningEngine() {
