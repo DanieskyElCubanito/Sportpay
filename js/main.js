@@ -30,6 +30,9 @@ function getTelegramUser() {
 // --- 3. SINCRONIZACIÓN Y PANEL ---
 
 async function syncInitialData() {
+    // Pequeña pausa para asegurar que Telegram inyectó los datos
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     state.userId = getTelegramUser();
     
     if (!state.userId) {
@@ -39,7 +42,7 @@ async function syncInitialData() {
         return;
     }
 
-    // Capturamos el parámetro de invitación
+    // Capturamos el parámetro de invitación (start_param)
     const startParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param || '';
     console.log("ID del invitador detectado:", startParam); 
 
@@ -80,7 +83,7 @@ function updateDashboard() {
     
     // Actualizar Enlace de Referido automático
     if (refInput && state.userId) {
-        // Reemplaza 'TuBotNombre_bot' por el alias real de tu bot en BotFather
+        // Enlace dinámico con tu bot
         refInput.value = `https://t.me/DannyDevRobot?start=${state.userId}`;
     }
 
