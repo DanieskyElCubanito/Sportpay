@@ -19,7 +19,7 @@ window.state = {
     refsL5: 0
 };
 
-// --- 2. CAPTURA DE ID MEJORADA (Evita los ceros) ---
+// --- 2. CAPTURA DE ID Y PARÁMETROS MEJORADA ---
 function getTelegramUser() {
     const tgData = window.Telegram?.WebApp?.initDataUnsafe;
     const urlParams = new URLSearchParams(window.location.search);
@@ -27,10 +27,18 @@ function getTelegramUser() {
     return id ? String(id) : null;
 }
 
+// Nueva función para capturar el referido en enlaces Direct App
+function getReferralParam() {
+    const tgData = window.Telegram?.WebApp?.initDataUnsafe;
+    // En enlaces /app?startapp=XXX, Telegram lo guarda en start_param
+    // En enlaces directos por URL, podría venir en la query
+    const urlParams = new URLSearchParams(window.location.search);
+    return tgData?.start_param || urlParams.get('tgWebAppStartParam') || "";
+}
+
 // --- 3. SINCRONIZACIÓN Y PANEL ---
 
 async function syncInitialData() {
-    // CORRECCIÓN: Esperamos a que Telegram WebApp esté realmente listo
     if (window.Telegram?.WebApp) {
         window.Telegram.WebApp.ready();
     }
@@ -44,14 +52,9 @@ async function syncInitialData() {
         return;
     }
 
-    // CORRECCIÓN CRÍTICA: Captura limpia del parámetro de invitación
-    // Si no hay invitado, enviamos cadena vacía para que la API no ponga un "0"
-    let startParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param || "";
-    
-    // Si el usuario se está invitando a sí mismo, anulamos el parámetro
-    if (startParam === state.userId) { startParam = ""; }
-
-    console.log("ID del invitador detectado:", startParam); 
+    // CAPTURA MEJORADA PARA EL NUEVO ENLACE
+    const startParam = getReferralParam();
+    console.log("Referido detectado:", startParam); 
 
     try {
         const response = await fetch(`${API_URLS.user}?user_id=${state.userId}&invited_by=${startParam}`);
@@ -62,7 +65,6 @@ async function syncInitialData() {
             state.totalInvestedUSDT = parseFloat(data.invested || 0);
             state.referralCount = data.referrals || 0;
 
-            // Sincronización de niveles
             state.refsL1 = data.refsL1 || data.referrals || 0; 
             state.refsL2 = data.refsL2 || 0;
             state.refsL3 = data.refsL3 || 0;
@@ -88,12 +90,11 @@ function updateDashboard() {
     if (refEl) refEl.innerText = state.referralCount;
     if (idEl) idEl.innerText = `ID: ${state.userId}`;
     
-    // Actualizar Enlace de Referido automático
+    // ACTUALIZACIÓN DEL FORMATO DE ENLACE A DIRECT APP
     if (refInput && state.userId) {
-        refInput.value = `https://t.me/CryptoDogeFarming_bot?start=${state.userId}`;
+        refInput.value = `https://t.me/DannyDevRobot/app?startapp=${state.userId}`;
     }
 
-    // Actualizar contadores de niveles en el HTML
     const l1 = document.getElementById('ref-L1');
     const l2 = document.getElementById('ref-L2');
     const l3 = document.getElementById('ref-L3');
@@ -163,12 +164,12 @@ window.executeReinvestDirectly = async function() {
             state.totalEarnedUSD = parseFloat(result.balance);
             state.totalInvestedUSDT = parseFloat(result.invested);
             updateDashboard();
-            window.showToast("✅ Reinversión guardada en la nube");
+            window.showToast("✅ Reinversión guardada");
         } else {
             window.showToast(`❌ ${result.message}`, "error");
         }
     } catch (e) {
-        window.showToast("⚠️ Error: No se pudo guardar la reinversión", "error");
+        window.showToast("⚠️ Error de conexión", "error");
     }
 };
 
@@ -205,16 +206,13 @@ function initUserProfile() {
     }
 }
 
-// --- 6. UTILIDADES Y REFERIDOS ---
+// --- 6. UTILIDADES ---
 
 window.copyLink = function() {
     const copyText = document.getElementById("ref-link");
-    if (!copyText || copyText.value === "Cargando enlace...") return;
-    
-    copyText.select();
-    copyText.setSelectionRange(0, 99999); 
+    if (!copyText || copyText.value === "") return;
     navigator.clipboard.writeText(copyText.value);
-    window.showToast("✅ Enlace copiado al portapapeles");
+    window.showToast("✅ Enlace copiado");
 };
 
 window.showToast = function(message, type = "success") {
@@ -223,7 +221,7 @@ window.showToast = function(message, type = "success") {
     const toast = document.createElement('div');
     toast.className = 'toast-notif';
     toast.innerText = message;
-    toast.style.cssText = `position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:${type==="success"?"#10b981":"#ef4444"}; color:white; padding:12px 24px; border-radius:50px; z-index:10000; font-weight:bold; box-shadow: 0 4px 15px rgba(0,0,0,0.3);`;
+    toast.style.cssText = `position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:${type==="success"?"#10b981":"#ef4444"}; color:white; padding:12px 24px; border-radius:50px; z-index:10000; font-weight:bold;`;
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 3000);
 };
@@ -235,10 +233,9 @@ window.onload = () => {
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
     }
-
     setTimeout(() => {
         initUserProfile();
         syncInitialData();
         startMiningEngine();
-    }, 200); // Un poco más de tiempo para asegurar la carga en móviles lentos
+    }, 200);
 };
