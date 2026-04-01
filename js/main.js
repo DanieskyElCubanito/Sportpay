@@ -39,33 +39,30 @@ async function syncInitialData() {
         return;
     }
 
+    // Capturamos el parámetro de invitación
     const startParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param || '';
+    console.log("ID del invitador detectado:", startParam); 
 
-const startParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param || '';
-console.log("ID del invitador detectado:", startParam); 
     try {
         const response = await fetch(`${API_URLS.user}?user_id=${state.userId}&invited_by=${startParam}`);
         const data = await response.json();
 
-// ... dentro de syncInitialData()
-if (data && (data.user_id || data.status === "success")) {
-    state.totalEarnedUSD = parseFloat(data.balance || 0);
-    state.totalInvestedUSDT = parseFloat(data.invested || 0);
-    state.referralCount = data.referrals || 0; // Este es el que marca "1" en tu captura
+        if (data && (data.user_id || data.status === "success")) {
+            state.totalEarnedUSD = parseFloat(data.balance || 0);
+            state.totalInvestedUSDT = parseFloat(data.invested || 0);
+            state.referralCount = data.referrals || 0;
 
-    // ESTO ES LO QUE TE FALTA AÑADIR:
-    state.refsL1 = data.refsL1 || data.referrals || 0; // Si no hay desglose, usa el total en L1
-    state.refsL2 = data.refsL2 || 0;
-    state.refsL3 = data.refsL3 || 0;
-    state.refsL4 = data.refsL4 || 0;
-    state.refsL5 = data.refsL5 || 0;
+            // Sincronización de niveles
+            state.refsL1 = data.refsL1 || data.referrals || 0; 
+            state.refsL2 = data.refsL2 || 0;
+            state.refsL3 = data.refsL3 || 0;
+            state.refsL4 = data.refsL4 || 0;
+            state.refsL5 = data.refsL5 || 0;
 
-    updateDashboard();
-}
+            updateDashboard();
+        }
     } catch (e) {
-        console.error("Error sincronizando con la API de Vercel:", e);
-        const urlParams = new URLSearchParams(window.location.search);
-        state.totalEarnedUSD = parseFloat(urlParams.get('balance')) || 0;
+        console.error("Error sincronizando:", e);
         updateDashboard();
     }
 }
