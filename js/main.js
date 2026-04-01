@@ -30,9 +30,11 @@ function getTelegramUser() {
 // --- 3. SINCRONIZACIÓN Y PANEL ---
 
 async function syncInitialData() {
-    // Pequeña pausa para asegurar que Telegram inyectó los datos
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
+    // CORRECCIÓN: Esperamos a que Telegram WebApp esté realmente listo
+    if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.ready();
+    }
+
     state.userId = getTelegramUser();
     
     if (!state.userId) {
@@ -42,8 +44,13 @@ async function syncInitialData() {
         return;
     }
 
-    // Capturamos el parámetro de invitación (start_param)
-    const startParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param || '';
+    // CORRECCIÓN CRÍTICA: Captura limpia del parámetro de invitación
+    // Si no hay invitado, enviamos cadena vacía para que la API no ponga un "0"
+    let startParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param || "";
+    
+    // Si el usuario se está invitando a sí mismo, anulamos el parámetro
+    if (startParam === state.userId) { startParam = ""; }
+
     console.log("ID del invitador detectado:", startParam); 
 
     try {
@@ -83,8 +90,7 @@ function updateDashboard() {
     
     // Actualizar Enlace de Referido automático
     if (refInput && state.userId) {
-        // Enlace dinámico con tu bot
-        refInput.value = `https://t.me/DannyDevRobot?start=${state.userId}`;
+        refInput.value = `https://t.me/CryptoDogeFarming_bot?start=${state.userId}`;
     }
 
     // Actualizar contadores de niveles en el HTML
@@ -222,7 +228,7 @@ window.showToast = function(message, type = "success") {
     setTimeout(() => toast.remove(), 3000);
 };
 
-// --- 7. LANZAMIENTO (Asegura la carga de Telegram) ---
+// --- 7. LANZAMIENTO ---
 
 window.onload = () => {
     if (window.Telegram?.WebApp) {
@@ -234,5 +240,5 @@ window.onload = () => {
         initUserProfile();
         syncInitialData();
         startMiningEngine();
-    }, 150);
+    }, 200); // Un poco más de tiempo para asegurar la carga en móviles lentos
 };
