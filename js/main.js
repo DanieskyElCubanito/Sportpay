@@ -133,6 +133,7 @@ function updateDashboard() {
         // Aplicamos tu nueva regla: sin puntos ni comas si es entero
         speedEl.innerText = `${currentGHS} GH/s activos`;
     }
+}
 // --- 4. ACCIONES (REINVERTIR Y RECLAMAR) ---
 
 window.openReinvestModal = function() {
