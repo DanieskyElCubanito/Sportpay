@@ -78,36 +78,38 @@ async function syncInitialData() {
 }
 
 function updateDashboard() {
-    // IDs nuevos para el balance dual
+    // 1. Referencias a los elementos del nuevo Dashboard
     const hashEl = document.getElementById('main-balance-hash');
     const usdtEl = document.getElementById('main-balance-usdt');
-    
-    // IDs existentes que ya tenías
     const speedEl = document.getElementById('mining-speed');
     const refEl = document.getElementById('ref-count');
     const idEl = document.getElementById('user-id');
     const refInput = document.getElementById('ref-link');
 
-    // 1. Actualización del Balance (Hash grande, USDT pequeño)
-    if (hashEl && usdtEl) {
-        const totalHash = Math.floor(state.totalEarnedUSD * 1000); // 100 USDT -> 100,000 HASH
-        hashEl.innerText = totalHash.toLocaleString(); 
+    // 2. Actualización del Balance (Hash y USDT)
+    // Usamos state.totalEarnedUSD que es el que viene de Supabase
+    if (hashEl) {
+        const totalHash = Math.floor(state.totalEarnedUSD * 1000);
+        hashEl.innerText = totalHash.toLocaleString();
+    }
+    if (usdtEl) {
         usdtEl.innerText = state.totalEarnedUSD.toFixed(2);
     }
 
-    // 2. Actualización de Estadísticas e ID
+    // 3. Resto de funciones (Referidos e ID)
     if (refEl) refEl.innerText = state.referralCount;
     if (idEl) idEl.innerText = `ID: ${state.userId}`;
     
-    // 3. Velocidad de minería basada en la inversión real de Supabase
-    if (speedEl) {
-        const speed = (state.totalInvestedUSDT * 10).toFixed(1); // Ejemplo: 1 USDT = 10 GH/s
-        speedEl.innerText = `${speed} GH/s activos`;
-    }
-    
-    // 4. Generar el enlace de referido (Corregido el corte de texto)
+    // 4. Generar el enlace de referido corregido
     if (refInput && state.userId) {
         refInput.value = `https://t.me/DannyDevRobot/app?startapp=${state.userId}`;
+    }
+
+    // 5. Actualizar velocidad visual
+    if (speedEl) {
+        // Si tienes 0 invertido en Supabase, saldrá 0.0 GH/s
+        const speed = (state.totalInvestedUSDT * 10).toFixed(1);
+        speedEl.innerText = `${speed} GH/s activos`;
     }
 }
 
