@@ -102,13 +102,15 @@ function updateDashboard() {
 
     // 1. Balance Dual (HASH y USDT)
     if (hashEl) {
-        const totalHash = Math.floor(state.totalEarnedUSD * state.hashRate);
-        hashEl.innerText = totalHash.toLocaleString();
+        // Conversión: 1 USDT = 1000 HASH
+        const totalHash = Math.floor(state.totalEarnedUSD * 1000);
+        // .toLocaleString('de-DE') añade el punto de mil (100.000)
+        hashEl.innerText = totalHash.toLocaleString('de-DE');
     }
     if (usdtEl) {
+        // Muestra el valor original de Supabase con 2 decimales
         usdtEl.innerText = state.totalEarnedUSD.toFixed(2);
     }
-
     // 2. Red y Referidos
     if (refEl) refEl.innerText = state.referralCount;
     if (l1) l1.innerText = state.refsL1;
