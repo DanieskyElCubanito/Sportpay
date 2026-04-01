@@ -47,7 +47,7 @@ console.log("ID del invitador detectado:", startParam);
         const response = await fetch(`${API_URLS.user}?user_id=${state.userId}&invited_by=${startParam}`);
         const data = await response.json();
 
-        // ... dentro de syncInitialData()
+// ... dentro de syncInitialData()
 if (data && (data.user_id || data.status === "success")) {
     state.totalEarnedUSD = parseFloat(data.balance || 0);
     state.totalInvestedUSDT = parseFloat(data.invested || 0);
