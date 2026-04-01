@@ -81,47 +81,55 @@
 </div>
 
     <section id="dashboard" class="view active">
-        <div class="main-card" style="background: linear-gradient(180deg, rgba(0,136,204,0.15) 0%, var(--card-glass) 100%);">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                <div class="balance-label">Balance Disponible</div>
-                <div style="display: flex; align-items: center; gap: 5px; background: rgba(16, 185, 129, 0.1); padding: 4px 10px; border-radius: 20px;">
-                    <span style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; box-shadow: 0 0 10px #10b981;"></span>
-                    <span style="font-size: 0.65rem; font-weight: 800; color: #10b981;">ACTIVO</span>
-                </div>
-            </div>
-            <div class="balance-val">$<span id="main-balance">0.00</span></div>
-            
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 20px;">
-                <button class="btn-action btn-blue" onclick="switchTab('planes')" style="flex-direction: column; padding: 12px 5px; font-size: 0.75rem; height: 65px;">
-                    <i class="fa-solid fa-plus" style="margin-bottom: 4px;"></i> Invertir
-                </button>
-
-                <div style="position: relative;">
-                    <span style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; font-size: 0.6rem; font-weight: 800; padding: 2px 6px; border-radius: 6px; z-index: 10; border: 1px solid #05070a;">+5%</span>
-                    <button class="btn-action btn-dark" onclick="openReinvestModal()" style="width: 100%; flex-direction: column; padding: 12px 5px; font-size: 0.75rem; height: 65px; border: 1px solid rgba(0,136,204,0.3);">
-                        <i class="fa-solid fa-rotate" style="color: var(--accent-blue); margin-bottom: 4px;"></i> Reinvertir
-                    </button>
-                </div>
-
-                <button class="btn-action btn-dark" onclick="switchTab('history')" style="flex-direction: column; padding: 12px 5px; font-size: 0.75rem; height: 65px;">
-                    <i class="fa-solid fa-clock-rotate-left" style="margin-bottom: 4px;"></i> Historial
-                </button>
+    <div class="main-card" style="background: linear-gradient(180deg, rgba(0,136,204,0.15) 0%, var(--card-glass) 100%);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div class="balance-label">Balance Disponible</div>
+            <div style="display: flex; align-items: center; gap: 5px; background: rgba(16, 185, 129, 0.1); padding: 4px 10px; border-radius: 20px;">
+                <span style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; box-shadow: 0 0 10px #10b981;"></span>
+                <span style="font-size: 0.65rem; font-weight: 800; color: #10b981;">ACTIVO</span>
             </div>
         </div>
+        
+        <div class="balance-val" style="display: flex; align-items: baseline; gap: 5px;">
+            <span id="main-balance-hash">0</span>
+            <span style="font-size: 0.8rem; color: var(--accent-blue); font-weight: 600; margin-right: 5px;">HASH</span>
+            <span style="font-size: 0.9rem; color: #94a3b8; font-weight: 400;">≈ <span id="main-balance-usdt">0.00</span> <small style="font-size: 0.6rem;">USDT</small></span>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 20px;">
+            <button class="btn-action btn-blue" onclick="switchTab('planes')" style="flex-direction: column; padding: 12px 5px; font-size: 0.75rem; height: 65px;">
+                <i class="fa-solid fa-plus" style="margin-bottom: 4px;"></i> Invertir
+            </button>
 
-        <div class="main-card">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <div class="balance-label">Minería en curso</div>
-                    <div style="font-size: 1.6rem; font-weight: 800; margin-top: 5px;">$<span id="mining-balance">0.0000</span></div>
-                    <div id="mining-speed" style="font-size: 0.7rem; color: var(--accent-blue); font-weight: 600;">0.0 GH/s activos</div>
-                </div>
-                <button onclick="claimMining()" class="btn-action btn-blue" style="padding: 10px 15px; font-size: 0.8rem; border-radius: 12px; height: auto;">
-                    <i class="fa-solid fa-hand-holding-dollar"></i> Reclamar
+            <div style="position: relative;">
+                <span style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; font-size: 0.6rem; font-weight: 800; padding: 2px 6px; border-radius: 6px; z-index: 10; border: 1px solid #05070a;">+5%</span>
+                <button class="btn-action btn-dark" onclick="openReinvestModal()" style="width: 100%; flex-direction: column; padding: 12px 5px; font-size: 0.75rem; height: 65px; border: 1px solid rgba(0,136,204,0.3);">
+                    <i class="fa-solid fa-rotate" style="color: var(--accent-blue); margin-bottom: 4px;"></i> Reinvertir
                 </button>
             </div>
+
+            <button class="btn-action btn-dark" onclick="switchTab('history')" style="flex-direction: column; padding: 12px 5px; font-size: 0.75rem; height: 65px;">
+                <i class="fa-solid fa-clock-rotate-left" style="margin-bottom: 4px;"></i> Historial
+            </button>
         </div>
-    </section>
+    </div>
+
+    <div class="main-card">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <div class="balance-label">Minería en curso</div>
+                <div style="display: flex; align-items: baseline; gap: 4px; margin-top: 5px;">
+                    <div style="font-size: 1.6rem; font-weight: 800;"><span id="mining-hash">0</span></div>
+                    <div style="font-size: 0.7rem; color: #94a3b8;">HASH</div>
+                </div>
+                <div id="mining-speed" style="font-size: 0.7rem; color: var(--accent-blue); font-weight: 600;">0.0 GH/s activos</div>
+            </div>
+            <button onclick="claimMining()" class="btn-action btn-blue" style="padding: 10px 15px; font-size: 0.8rem; border-radius: 12px; height: auto;">
+                <i class="fa-solid fa-hand-holding-dollar"></i> Reclamar
+            </button>
+        </div>
+    </div>
+</section>
     <section id="planes" class="view">
         <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 20px;">Purchase Hash Power</h2>
         
