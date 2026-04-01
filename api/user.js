@@ -47,7 +47,50 @@ export default async function handler(req, res) {
 
       if (createError) throw createError;
       user = newUser;
+// --- PEGAR DENTRO DEL CONTROLADOR DE USUARIOS ---
 
+const { user_id, amount_to_add } = req.body;
+
+try {
+    // 1. Obtener el balance actual desde la tabla 'users'
+    const { data: user, error: fetchError } = await supabase
+        .from('users')
+        .select('balance')
+        .eq('user_id', user_id)
+        .single();
+
+    if (fetchError || !user) {
+        return res.status(404).json({ status: "error", message: "Usuario no encontrado" });
+    }
+
+    // 2. Sumar el monto minado al balance existente
+    const currentBalance = parseFloat(user.balance || 0);
+    const reward = parseFloat(amount_to_add || 0);
+    const newBalance = currentBalance + reward;
+
+    // 3. Actualizar la fila del usuario en Supabase
+    const { error: updateError } = await supabase
+        .from('users')
+        .update({ 
+            balance: newBalance,
+            last_claim_at: new Date().toISOString() 
+        })
+        .eq('user_id', user_id);
+
+    if (updateError) throw updateError;
+
+    // 4. Devolver el nuevo balance al frontend
+    return res.status(200).json({
+        status: "success",
+        new_balance: newBalance
+    });
+
+} catch (error) {
+    return res.status(500).json({ status: "error", message: error.message });
+}
+
+// --- FIN DEL FRAGMENTO ---
+      
       // 3. LOGICA DE CONTEO: Si fue invitado por alguien, le sumamos el referido al "padre"
       if (user.invited_by) {
         const { data: sponsor } = await supabase
