@@ -41,6 +41,8 @@ async function syncInitialData() {
 
     const startParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param || '';
 
+const startParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param || '';
+console.log("ID del invitador detectado:", startParam); 
     try {
         const response = await fetch(`${API_URLS.user}?user_id=${state.userId}&invited_by=${startParam}`);
         const data = await response.json();
