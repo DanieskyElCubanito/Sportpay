@@ -4,14 +4,12 @@ const API_URLS = {
     reinvest: '/api/reinvest'
 };
 
-// Estado único de la aplicación (Actualizado con Niveles)
 window.state = {
     userId: null,
     totalEarnedUSD: 0,
     totalInvestedUSDT: 0,
     referralCount: 0,
     accumulatedMining: 0,
-    // Datos de red por nivel
     refsL1: 0,
     refsL2: 0,
     refsL3: 0,
@@ -19,7 +17,7 @@ window.state = {
     refsL5: 0
 };
 
-// --- 2. CAPTURA DE ID Y PARÁMETROS MEJORADA ---
+// --- 2. CAPTURA DE ID MEJORADA ---
 function getTelegramUser() {
     const tgData = window.Telegram?.WebApp?.initDataUnsafe;
     const urlParams = new URLSearchParams(window.location.search);
@@ -27,18 +25,10 @@ function getTelegramUser() {
     return id ? String(id) : null;
 }
 
-// Nueva función para capturar el referido en enlaces Direct App
-function getReferralParam() {
-    const tgData = window.Telegram?.WebApp?.initDataUnsafe;
-    // En enlaces /app?startapp=XXX, Telegram lo guarda en start_param
-    // En enlaces directos por URL, podría venir en la query
-    const urlParams = new URLSearchParams(window.location.search);
-    return tgData?.start_param || urlParams.get('tgWebAppStartParam') || "";
-}
-
 // --- 3. SINCRONIZACIÓN Y PANEL ---
 
 async function syncInitialData() {
+    // Aseguramos que Telegram esté listo
     if (window.Telegram?.WebApp) {
         window.Telegram.WebApp.ready();
     }
@@ -46,21 +36,29 @@ async function syncInitialData() {
     state.userId = getTelegramUser();
     
     if (!state.userId) {
-        console.error("Error: No se pudo obtener el ID de Telegram.");
         const idEl = document.getElementById('user-id');
-        if (idEl) idEl.innerText = "ID: No detectado (Abre desde TG)";
+        if (idEl) idEl.innerText = "ID: No detectado";
         return;
     }
 
-    // CAPTURA MEJORADA PARA EL NUEVO ENLACE
-    const startParam = getReferralParam();
-    console.log("Referido detectado:", startParam); 
+    // --- CORRECCIÓN PARA ENLACES DIRECT APP (/app?startapp=) ---
+    // Telegram guarda el valor en 'start_param' dentro de initDataUnsafe
+    let startParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param || "";
+    
+    // Si viene vacío, intentamos buscarlo en la URL por si acaso
+    if (!startParam) {
+        const urlParams = new URLSearchParams(window.location.search);
+        startParam = urlParams.get('tgWebAppStartParam') || "";
+    }
+
+    console.log("Invitador detectado:", startParam); 
 
     try {
+        // Enviamos el invitado a la API
         const response = await fetch(`${API_URLS.user}?user_id=${state.userId}&invited_by=${startParam}`);
         const data = await response.json();
 
-        if (data && (data.user_id || data.status === "success")) {
+        if (data) {
             state.totalEarnedUSD = parseFloat(data.balance || 0);
             state.totalInvestedUSDT = parseFloat(data.invested || 0);
             state.referralCount = data.referrals || 0;
@@ -74,7 +72,7 @@ async function syncInitialData() {
             updateDashboard();
         }
     } catch (e) {
-        console.error("Error sincronizando:", e);
+        console.error("Error:", e);
         updateDashboard();
     }
 }
@@ -90,7 +88,7 @@ function updateDashboard() {
     if (refEl) refEl.innerText = state.referralCount;
     if (idEl) idEl.innerText = `ID: ${state.userId}`;
     
-    // ACTUALIZACIÓN DEL FORMATO DE ENLACE A DIRECT APP
+    // Generar el enlace en el formato que te gustó (Direct App)
     if (refInput && state.userId) {
         refInput.value = `https://t.me/DannyDevRobot/app?startapp=${state.userId}`;
     }
@@ -113,17 +111,15 @@ function updateDashboard() {
     }
 }
 
-// --- 4. ACCIONES DE REINVERTIR Y RECLAMAR ---
+// --- 4. ACCIONES ---
 
 window.openReinvestModal = function() {
     if (state.totalEarnedUSD < 1) {
         window.showToast("❌ Mínimo 1.00 USDT", "error");
         return;
     }
-
     const amount = state.totalEarnedUSD;
     const bonus = amount * 0.05;
-
     const oldModal = document.getElementById('custom-reinvest-modal');
     if (oldModal) oldModal.remove();
 
@@ -147,29 +143,21 @@ window.openReinvestModal = function() {
 window.executeReinvestDirectly = async function() {
     const modal = document.getElementById('custom-reinvest-modal');
     if (modal) modal.remove();
-
     try {
         const response = await fetch(API_URLS.reinvest, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                user_id: state.userId,
-                amount: state.totalEarnedUSD
-            })
+            body: JSON.stringify({ user_id: state.userId, amount: state.totalEarnedUSD })
         });
-
         const result = await response.json();
-
         if (result.status === "success") {
             state.totalEarnedUSD = parseFloat(result.balance);
             state.totalInvestedUSDT = parseFloat(result.invested);
             updateDashboard();
-            window.showToast("✅ Reinversión guardada");
-        } else {
-            window.showToast(`❌ ${result.message}`, "error");
+            window.showToast("✅ Reinversión completada");
         }
     } catch (e) {
-        window.showToast("⚠️ Error de conexión", "error");
+        window.showToast("⚠️ Error al procesar", "error");
     }
 };
 
@@ -184,7 +172,7 @@ window.claimMining = function() {
     window.showToast("✅ Saldo reclamado");
 };
 
-// --- 5. MOTOR DE MINERÍA Y PERFIL ---
+// --- 5. MOTOR ---
 
 function startMiningEngine() {
     setInterval(() => {
@@ -210,7 +198,7 @@ function initUserProfile() {
 
 window.copyLink = function() {
     const copyText = document.getElementById("ref-link");
-    if (!copyText || copyText.value === "") return;
+    if (!copyText) return;
     navigator.clipboard.writeText(copyText.value);
     window.showToast("✅ Enlace copiado");
 };
@@ -226,7 +214,7 @@ window.showToast = function(message, type = "success") {
     setTimeout(() => toast.remove(), 3000);
 };
 
-// --- 7. LANZAMIENTO ---
+// --- 7. INICIO ---
 
 window.onload = () => {
     if (window.Telegram?.WebApp) {
