@@ -1,7 +1,8 @@
 // --- 1. CONFIGURACIÓN GLOBAL ---
 const API_URLS = {
     user: '/api/user',
-    reinvest: '/api/reinvest'
+    reinvest: '/api/reinvest',
+    claim: '/api/user/claim' // Añadida para la persistencia en Supabase
 };
 
 window.state = {
@@ -14,47 +15,53 @@ window.state = {
     refsL2: 0,
     refsL3: 0,
     refsL4: 0,
-    refsL5: 0
+    refsL5: 0,
+    hashRate: 1000 // 1 USDT = 1000 HASH
 };
 
-// --- 2. CAPTURA DE ID MEJORADA ---
+// --- 2. CAPTURA DE DATOS DE USUARIO ---
 function getTelegramUser() {
     const tgData = window.Telegram?.WebApp?.initDataUnsafe;
     const urlParams = new URLSearchParams(window.location.search);
+    // Prioridad: 1. SDK de Telegram, 2. Parámetro en URL
     const id = tgData?.user?.id || urlParams.get('user_id');
     return id ? String(id) : null;
 }
 
-// --- 3. SINCRONIZACIÓN Y PANEL ---
+function initUserProfile() {
+    const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
+    const nameEl = document.getElementById('user-full-name');
+    const picEl = document.getElementById('user-pic');
+    const idEl = document.getElementById('user-id');
+
+    if (user) {
+        if (nameEl) nameEl.innerText = `${user.first_name || ''} ${user.last_name || ''}`.trim();
+        if (picEl && user.photo_url) picEl.src = user.photo_url;
+        if (idEl) idEl.innerText = `ID: ${user.id}`;
+    } else {
+        // Modo prueba si no hay Telegram detectado
+        if (idEl) idEl.innerText = "ID: Modo Desarrollo";
+    }
+}
+
+// --- 3. SINCRONIZACIÓN CON SUPABASE ---
 
 async function syncInitialData() {
-    // Aseguramos que Telegram esté listo
-    if (window.Telegram?.WebApp) {
-        window.Telegram.WebApp.ready();
-    }
-
     state.userId = getTelegramUser();
     
     if (!state.userId) {
-        const idEl = document.getElementById('user-id');
-        if (idEl) idEl.innerText = "ID: No detectado";
+        console.error("ID de usuario no detectado");
         return;
     }
 
-    // --- CORRECCIÓN PARA ENLACES DIRECT APP (/app?startapp=) ---
-    // Telegram guarda el valor en 'start_param' dentro de initDataUnsafe
+    // Captura de referido desde el enlace /app?startapp=ID
     let startParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param || "";
-    
-    // Si viene vacío, intentamos buscarlo en la URL por si acaso
     if (!startParam) {
         const urlParams = new URLSearchParams(window.location.search);
         startParam = urlParams.get('tgWebAppStartParam') || "";
     }
 
-    console.log("Invitador detectado:", startParam); 
-
     try {
-        // Enviamos el invitado a la API
         const response = await fetch(`${API_URLS.user}?user_id=${state.userId}&invited_by=${startParam}`);
         const data = await response.json();
 
@@ -72,13 +79,13 @@ async function syncInitialData() {
             updateDashboard();
         }
     } catch (e) {
-        console.error("Error:", e);
+        console.error("Error en sincronización:", e);
         updateDashboard();
     }
 }
 
 function updateDashboard() {
-    // 1. Referencias a los elementos del nuevo Dashboard
+    // Referencias a elementos
     const hashEl = document.getElementById('main-balance-hash');
     const usdtEl = document.getElementById('main-balance-usdt');
     const speedEl = document.getElementById('mining-speed');
@@ -86,52 +93,44 @@ function updateDashboard() {
     const idEl = document.getElementById('user-id');
     const refInput = document.getElementById('ref-link');
 
-    // 2. Actualización del Balance (Hash y USDT)
-    // Usamos state.totalEarnedUSD que es el que viene de Supabase
-    if (hashEl) {
-        const totalHash = Math.floor(state.totalEarnedUSD * 1000);
-        hashEl.innerText = totalHash.toLocaleString();
-    }
-    if (usdtEl) {
-        usdtEl.innerText = state.totalEarnedUSD.toFixed(2);
-    }
-
-    // 3. Resto de funciones (Referidos e ID)
-    if (refEl) refEl.innerText = state.referralCount;
-    if (idEl) idEl.innerText = `ID: ${state.userId}`;
-    
-    // 4. Generar el enlace de referido corregido
-    if (refInput && state.userId) {
-        refInput.value = `https://t.me/DannyDevRobot/app?startapp=${state.userId}`;
-    }
-
-    // 5. Actualizar velocidad visual
-    if (speedEl) {
-        // Si tienes 0 invertido en Supabase, saldrá 0.0 GH/s
-        const speed = (state.totalInvestedUSDT * 10).toFixed(1);
-        speedEl.innerText = `${speed} GH/s activos`;
-    }
-}
-
+    // Referencias a niveles de red
     const l1 = document.getElementById('ref-L1');
     const l2 = document.getElementById('ref-L2');
     const l3 = document.getElementById('ref-L3');
     const l4 = document.getElementById('ref-L4');
     const l5 = document.getElementById('ref-L5');
 
+    // 1. Balance Dual (HASH y USDT)
+    if (hashEl) {
+        const totalHash = Math.floor(state.totalEarnedUSD * state.hashRate);
+        hashEl.innerText = totalHash.toLocaleString();
+    }
+    if (usdtEl) {
+        usdtEl.innerText = state.totalEarnedUSD.toFixed(2);
+    }
+
+    // 2. Red y Referidos
+    if (refEl) refEl.innerText = state.referralCount;
     if (l1) l1.innerText = state.refsL1;
     if (l2) l2.innerText = state.refsL2;
     if (l3) l3.innerText = state.refsL3;
     if (l4) l4.innerText = state.refsL4;
     if (l5) l5.innerText = state.refsL5;
-    
+
+    // 3. ID y Enlace
+    if (idEl && state.userId) idEl.innerText = `ID: ${state.userId}`;
+    if (refInput && state.userId) {
+        refInput.value = `https://t.me/DannyDevRobot/app?startapp=${state.userId}`;
+    }
+
+    // 4. Velocidad Visual (GH/s)
     if (speedEl) {
-        const currentGHS = (state.totalInvestedUSDT || 0) * 1000;
+        const currentGHS = (state.totalInvestedUSDT || 0) * 10; // Ajusta multiplicador según desees
         speedEl.innerText = `${currentGHS.toLocaleString()} GH/s activos`;
     }
 }
 
-// --- 4. ACCIONES ---
+// --- 4. ACCIONES (REINVERTIR Y RECLAMAR) ---
 
 window.openReinvestModal = function() {
     if (state.totalEarnedUSD < 1) {
@@ -140,6 +139,7 @@ window.openReinvestModal = function() {
     }
     const amount = state.totalEarnedUSD;
     const bonus = amount * 0.05;
+    
     const oldModal = document.getElementById('custom-reinvest-modal');
     if (oldModal) oldModal.remove();
 
@@ -181,37 +181,50 @@ window.executeReinvestDirectly = async function() {
     }
 };
 
-window.claimMining = function() {
-    if (state.accumulatedMining <= 0) {
+window.claimMining = async function() {
+    if (state.accumulatedMining <= 0.000001) {
         window.showToast("❌ Nada para reclamar", "error");
         return;
     }
-    state.totalEarnedUSD += state.accumulatedMining;
-    state.accumulatedMining = 0;
-    updateDashboard();
-    window.showToast("✅ Saldo reclamado");
+
+    try {
+        const response = await fetch(API_URLS.claim, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                user_id: state.userId, 
+                amount_to_add: state.accumulatedMining 
+            })
+        });
+        const result = await response.json();
+        
+        if (result.status === "success") {
+            state.totalEarnedUSD = parseFloat(result.new_balance);
+            state.accumulatedMining = 0;
+            updateDashboard();
+            window.showToast("✅ Saldo guardado en Supabase");
+        }
+    } catch (e) {
+        window.showToast("⚠️ Error de conexión", "error");
+    }
 };
 
-// --- 5. MOTOR ---
+// --- 5. MOTOR DE MINERÍA ---
 
 function startMiningEngine() {
     setInterval(() => {
         if (state.totalInvestedUSDT > 0) {
-            state.accumulatedMining += (state.totalInvestedUSDT * 1000 * 0.0000001);
-            const display = document.getElementById('mining-balance');
-            if (display) display.innerText = state.accumulatedMining.toFixed(6);
+            // Tasa: 3% diario aprox.
+            const gainPerSec = (state.totalInvestedUSDT * 0.03) / 86400;
+            state.accumulatedMining += gainPerSec;
+            
+            const displayHash = document.getElementById('mining-hash');
+            if (displayHash) {
+                // Mostramos en formato HASH (USDT * 1000)
+                displayHash.innerText = Math.floor(state.accumulatedMining * state.hashRate).toLocaleString();
+            }
         }
     }, 1000);
-}
-
-function initUserProfile() {
-    const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
-    if (user) {
-        const nameEl = document.getElementById('user-full-name');
-        const picEl = document.getElementById('user-pic');
-        if (nameEl) nameEl.innerText = `${user.first_name || ''} ${user.last_name || ''}`.trim();
-        if (picEl && user.photo_url) picEl.src = user.photo_url;
-    }
 }
 
 // --- 6. UTILIDADES ---
@@ -219,6 +232,8 @@ function initUserProfile() {
 window.copyLink = function() {
     const copyText = document.getElementById("ref-link");
     if (!copyText) return;
+    copyText.select();
+    copyText.setSelectionRange(0, 99999);
     navigator.clipboard.writeText(copyText.value);
     window.showToast("✅ Enlace copiado");
 };
@@ -229,7 +244,7 @@ window.showToast = function(message, type = "success") {
     const toast = document.createElement('div');
     toast.className = 'toast-notif';
     toast.innerText = message;
-    toast.style.cssText = `position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:${type==="success"?"#10b981":"#ef4444"}; color:white; padding:12px 24px; border-radius:50px; z-index:10000; font-weight:bold;`;
+    toast.style.cssText = `position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:${type==="success"?"#10b981":"#ef4444"}; color:white; padding:12px 24px; border-radius:50px; z-index:10000; font-weight:bold; box-shadow:0 4px 15px rgba(0,0,0,0.3);`;
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 3000);
 };
@@ -241,9 +256,11 @@ window.onload = () => {
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
     }
-    setTimeout(() => {
+    
+    // Pequeño delay para asegurar que el DOM esté listo
+    setTimeout(async () => {
         initUserProfile();
-        syncInitialData();
+        await syncInitialData();
         startMiningEngine();
-    }, 200);
+    }, 100);
 };
