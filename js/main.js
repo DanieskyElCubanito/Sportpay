@@ -78,20 +78,38 @@ async function syncInitialData() {
 }
 
 function updateDashboard() {
-    const mainBalEl = document.getElementById('main-balance');
+    // IDs nuevos para el balance dual
+    const hashEl = document.getElementById('main-balance-hash');
+    const usdtEl = document.getElementById('main-balance-usdt');
+    
+    // IDs existentes que ya tenías
     const speedEl = document.getElementById('mining-speed');
     const refEl = document.getElementById('ref-count');
     const idEl = document.getElementById('user-id');
     const refInput = document.getElementById('ref-link');
 
-    if (mainBalEl) mainBalEl.innerText = state.totalEarnedUSD.toFixed(2);
+    // 1. Actualización del Balance (Hash grande, USDT pequeño)
+    if (hashEl && usdtEl) {
+        const totalHash = Math.floor(state.totalEarnedUSD * 1000); // 100 USDT -> 100,000 HASH
+        hashEl.innerText = totalHash.toLocaleString(); 
+        usdtEl.innerText = state.totalEarnedUSD.toFixed(2);
+    }
+
+    // 2. Actualización de Estadísticas e ID
     if (refEl) refEl.innerText = state.referralCount;
     if (idEl) idEl.innerText = `ID: ${state.userId}`;
     
-    // Generar el enlace en el formato que te gustó (Direct App)
+    // 3. Velocidad de minería basada en la inversión real de Supabase
+    if (speedEl) {
+        const speed = (state.totalInvestedUSDT * 10).toFixed(1); // Ejemplo: 1 USDT = 10 GH/s
+        speedEl.innerText = `${speed} GH/s activos`;
+    }
+    
+    // 4. Generar el enlace de referido (Corregido el corte de texto)
     if (refInput && state.userId) {
         refInput.value = `https://t.me/DannyDevRobot/app?startapp=${state.userId}`;
     }
+}
 
     const l1 = document.getElementById('ref-L1');
     const l2 = document.getElementById('ref-L2');
