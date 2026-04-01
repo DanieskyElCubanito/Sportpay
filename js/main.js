@@ -82,7 +82,7 @@ function updateDashboard() {
     // Actualizar Enlace de Referido automático
     if (refInput && state.userId) {
         // Reemplaza 'TuBotNombre_bot' por el alias real de tu bot en BotFather
-        refInput.value = `https://t.me/CryptoDogeFarming_bot?start=${state.userId}`;
+        refInput.value = `https://t.me/DannyDevRobot?start=${state.userId}`;
     }
 
     // Actualizar contadores de niveles en el HTML
