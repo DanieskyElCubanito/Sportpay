@@ -6,6 +6,58 @@ const supabase = createClient(
   process.env.SUPABASE_ANON_KEY
 )
 
+// ... (Configuración de Supabase arriba)
+
+export default async function handler(req, res) {
+    const { user_id, invited_by } = req.query;
+
+    if (!user_id) return res.status(400).json({ error: "Falta ID" });
+
+    // 1. Intentar obtener el usuario
+    let { data: user, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('user_id', user_id)
+        .single();
+
+    // 2. SI EL USUARIO ES NUEVO (Aquí es donde se cuenta el referido)
+    if (!user && !error) {
+        // Creamos al usuario nuevo y le asignamos quién lo invitó
+        const { data: newUser, error: createError } = await supabase
+            .from('users')
+            .insert([{ 
+                user_id: user_id, 
+                balance: 0, 
+                invested: 0, 
+                referrals: 0,
+                invited_by: invited_by || null // Guardamos el ID del que invitó
+            }])
+            .select()
+            .single();
+
+        user = newUser;
+
+        // --- AQUÍ ESTÁ EL TRUCO PARA QUE CUENTE ---
+        if (invited_by && invited_by !== "" && invited_by !== user_id) {
+            // Buscamos al patrocinador y le sumamos +1 al contador de referrals
+            const { data: sponsor } = await supabase
+                .from('users')
+                .select('referrals')
+                .eq('user_id', invited_by)
+                .single();
+
+            if (sponsor) {
+                await supabase
+                    .from('users')
+                    .update({ referrals: (sponsor.referrals || 0) + 1 })
+                    .eq('user_id', invited_by);
+            }
+        }
+    }
+
+    return res.status(200).json(user);
+                    }
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
