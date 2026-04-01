@@ -45,20 +45,21 @@ async function syncInitialData() {
         const response = await fetch(`${API_URLS.user}?user_id=${state.userId}&invited_by=${startParam}`);
         const data = await response.json();
 
-        if (data && (data.user_id || data.status === "success")) {
-            state.totalEarnedUSD = parseFloat(data.balance || 0);
-            state.totalInvestedUSDT = parseFloat(data.invested || 0);
-            state.referralCount = data.referrals || 0;
-            
-            // Sincronizar niveles si la API los provee
-            state.refsL1 = data.refsL1 || 0;
-            state.refsL2 = data.refsL2 || 0;
-            state.refsL3 = data.refsL3 || 0;
-            state.refsL4 = data.refsL4 || 0;
-            state.refsL5 = data.refsL5 || 0;
+        // ... dentro de syncInitialData()
+if (data && (data.user_id || data.status === "success")) {
+    state.totalEarnedUSD = parseFloat(data.balance || 0);
+    state.totalInvestedUSDT = parseFloat(data.invested || 0);
+    state.referralCount = data.referrals || 0; // Este es el que marca "1" en tu captura
 
-            updateDashboard();
-        }
+    // ESTO ES LO QUE TE FALTA AÑADIR:
+    state.refsL1 = data.refsL1 || data.referrals || 0; // Si no hay desglose, usa el total en L1
+    state.refsL2 = data.refsL2 || 0;
+    state.refsL3 = data.refsL3 || 0;
+    state.refsL4 = data.refsL4 || 0;
+    state.refsL5 = data.refsL5 || 0;
+
+    updateDashboard();
+}
     } catch (e) {
         console.error("Error sincronizando con la API de Vercel:", e);
         const urlParams = new URLSearchParams(window.location.search);
