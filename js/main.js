@@ -125,12 +125,14 @@ function updateDashboard() {
         refInput.value = `https://t.me/DannyDevRobot/app?startapp=${state.userId}`;
     }
 
-    // 4. Velocidad Visual (GH/s)
+    // 5. Actualizar velocidad visual (GH/s)
     if (speedEl) {
-        const currentGHS = (state.totalInvestedUSDT || 0) * 10; // Ajusta multiplicador según desees
-        speedEl.innerText = `${currentGHS.toLocaleString()} GH/s activos`;
-    }
-}
+        // Si 100 USDT deben ser 100,000 GH/s, el multiplicador es 1000
+        const currentGHS = Math.floor((state.totalInvestedUSDT || 0) * 1000);
+        
+        // Aplicamos tu nueva regla: sin puntos ni comas si es entero
+        speedEl.innerText = `${currentGHS} GH/s activos`;
+                                                                    }
 
 // --- 4. ACCIONES (REINVERTIR Y RECLAMAR) ---
 
