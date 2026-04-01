@@ -105,7 +105,7 @@ function updateDashboard() {
         // Conversión: 1 USDT = 1000 HASH
         const totalHash = Math.floor(state.totalEarnedUSD * 1000);
         // .toLocaleString('de-DE') añade el punto de mil (100.000)
-        hashEl.innerText = totalHash.toLocaleString('de-DE');
+        hashEl.innerText = totalHash; //toLocaleString('de-DE');
     }
     if (usdtEl) {
         // Muestra el valor original de Supabase con 2 decimales
