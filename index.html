@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <link rel="stylesheet" href="src/styles/theme.css">
-    
+
     <style>
         /* Estilos en cascada para la ambientación Cyberpunk del Futuro */
         .neon-glow-card {
@@ -19,7 +19,7 @@
             border: 1px solid rgba(0, 136, 204, 0.3) !important;
             box-shadow: 0 0 15px rgba(0, 136, 204, 0.15);
         }
-        
+
         /* Núcleo de Energía Giratorio Animado */
         .quantum-loader {
             width: 80px; height: 80px;
@@ -33,7 +33,7 @@
             box-shadow: 0 0 20px rgba(0, 136, 204, 0.4);
             flex-shrink: 0;
         }
-        
+
         @keyframes spinCore {
             0% { transform: rotate(0deg); box-shadow: 0 0 15px rgba(0, 136, 204, 0.3); }
             50% { transform: rotate(180deg); box-shadow: 0 0 25px rgba(16, 185, 129, 0.5); }
@@ -137,30 +137,22 @@
 <body>
 
 <div class="app-shell">
-    
-    <!-- HEADER PERFIL DE USUARIO -->
-    <div class="header-profile" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05);">
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <div style="position: relative; width: 50px; height: 50px;">
-                <img id="user-pic" src="https://ui-avatars.com/api/?name=User&background=0088cc&color=fff" style="width: 100%; height: 100%; border-radius: 14px; border: 2px solid rgba(0,136,204,0.3); object-fit: cover; display: block;">
-                <span style="position: absolute; bottom: -2px; right: -2px; width: 12px; height: 12px; background: #10b981; border: 2px solid #05070a; border-radius: 50%;"></span>
+
+    <div class="header-profile" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; background: rgba(255,255,255,0.02); padding: 8px 12px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.05);">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="position: relative; width: 38px; height: 38px;">
+                <img id="user-pic" src="https://ui-avatars.com/api/?name=User&background=0088cc&color=fff" style="width: 100%; height: 100%; border-radius: 10px; border: 1.5px solid rgba(0,136,204,0.3); object-fit: cover; display: block;">
+                <span style="position: absolute; bottom: -2px; right: -2px; width: 10px; height: 10px; background: #10b981; border: 2px solid #05070a; border-radius: 50%;"></span>
             </div>
             <div style="display: flex; flex-direction: column; justify-content: center;">
-                <h2 id="user-full-name" style="margin: 0; font-size: 1.1rem; font-weight: 800; color: #fff; line-height: 1.2;">Cargando...</h2>
-                <span id="user-id" style="font-size: 0.75rem; color: var(--blue-tg); font-weight: 700; margin-top: 2px; font-family: monospace;">ID: 0000000000</span>
+                <h2 id="user-full-name" style="margin: 0; font-size: 0.95rem; font-weight: 800; color: #fff; line-height: 1.1;">Cargando...</h2>
+                <span id="user-id" style="font-size: 0.65rem; color: var(--blue-tg); font-weight: 700; margin-top: 2px; font-family: monospace;">ID: 0000000000</span>
             </div>
-        </div>
-        <!-- Racha Diaria -->
-        <div style="text-align: right; background: rgba(245, 158, 11, 0.1); padding: 6px 12px; border-radius: 12px; border: 1px solid rgba(245, 158, 11, 0.3);">
-            <div style="font-size: 0.55rem; color: #f59e0b; font-weight: 800; letter-spacing: 0.5px;">RACHA IA</div>
-            <div style="font-size: 0.85rem; color: #fff; font-weight: 800;"><i class="fa-solid fa-fire" style="color: #f59e0b; margin-right: 2px;"></i> 3 Días</div>
         </div>
     </div>
 
-    <!-- VISTA 1: DASHBOARD / HOME -->
     <section id="dashboard" class="view active">
-        
-        <!-- Tarjeta de Balance con Estilo Holográfico -->
+
         <div class="main-card neon-glow-card" style="background: linear-gradient(180deg, rgba(0,136,204,0.18) 0%, rgba(13,17,28,0.9) 100%);">
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div class="balance-label" style="font-size: 0.65rem; opacity: 0.8;">BÓVEDA DE RECURSOS DIGITALES</div>
@@ -176,7 +168,6 @@
                 <span style="font-size: 0.9rem; color: #94a3b8; font-weight: 400; margin-left: auto;">≈ <span id="main-balance-usdt" style="color: #fff; font-weight: 700;">0.00</span> <small style="color: #10b981; font-weight: 700; font-size: 0.65rem;">USDT</small></span>
             </div>
 
-            <!-- Acciones Rápidas -->
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 20px;">
                 <button class="btn-action btn-blue" onclick="switchTab('planes')" style="flex-direction: column; padding: 12px 5px; font-size: 0.75rem; height: 68px; border-radius: 16px;">
                     <i class="fa-solid fa-bolt" style="margin-bottom: 4px; font-size: 1.1rem;"></i> Invertir
@@ -195,7 +186,6 @@
             </div>
         </div>
 
-        <!-- SECCIÓN CUÁNTICA INTERACTIVA: MINERÍA ACTIVA -->
         <div class="main-card" style="background: rgba(13, 17, 28, 0.7); border: 1px solid rgba(255,255,255,0.05); padding: 20px; border-radius: 24px;">
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 15px;">
                 <div style="flex: 1;">
@@ -208,14 +198,12 @@
                         <i class="fa-solid fa-microchip"></i> 0.0 GH/s núcleos asignados
                     </div>
                 </div>
-                
-                <!-- El núcleo futurista dinámico -->
+
                 <div class="quantum-loader">
                     <i class="fa-solid fa-atom" style="font-size: 1.8rem; color: #0088cc;"></i>
                 </div>
             </div>
 
-            <!-- Telemetría en tiempo real -->
             <div style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed rgba(255,255,255,0.08); display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                 <div>
                     <div style="display: flex; justify-content: space-between; font-size: 0.6rem; color: #848da0; font-weight: bold;">
@@ -237,19 +225,9 @@
                 <i class="fa-solid fa-hand-holding-dollar"></i> RECLAMAR RECOMPENSAS IA
             </button>
         </div>
-        
-        <!-- EVENTO COMUNITARIO -->
-        <div class="main-card" style="background: linear-gradient(90deg, rgba(245,158,11,0.1) 0%, rgba(5,7,10,0.4) 100%); border: 1px dashed rgba(245,158,11,0.4); border-radius: 18px; padding: 15px; display: flex; align-items: center; gap: 12px;">
-            <i class="fa-solid fa-bullhorn" style="font-size: 1.4rem; color: #f59e0b;"></i>
-            <div style="flex: 1;">
-                <div style="font-size: 0.75rem; font-weight: 800; color: #fff;">EVENTO GLOBAL ACTIVO</div>
-                <div style="font-size: 0.65rem; color: #94a3b8; margin-top: 2px;">¡Duplica tu velocidad de extracción activando cualquier Nodo en las próximas 24 horas!</div>
-            </div>
-        </div>
-        
+
     </section>
 
-    <!-- VISTA 2: PLANES / INVERSIÓN -->
     <section id="planes" class="view">
         <h2 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 20px; color: #fff;"><i class="fa-solid fa-server" style="color: var(--blue-tg); margin-right: 6px;"></i>Contratar Potencia Dedicada</h2>
 
@@ -279,7 +257,7 @@
 
         <div class="main-card neon-glow-card" style="text-align: center; padding: 25px;">
             <div class="balance-label" style="margin-bottom: 12px; font-size: 0.7rem; letter-spacing: 1.5px;">INYECTAR LIQUIDEZ REQUERIDA (USDT)</div>
-            
+
             <input type="number" id="invest-amount" placeholder="0.00" oninput="calculateROI()">
 
             <div style="background: rgba(5, 7, 10, 0.7); border-radius: 18px; padding: 20px; border: 1px solid rgba(255,255,255,0.06); text-align: left;">
@@ -296,14 +274,13 @@
                     <span id="calc-tier" style="font-weight: 800; color: #f59e0b; letter-spacing: 1px;">---</span>
                 </div>
             </div>
-            
+
             <button class="btn-action btn-blue" style="width: 100%; margin-top: 20px; height: 55px; border-radius: 16px; font-weight: 800; font-size: 0.95rem; letter-spacing: 0.5px;" onclick="openPayModal()">
                 <i class="fa-solid fa-satellite-dish"></i> PROPAGAR INTERCONEXIÓN
             </button>
         </div>
     </section>
 
-    <!-- VISTA 3: RED MULTINIVEL -->
     <section id="red" class="view">
         <h2 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 20px; color: #fff;"><i class="fa-solid fa-network-wired" style="color: var(--blue-tg); margin-right: 6px;"></i>Arquitectura Distribuidor</h2>
 
@@ -344,10 +321,9 @@
         </div>
     </section>
 
-    <!-- VISTA 4: MISIONES -->
     <section id="misiones" class="view">
         <h2 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 20px; color: #fff;"><i class="fa-solid fa-gift" style="color: #10b981; margin-right: 6px;"></i>Incentivos de Expansión</h2>
-        
+
         <div class="main-card" style="display: flex; align-items: center; gap: 15px; background: rgba(13,17,28,0.7); border-radius: 18px; padding: 15px;">
             <div style="width: 45px; height: 45px; background: rgba(29, 161, 242, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                 <i class="fa-brands fa-twitter" style="font-size: 1.3rem; color: #1da1f2;"></i>
@@ -371,19 +347,16 @@
         </div>
     </section>
 
-    <!-- VISTA 5: HISTORIAL -->
     <section id="history" class="view">
         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
             <i class="fa-solid fa-arrow-left" onclick="switchTab('dashboard')" style="cursor: pointer; color: var(--blue-tg);"></i>
             <h2 style="font-size: 1.4rem; font-weight: 800; margin: 0; color: #fff;">Registros de Ledger</h2>
         </div>
         <div id="history-list">
-            <!-- Inyección de transacciones dinámica -->
-        </div>
+            </div>
     </section>
 </div>
 
-<!-- MENÚ DE NAVEGACIÓN INFERIOR TOTALMENTE RECONSTRUIDO Y PROTEGIDO -->
 <nav class="fixed-nav-bar">
     <button class="fixed-nav-btn active" onclick="switchTab('dashboard', this)">
         <i class="fa-solid fa-terminal"></i>
@@ -403,7 +376,6 @@
     </button>
 </nav>
 
-<!-- MODAL PASARELA DE PAGOS -->
 <div id="payModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(3,5,8,0.95); z-index:10000; justify-content:center; align-items:center; padding:20px; backdrop-filter:blur(8px);">
     <div class="main-card neon-glow-card" style="width:100%; max-width:350px; text-align:center; padding:25px;">
         <h3 style="margin-bottom: 15px; color: #fff; font-weight: 800; font-size: 1.2rem;">Canalizar Depósito</h3>
@@ -420,14 +392,14 @@
     window.switchTab = function(tabId, button) {
         // 1. Ocultar todas las vistas
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        
+
         // 2. Mostrar la vista seleccionada
         const targetView = document.getElementById(tabId);
         if(targetView) targetView.classList.add('active');
 
         // 3. Quitar el estado activo de todos los botones de la barra inferior
         document.querySelectorAll('.fixed-nav-btn').forEach(b => b.classList.remove('active'));
-        
+
         // 4. Activar el botón correcto
         if(button) {
             button.classList.add('active');
