@@ -415,11 +415,20 @@
     </div>
 </div>
 
-<!-- ÚNICO PUNTO DE ENTRADA -->
+<!-- ÚNICO PUNTO DE ENTRADA CORREGIDO -->
 <script type="module">
-    // Aseguramos la visibilidad global de las funciones necesarias para evitar errores de módulos
     import { switchTab, calculateROI, openPayModal, claimMining, copyLink, copyAddress } from './src/main.js';
-    window.switchTab = switchTab;
+    
+    // Forzar lectura global
+    window.switchTab = switchTab || function(tabId, button) {
+        // Alternativa de emergencia si tu main.js no exporta la función directamente
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        const targetView = document.getElementById(tabId);
+        if(targetView) targetView.classList.add('active');
+        
+        document.querySelectorAll('.fixed-nav-btn').forEach(b => b.classList.remove('active'));
+        if(button) button.classList.add('active');
+    };
     window.calculateROI = calculateROI;
     window.openPayModal = openPayModal;
     window.claimMining = claimMining;
