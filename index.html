@@ -415,22 +415,44 @@
     </div>
 </div>
 
-<!-- ÚNICO PUNTO DE ENTRADA CORREGIDO -->
-<script type="module">
-    import { switchTab, calculateROI, openPayModal, claimMining, copyLink, copyAddress } from './src/main.js';
-    
-    // Forzar lectura global
-    window.switchTab = switchTab || function(tabId, button) {
-        // Alternativa de emergencia si tu main.js no exporta la función directamente
+<script>
+    // Sistema de navegación blindado
+    window.switchTab = function(tabId, button) {
+        // 1. Ocultar todas las vistas
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        
+        // 2. Mostrar la vista seleccionada
         const targetView = document.getElementById(tabId);
         if(targetView) targetView.classList.add('active');
-        
+
+        // 3. Quitar el estado activo de todos los botones de la barra inferior
         document.querySelectorAll('.fixed-nav-btn').forEach(b => b.classList.remove('active'));
-        if(button) button.classList.add('active');
+        
+        // 4. Activar el botón correcto
+        if(button) {
+            button.classList.add('active');
+        } else {
+            // Si el cambio de pestaña se hizo desde otro lado (ej. un botón en el dashboard)
+            const navBtn = document.querySelector(`.fixed-nav-btn[onclick*="${tabId}"]`);
+            if(navBtn) navBtn.classList.add('active');
+        }
     };
+
+    // Funciones básicas para que el Modal funcione sin depender de main.js
+    window.openPayModal = function() { 
+        document.getElementById('payModal').style.display = 'flex'; 
+    };
+    window.closePayModal = function() { 
+        document.getElementById('payModal').style.display = 'none'; 
+    };
+</script>
+
+<script type="module">
+    // Aquí importas solo las funciones de lógica dura
+    import { calculateROI, claimMining, copyLink, copyAddress } from './src/main.js';
+
+    // Se las asignas a window para que los botones en el HTML las encuentren
     window.calculateROI = calculateROI;
-    window.openPayModal = openPayModal;
     window.claimMining = claimMining;
     window.copyLink = copyLink;
     window.copyAddress = copyAddress;
